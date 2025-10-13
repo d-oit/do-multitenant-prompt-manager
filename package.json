@@ -14,6 +14,7 @@
     "lint": "npm run lint --workspace prompt-manager-worker && npm run lint --workspace frontend",
     "lint:fix": "npm run lint:fix --workspace prompt-manager-worker && npm run lint:fix --workspace frontend",
     "format": "prettier --check .",
+    "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint-staged": "lint-staged",
     "test": "npm run test --workspace prompt-manager-worker && npm run test --workspace frontend",
