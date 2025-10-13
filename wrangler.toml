@@ -1,0 +1,14 @@
+name = "prompt-manager-api"
+main = "worker/src/index.ts"
+compatibility_date = "2024-10-10"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "prompt_manager"
+database_id = "<YOUR_D1_DATABASE_ID>"
+migrations_dir = "worker/migrations"
+
+[[kv_namespaces]]
+binding = "PROMPT_CACHE"
+id = "<YOUR_KV_NAMESPACE_ID>"

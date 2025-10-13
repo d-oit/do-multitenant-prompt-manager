@@ -1,0 +1,49 @@
+{
+  "name": "prompt-manager",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "workspaces": [
+    "frontend",
+    "worker"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:worker": "npm run dev --workspace prompt-manager-worker",
+    "build:frontend": "npm run build --workspace frontend",
+    "lint": "npm run lint --workspace prompt-manager-worker && npm run lint --workspace frontend",
+    "lint:fix": "npm run lint:fix --workspace prompt-manager-worker && npm run lint:fix --workspace frontend",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint-staged": "lint-staged",
+    "test": "npm run test --workspace prompt-manager-worker && npm run test --workspace frontend",
+    "test:worker": "npm run test --workspace prompt-manager-worker",
+    "test:frontend": "npm run test --workspace frontend",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "deploy:worker": "npm run deploy --workspace prompt-manager-worker",
+    "deploy:pages": "node scripts/deploy-pages.mjs",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-vitest": "^0.5.4",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3"
+  },
+  "dependencies": {
+    "prompt-manager": "file:",
+    "sharp": "^0.34.4"
+  }
+}

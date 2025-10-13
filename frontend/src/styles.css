@@ -1,0 +1,317 @@
+@import "./design-system/base.css";
+@import "./styles/animations.css";
+
+.pm-app-shell__meta {
+  margin: 0;
+  font-size: var(--pm-font-size-sm);
+  color: var(--pm-color-accent);
+  word-break: break-word;
+}
+
+.pm-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pm-spacing-6);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.pm-toolbar > *:first-child {
+  flex: 1 1 320px;
+}
+
+.pm-toolbar > .pm-pill-group {
+  flex-shrink: 0;
+}
+
+.pm-pill-group__item {
+  font-size: var(--pm-font-size-sm);
+}
+
+.filters-card .pm-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-4);
+}
+
+.filters-grid {
+  display: grid;
+  gap: var(--pm-spacing-4);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.filters-grid--secondary {
+  align-items: end;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.filters-actions {
+  display: inline-flex;
+  gap: var(--pm-spacing-2);
+  align-items: center;
+}
+
+.filters-order {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-2);
+}
+
+.filters-order button {
+  align-self: flex-start;
+}
+
+.prompt-table .pm-table {
+  min-width: 58rem;
+}
+
+.prompt-table__title {
+  display: flex;
+  align-items: center;
+  gap: var(--pm-spacing-2);
+}
+
+.prompt-table__details summary {
+  cursor: pointer;
+  color: var(--pm-color-accent);
+}
+
+.prompt-table__details pre {
+  margin-top: var(--pm-spacing-2);
+  background: var(--pm-color-surface-alt);
+  border-radius: var(--pm-radius-md);
+  padding: var(--pm-spacing-3);
+  border: 1px solid var(--pm-color-border);
+  max-height: 18rem;
+  overflow: auto;
+  font-family: var(--pm-font-family-mono);
+  font-size: var(--pm-font-size-xs);
+}
+
+.prompt-table__metadata {
+  background: var(--pm-color-surface-alt);
+  border-radius: var(--pm-radius-md);
+  padding: var(--pm-spacing-3);
+  border: 1px solid var(--pm-color-border);
+  max-width: 18rem;
+  overflow: auto;
+  font-family: var(--pm-font-family-mono);
+  font-size: var(--pm-font-size-xs);
+}
+
+.prompt-table__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pm-spacing-2);
+}
+
+.prompt-table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pm-spacing-2);
+}
+
+.prompt-table__sort {
+  justify-content: space-between;
+  width: 100%;
+  font-size: var(--pm-font-size-xs);
+}
+
+.prompt-table__sort--active {
+  color: var(--pm-color-accent);
+}
+
+.prompt-table__sort-indicator {
+  font-family: var(--pm-font-family-mono);
+}
+
+.pm-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pm-spacing-4);
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--pm-color-border);
+  border-radius: var(--pm-radius-xl);
+  padding: var(--pm-spacing-3) var(--pm-spacing-4);
+  background: var(--pm-color-surface);
+}
+
+.pm-pagination span {
+  font-size: var(--pm-font-size-sm);
+  color: var(--pm-color-text-muted);
+}
+
+.prompt-detail .pm-card__content {
+  gap: var(--pm-spacing-4);
+}
+
+.prompt-detail__actions {
+  display: flex;
+  gap: var(--pm-spacing-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.prompt-detail__grid {
+  display: grid;
+  gap: var(--pm-spacing-3);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.prompt-detail__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pm-spacing-2);
+}
+
+.prompt-detail__metadata,
+.prompt-detail__metadata-small {
+  background: var(--pm-color-surface-alt);
+  border-radius: var(--pm-radius-md);
+  padding: var(--pm-spacing-3);
+  border: 1px solid var(--pm-color-border);
+  font-family: var(--pm-font-family-mono);
+  font-size: var(--pm-font-size-xs);
+  overflow: auto;
+}
+
+.prompt-detail__metadata {
+  max-height: 18rem;
+}
+
+.prompt-detail__metadata-small {
+  margin-top: var(--pm-spacing-2);
+}
+
+.prompt-detail__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-2);
+}
+
+.prompt-detail__subheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.prompt-detail__versions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-3);
+}
+
+.prompt-detail__versions li {
+  padding: var(--pm-spacing-3);
+  border: 1px solid var(--pm-color-border);
+  border-radius: var(--pm-radius-lg);
+  background: var(--pm-color-surface-alt);
+}
+
+.analytics-panel .pm-card__content {
+  gap: var(--pm-spacing-4);
+}
+
+.analytics-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pm-spacing-3);
+  align-items: flex-end;
+}
+
+.analytics-panel .pm-table {
+  min-width: 40rem;
+}
+
+.tenant-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-3);
+}
+
+.tenant-selector details {
+  border: 1px dashed var(--pm-color-border);
+  border-radius: var(--pm-radius-lg);
+  padding: var(--pm-spacing-3);
+  background: var(--pm-color-surface-alt);
+}
+
+.tenant-selector summary {
+  cursor: pointer;
+  font-size: var(--pm-font-size-sm);
+  color: var(--pm-color-accent);
+}
+
+.tenant-create-actions {
+  display: flex;
+  gap: var(--pm-spacing-2);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.pm-alert + .pm-alert {
+  margin-top: var(--pm-spacing-3);
+}
+
+@media (max-width: 900px) {
+  .pm-toolbar {
+    gap: var(--pm-spacing-4);
+  }
+
+  .filters-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .pm-pagination {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--pm-spacing-3);
+  }
+
+  .pm-pagination button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .pm-toolbar {
+    flex-direction: column;
+  }
+
+  .pm-pill-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filters-grid,
+  .filters-grid--secondary {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .prompt-detail__actions {
+    justify-content: flex-start;
+  }
+
+  .pm-grid--content {
+    grid-template-columns: 1fr;
+  }
+
+  .prompt-table .pm-table {
+    min-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prompt-table__details summary {
+    transition: none;
+  }
+}

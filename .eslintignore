@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.wrangler/
+.husky/
+scripts/deploy-pages.mjs
+frontend/dist/
+worker/.wrangler/
