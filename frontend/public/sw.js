@@ -162,7 +162,7 @@ self.addEventListener("push", (event) => {
   console.log("[SW] Push notification received:", event);
 
   const data = event.data ? event.data.json() : {};
-  const title = data.title || "DO Multi-Tenant Prompt Manager";
+  const title = data.title || "d.o. Prompt Manager";
   const options = {
     body: data.body || "You have a new notification",
     icon: "/icon-192.png",

@@ -2,7 +2,7 @@ export function getOpenAPIDocument(): Record<string, unknown> {
   return {
     openapi: "3.0.3",
     info: {
-      title: "DO Multi-Tenant Prompt Manager API",
+      title: "d.o. Prompt Manager API",
       version: "1.0.0",
       description:
         "REST API for managing prompt templates, analytics, and tenant resources in a multi-tenant environment. The API supports versioning via URL prefix (/v1/) or Accept-Version header."

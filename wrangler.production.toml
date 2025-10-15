@@ -18,3 +18,7 @@ migrations_dir = "worker/migrations"
 [[env.production.kv_namespaces]]
 binding = "PROMPT_CACHE"
 id = "31752b95b8c0430598fa265d83877579"
+
+# Production environment variables
+[env.production.vars]
+ALLOWED_ORIGINS = "https://do-multitenant-prompt-manager-production.your-domain.com"

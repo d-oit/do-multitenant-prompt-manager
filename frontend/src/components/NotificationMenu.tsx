@@ -4,11 +4,7 @@ import Badge from "./ui/Badge";
 import { fetchNotifications, markNotificationRead } from "../lib/api";
 import type { NotificationItem } from "../types";
 
-interface NotificationMenuProps {
-  token: string;
-}
-
-export default function NotificationMenu({ token }: NotificationMenuProps): JSX.Element {
+export default function NotificationMenu(): JSX.Element {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -17,14 +13,14 @@ export default function NotificationMenu({ token }: NotificationMenuProps): JSX.
   const loadNotifications = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await fetchNotifications(token || undefined);
+      const data = await fetchNotifications();
       setNotifications(data);
     } catch (error) {
       console.error("Failed to load notifications", error);
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     void loadNotifications();
@@ -52,7 +48,7 @@ export default function NotificationMenu({ token }: NotificationMenuProps): JSX.
 
   async function handleMarkRead(id: string) {
     try {
-      await markNotificationRead(id, token || undefined);
+      await markNotificationRead(id);
       await loadNotifications();
     } catch (error) {
       console.error("Failed to mark notification read", error);

@@ -6,9 +6,7 @@ test.describe("App shell", () => {
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1000);
 
-    await expect(
-      page.getByRole("heading", { name: /DO Multi-Tenant Prompt Manager/i })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: /d.o. Prompt Manager/i })).toBeVisible();
 
     // Test navigation
     await page.getByRole("button", { name: "Prompts" }).first().click();

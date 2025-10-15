@@ -19,10 +19,9 @@ import Badge from "../components/ui/Badge";
 
 interface DashboardPageProps {
   tenantId: string;
-  token?: string;
 }
 
-export default function DashboardPage({ tenantId, token }: DashboardPageProps): JSX.Element {
+export default function DashboardPage({ tenantId }: DashboardPageProps): JSX.Element {
   const [overview, setOverview] = useState<DashboardOverviewResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +32,7 @@ export default function DashboardPage({ tenantId, token }: DashboardPageProps): 
     setLoading(true);
     setError(null);
 
-    fetchDashboardOverview(tenantId, 14, token || undefined)
+    fetchDashboardOverview(tenantId, 14)
       .then((data) => {
         if (cancelled) return;
         setOverview(data);
@@ -50,7 +49,7 @@ export default function DashboardPage({ tenantId, token }: DashboardPageProps): 
     return () => {
       cancelled = true;
     };
-  }, [tenantId, token, reloadKey]);
+  }, [tenantId, reloadKey]);
 
   const formatMetric = (metric: DashboardMetric) => {
     const delta =

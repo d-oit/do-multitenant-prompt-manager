@@ -10,4 +10,5 @@ export interface Env {
   ACCESS_TOKEN_TTL_SECONDS?: string;
   REFRESH_TOKEN_TTL_SECONDS?: string;
   E2E_TEST_MODE?: string;
+  ALLOWED_ORIGINS?: string;
 }

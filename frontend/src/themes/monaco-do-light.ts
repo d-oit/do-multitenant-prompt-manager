@@ -1,6 +1,6 @@
 /**
  * Monaco Editor Theme: "do-light"
- * Professional light theme for DO Multi-Tenant Prompt Manager
+ * Professional light theme for d.o. Prompt Manager
  * Based on VS Code Light+ with custom color palette
  *
  * Color tokens synchronized with design-system/tokens.css

@@ -12,3 +12,7 @@ migrations_dir = "worker/migrations"
 [[kv_namespaces]]
 binding = "PROMPT_CACHE"
 id = "2aa521329da2494eafe5cd08b866281d"
+
+# Development environment variables
+[vars]
+ALLOWED_ORIGINS = "http://localhost:5173,http://localhost:4173"

@@ -51,6 +51,7 @@
   justify-content: center;
   color: var(--color-text-secondary);
   flex-shrink: 0;
+  font-size: 1.125rem;
 }
 
 .theme-switcher__trigger-label {
@@ -199,10 +200,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: auto;
+  min-width: 28px;
+  height: auto;
   flex-shrink: 0;
   color: var(--color-text-secondary);
+  font-size: 1.125rem;
 }
 
 .theme-switcher__option--active .theme-switcher__option-icon {
@@ -303,8 +306,10 @@
   }
 
   .theme-switcher__option-icon {
-    width: 22px;
-    height: 22px;
+    width: auto;
+    min-width: 22px;
+    height: auto;
+    font-size: 1rem;
   }
 
   .theme-switcher__option-label {

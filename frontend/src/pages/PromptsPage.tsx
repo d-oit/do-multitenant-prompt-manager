@@ -21,7 +21,6 @@ interface ToastApi {
 
 interface PromptsPageProps {
   tenantId: string;
-  token: string;
   toast: ToastApi;
   createSignal: number;
 }
@@ -30,7 +29,6 @@ const PAGE_SIZE = 20;
 
 export default function PromptsPage({
   tenantId,
-  token,
   toast,
   createSignal
 }: PromptsPageProps): JSX.Element {
@@ -85,20 +83,17 @@ export default function PromptsPage({
       setLoading(true);
       setError(null);
       try {
-        const response = await listPrompts(
-          {
-            tenantId,
-            search: debouncedSearch || undefined,
-            tag: undefined,
-            metadataKey: undefined,
-            metadataValue: undefined,
-            sortBy,
-            order,
-            page,
-            pageSize: PAGE_SIZE
-          },
-          token || undefined
-        );
+        const response = await listPrompts({
+          tenantId,
+          search: debouncedSearch || undefined,
+          tag: undefined,
+          metadataKey: undefined,
+          metadataValue: undefined,
+          sortBy,
+          order,
+          page,
+          pageSize: PAGE_SIZE
+        });
 
         if (cancelled) return;
 
@@ -123,7 +118,7 @@ export default function PromptsPage({
     return () => {
       cancelled = true;
     };
-  }, [tenantId, sortBy, order, page, debouncedSearch, filters, token, reloadKey, showError]);
+  }, [tenantId, sortBy, order, page, debouncedSearch, filters, reloadKey, showError]);
 
   const handleSort = (field: SortField) => {
     setPage(1);
@@ -158,10 +153,10 @@ export default function PromptsPage({
     setFormBusy(true);
     try {
       if (editingPrompt) {
-        await updatePrompt(editingPrompt.id, values, tenantId, token || undefined);
+        await updatePrompt(editingPrompt.id, values, tenantId);
         showSuccess("Prompt updated");
       } else {
-        await createPrompt(values, token || undefined);
+        await createPrompt(values);
         showSuccess("Prompt created");
       }
       setIsFormOpen(false);
@@ -181,7 +176,7 @@ export default function PromptsPage({
   const handleConfirmDelete = async () => {
     if (!deletingPrompt) return;
     try {
-      await deletePrompt(deletingPrompt.id, tenantId, token || undefined);
+      await deletePrompt(deletingPrompt.id, tenantId);
       showWarning(`Prompt “${deletingPrompt.title}” deleted`);
       setDeletingPrompt(null);
       setReloadKey((count) => count + 1);
@@ -318,12 +313,7 @@ export default function PromptsPage({
         size="xl"
       >
         {detailPrompt ? (
-          <PromptCollaborationPanel
-            prompt={detailPrompt}
-            tenantId={tenantId}
-            token={token}
-            toast={toast}
-          />
+          <PromptCollaborationPanel prompt={detailPrompt} tenantId={tenantId} toast={toast} />
         ) : null}
       </Modal>
     </div>
