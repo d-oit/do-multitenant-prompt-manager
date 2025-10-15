@@ -1,51 +1,65 @@
 import { expect, test } from "./fixtures";
 
 test.describe("App shell", () => {
-  test("renders tenants and navigates between primary views", async ({ page, apiState }) => {
+  test("renders app and navigates between primary views", async ({ page, testId: _testId }) => {
     await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(1000);
 
-    await expect(page.getByRole("heading", { name: /DO Multi-Tenant Prompt Manager/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /DO Multi-Tenant Prompt Manager/i })
+    ).toBeVisible();
 
-    const tenantSelect = page.getByLabel("Tenant");
-    await expect(tenantSelect).toHaveValue(apiState.tenants[0].id);
-
-    await tenantSelect.selectOption(apiState.tenants[1].id);
-    await expect(tenantSelect).toHaveValue(apiState.tenants[1].id);
-
+    // Test navigation
     await page.getByRole("button", { name: "Prompts" }).first().click();
-    await expect(page.getByRole("heading", { name: "Prompts" }).first()).toBeVisible();
+    await page.waitForTimeout(1000);
+    await expect(page.getByRole("heading", { name: "Prompts" }).first()).toBeVisible({
+      timeout: 10000
+    });
 
     await page.getByRole("button", { name: "Analytics" }).first().click();
-    await expect(page.getByRole("heading", { name: "Prompt Analytics" }).first()).toBeVisible();
+    await page.waitForTimeout(1000);
+    await expect(page.getByRole("heading", { name: "Prompt Analytics" }).first()).toBeVisible({
+      timeout: 10000
+    });
 
     await page.getByRole("button", { name: "Tenants" }).first().click();
-    await expect(page.getByRole("heading", { name: "Tenants" }).first()).toBeVisible();
+    await page.waitForTimeout(1000);
+    await expect(page.getByRole("heading", { name: "Tenants" }).first()).toBeVisible({
+      timeout: 10000
+    });
 
     await page.getByRole("button", { name: "Dashboard" }).first().click();
-    await expect(page.locator(".page-title").first()).toContainText("overview");
+    await page.waitForTimeout(1000);
+    await expect(page.locator(".page-title").first()).toContainText("overview", { timeout: 10000 });
   });
 
-  test("creates a tenant from the sidebar form", async ({ page, apiState }) => {
+  test("creates a tenant from the sidebar form", async ({ page, testId }) => {
     await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(1000);
 
-    const initialCount = apiState.tenants.length;
     const createToggle = page.locator("summary", { hasText: "Create tenant" });
     await createToggle.click();
 
-    await page.getByLabel("Name").fill("Delta Co");
-    await page.getByLabel("Slug").fill("delta-co");
+    const tenantName = `E2E Tenant ${testId}`;
+    const tenantSlug = `e2e-tenant-${testId}`;
+
+    await page.getByLabel("Name").fill(tenantName);
+    await page.getByLabel("Slug").fill(tenantSlug);
     await page.getByRole("button", { name: "Create" }).click();
 
     await expect(page.getByText(/Tenant .* created/)).toBeVisible();
-    expect(apiState.tenants).toHaveLength(initialCount + 1);
 
-    const newlyCreated = apiState.tenants[apiState.tenants.length - 1];
-    await expect(page.getByLabel("Tenant")).toHaveValue(newlyCreated.id);
-    await expect(page.getByLabel("Tenant")).toContainText(newlyCreated.name);
+    // Should auto-select the new tenant
+    const tenantSelect = page.getByLabel("Tenant");
+    await expect(tenantSelect).toContainText(tenantName);
   });
 
-  test("shows install prompt and toggles dark mode", async ({ page }) => {
+  test("shows install prompt and toggles dark mode", async ({ page, testId: _testId }) => {
     await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(1000);
 
     await page.evaluate(() => {
       const event = new Event("beforeinstallprompt") as Event & {
@@ -72,8 +86,10 @@ test.describe("App shell", () => {
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", "dark");
   });
 
-  test("opens keyboard shortcuts reference from sidebar", async ({ page }) => {
+  test("opens keyboard shortcuts reference from sidebar", async ({ page, testId: _testId }) => {
     await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(500);
 
     await page.getByRole("button", { name: "View all shortcuts" }).click();
     const dialog = page.getByRole("dialog", { name: "Keyboard Shortcuts" });

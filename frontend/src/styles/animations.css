@@ -1,33 +1,33 @@
-/* Animation Utilities - Prompt Manager */
+/* Animation Utilities - Prompt Manager - Enhanced with Award-Winning Microinteractions */
 
 /* ============================================
-   PAGE TRANSITIONS
+   PAGE TRANSITIONS - Smooth and Delightful
    ============================================ */
 
 .page-enter {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(20px) scale(0.98);
 }
 
 .page-enter-active {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   transition:
-    opacity 300ms ease-out,
-    transform 300ms ease-out;
+    opacity 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .page-exit {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .page-exit-active {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(-20px) scale(0.98);
   transition:
-    opacity 200ms ease-in,
-    transform 200ms ease-in;
+    opacity 250ms cubic-bezier(0.4, 0, 1, 1),
+    transform 250ms cubic-bezier(0.4, 0, 1, 1);
 }
 
 /* ============================================
@@ -359,6 +359,250 @@
   to {
     stroke-dashoffset: 0;
   }
+}
+
+/* ============================================
+   MODERN MICROINTERACTIONS
+   ============================================ */
+
+/* Smooth scale animation for interactive elements */
+.scale-on-hover {
+  transition: transform var(--transition-base);
+}
+
+.scale-on-hover:hover:not(:disabled) {
+  transform: scale(1.02);
+}
+
+.scale-on-hover:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Floating animation for subtle movement */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Gentle wobble for playful feedback */
+@keyframes wobble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(2deg);
+  }
+  75% {
+    transform: rotate(-2deg);
+  }
+}
+
+.wobble {
+  animation: wobble 0.5s ease-in-out;
+}
+
+/* Success celebration */
+@keyframes celebrate {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  50% {
+    transform: scale(1.15) rotate(-5deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.celebrate {
+  animation: celebrate 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Glow effect for emphasis */
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(99, 102, 241, 0.8),
+      0 0 30px rgba(99, 102, 241, 0.4);
+  }
+}
+
+.glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Shake for errors */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* Smooth attention-grabbing pulse */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Slide in from different directions */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-left {
+  animation: slide-in-left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-in-right {
+  animation: slide-in-right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fade in with scale */
+@keyframes fade-in-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fade-in-scale {
+  animation: fade-in-scale 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Stagger children animations */
+.stagger-fade-in > * {
+  opacity: 0;
+  animation: fade-in-scale 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-fade-in > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.stagger-fade-in > *:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.stagger-fade-in > *:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.stagger-fade-in > *:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.stagger-fade-in > *:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.stagger-fade-in > *:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.stagger-fade-in > *:nth-child(7) {
+  animation-delay: 0.35s;
+}
+.stagger-fade-in > *:nth-child(8) {
+  animation-delay: 0.4s;
+}
+
+/* Ripple effect */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  margin-top: -50px;
+  pointer-events: none;
+  transform: scale(0);
+}
+
+.ripple:active::after {
+  animation: ripple 0.6s ease-out;
 }
 
 /* ============================================

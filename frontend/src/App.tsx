@@ -262,10 +262,10 @@ export default function App(): JSX.Element {
   return (
     <div className="app-shell">
       <ToastContainer toasts={toast.toasts} onDismiss={toast.dismissToast} />
-      <header className="app-shell__header">
+      <header className="app-shell__header glass">
         <div className="app-header flex items-center justify-between gap-lg">
           <div className="flex items-center gap-md">
-            <h1 className="app-header__title">DO Multi-Tenant Prompt Manager</h1>
+            <h1 className="app-header__title text-gradient">DO Multi-Tenant Prompt Manager</h1>
             <Badge tone="info">Production</Badge>
           </div>
           <div className="flex items-center gap-md">
@@ -279,7 +279,12 @@ export default function App(): JSX.Element {
             </div>
             <NotificationMenu token={token} />
             {installAvailable ? (
-              <Button variant="secondary" size="sm" onClick={() => void handleInstallClick()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => void handleInstallClick()}
+                className="scale-on-hover"
+              >
                 Install app
               </Button>
             ) : null}
@@ -288,7 +293,7 @@ export default function App(): JSX.Element {
         </div>
       </header>
       <aside className="app-shell__sidebar">
-        <div className="stack-lg">
+        <div className="stack-lg stagger-fade-in">
           <TenantSelector
             tenants={tenants}
             selectedTenantId={selectedTenantId}
@@ -297,12 +302,16 @@ export default function App(): JSX.Element {
             busy={creatingTenant}
           />
           <nav className="stack-sm">
-            {navItems.map((item) => (
+            {navItems.map((item, index) => (
               <Button
                 key={item.id}
                 variant={activeView === item.id ? "primary" : "ghost"}
-                className={cn("app-nav__item", activeView === item.id && "app-nav__item--active")}
+                className={cn(
+                  "app-nav__item ripple scale-on-hover",
+                  activeView === item.id && "app-nav__item--active"
+                )}
                 onClick={() => setActiveView(item.id)}
+                style={{ animationDelay: `${(index + 1) * 0.05}s` }}
               >
                 <span className="app-nav__icon" aria-hidden="true">
                   {item.icon}
@@ -333,7 +342,7 @@ export default function App(): JSX.Element {
           </div>
         </div>
       </aside>
-      <main className="app-shell__main">{renderMainContent()}</main>
+      <main className="app-shell__main custom-scrollbar">{renderMainContent()}</main>
       <nav className="app-bottom-nav">
         {navItems.map((item) => (
           <Button

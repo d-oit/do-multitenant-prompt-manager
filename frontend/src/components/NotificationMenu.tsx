@@ -12,7 +12,7 @@ export default function NotificationMenu({ token }: NotificationMenuProps): JSX.
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const pollRef = useRef<number>();
+  const pollRef = useRef<number | null>(null);
 
   const loadNotifications = useCallback(async () => {
     try {
@@ -32,7 +32,7 @@ export default function NotificationMenu({ token }: NotificationMenuProps): JSX.
       void loadNotifications();
     }, 60_000);
     return () => {
-      if (pollRef.current) window.clearInterval(pollRef.current);
+      if (pollRef.current !== null) window.clearInterval(pollRef.current);
     };
   }, [loadNotifications]);
 

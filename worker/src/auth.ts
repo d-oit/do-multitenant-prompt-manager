@@ -138,6 +138,22 @@ export async function authenticateRequest(
   env: Env,
   options: AuthOptions = {}
 ): Promise<AuthContext | null> {
+  // E2E test mode bypass - allows unauthenticated access with full permissions
+  if (env.E2E_TEST_MODE === "true") {
+    const testUser: AuthenticatedUser = {
+      id: "e2e-test-user",
+      email: "e2e@test.local",
+      name: "E2E Test User"
+    };
+    const testRole: RoleAssignment = {
+      roleId: "e2e-test-role",
+      roleName: "E2E Test Admin",
+      permissions: ["*"],
+      tenantId: null
+    };
+    return buildAuthContext(testUser, [testRole], "jwt");
+  }
+
   const authHeader = request.headers.get("authorization");
   const apiKeyHeader = request.headers.get("x-api-key");
 
