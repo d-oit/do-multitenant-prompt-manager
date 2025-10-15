@@ -505,7 +505,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
       const payload = JSON.parse(request.postData() || "{}");
       const now = new Date().toISOString();
       const tenant: Tenant = {
-        id: _nextId("tenant"),
+        id: __nextId("tenant"),
         name: payload.name,
         slug: payload.slug,
         createdAt: now
@@ -640,7 +640,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         }
         const now = new Date().toISOString();
         const prompt: Prompt = {
-          id: _nextId("prompt"),
+          id: __nextId("prompt"),
           tenantId,
           title: payload.title,
           body: payload.body,
@@ -744,7 +744,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
       const now = new Date().toISOString();
       state.promptActivity[promptId] = state.promptActivity[promptId] ?? [];
       state.promptActivity[promptId].unshift({
-        id: _nextId("activity"),
+        id: __nextId("activity"),
         promptId,
         tenantId,
         actor: request.headers()["authorization"] ? "authenticated" : "system",
@@ -766,7 +766,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const comment: PromptComment = {
-          id: _nextId("comment"),
+          id: __nextId("comment"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           parentId: payload.parentId ?? null,
@@ -793,7 +793,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const share: PromptShare = {
-          id: _nextId("share"),
+          id: __nextId("share"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           targetType: payload.targetType,
@@ -835,7 +835,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const approval: PromptApproval = {
-          id: _nextId("approval"),
+          id: __nextId("approval"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           requestedBy: "e2e-user",
