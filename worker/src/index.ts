@@ -10,7 +10,7 @@ import type {
   DashboardStats,
   UsageTrendPoint,
   TopPromptSummary
-} from "../../shared/types.js";
+} from "../../shared/types";
 import {
   authenticateRequest,
   generateSessionTokens,
@@ -286,7 +286,9 @@ export default {
 
       let response: Response | undefined;
 
-      if (isLoginRoute) {
+      if (path === "/healthz" && request.method === "GET") {
+        response = jsonResponse({ status: "ok" });
+      } else if (isLoginRoute) {
         response = await handleLogin(request, env);
       } else if (isRefreshRoute) {
         response = await handleRefresh(request, env);
@@ -2010,7 +2012,7 @@ async function handleApiKeyCreate(
   if (parsed.tenantId) {
     const tenant = await ensureTenant(env, parsed.tenantId);
     tenantId = tenant.id;
-    ensureTenantAccess(auth, tenantId);
+    ensureTenantAccess(auth, tenant.id);
   }
 
   const role = await env.DB.prepare("SELECT id FROM roles WHERE id = ?")

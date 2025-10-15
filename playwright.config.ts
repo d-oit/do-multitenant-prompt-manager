@@ -24,9 +24,8 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command:
-        "wrangler dev --local --persist-to=.wrangler/state --port 8787 --var E2E_TEST_MODE:true",
-      url: "http://localhost:8787/tenants",
+      command: "npm run dev:e2e --workspace do-multitenant-prompt-manager-worker",
+      url: "http://localhost:8787/healthz",
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000
     },

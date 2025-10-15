@@ -1,0 +1,11 @@
+{
+  "name": "@do-multitenant-prompt-manager/shared",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./types.js": "./types.ts",
+    "./types": "./types.ts",
+    "./designTokens.js": "./designTokens.ts",
+    "./designTokens": "./designTokens.ts"
+  }
+}

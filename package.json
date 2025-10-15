@@ -15,6 +15,7 @@
     "build": "npm run lint:fix && npm run format:fix && npm run build:frontend",
     "lint": "npm run lint --workspace do-multitenant-prompt-manager-worker && npm run lint --workspace frontend",
     "lint:fix": "npm run lint:fix --workspace do-multitenant-prompt-manager-worker && npm run lint:fix --workspace frontend",
+    "typecheck": "npm run typecheck --workspace do-multitenant-prompt-manager-worker && tsc --project frontend/tsconfig.json --noEmit",
     "format": "prettier --check .",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
