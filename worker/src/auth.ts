@@ -140,6 +140,7 @@ export async function authenticateRequest(
 ): Promise<AuthContext | null> {
   // E2E test mode bypass - allows unauthenticated access with full permissions
   if (env.E2E_TEST_MODE === "true") {
+    console.log("🧪 E2E_TEST_MODE enabled - bypassing authentication");
     const testUser: AuthenticatedUser = {
       id: "e2e-test-user",
       email: "e2e@test.local",
