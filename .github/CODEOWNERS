@@ -1,0 +1,11 @@
+# Default owners for the repository. Update these entries to match your org/team.
+# Lines are in the format: <pattern> <owner1> <owner2>
+
+# Require review for everything by the repo-maintainers team (replace with your org/team)
+* @d-oit
+
+# Example: frontend owners for UI changes
+frontend/ @d-oit
+
+# Example: worker/backend owners
+worker/ @d-oit

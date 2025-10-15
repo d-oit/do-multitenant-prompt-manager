@@ -75,6 +75,10 @@ npm run deploy:worker
 npm run deploy:pages
 ```
 
+## Repository Management
+
+This repository follows a structured branching strategy to maintain code quality and enable smooth collaboration. For detailed branching rules, branch protection settings, and contribution guidelines, see [.github/BRANCHING.md](./.github/BRANCHING.md).
+
 ## Scripts
 
 - `npm run dev:frontend` - Start frontend development server

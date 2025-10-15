@@ -1,0 +1,42 @@
+name: Apply Branch Protection
+
+on:
+  repository_dispatch:
+    types: [apply-branch-protection]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to protect'
+        required: true
+        default: 'main'
+
+jobs:
+  apply-protection:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
+      checks: write
+      deployments: write
+      packages: write
+      pages: read
+      discussions: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Apply branch protection
+        run: node scripts/apply-branch-protection.mjs ${{ github.repository_owner }} ${{ github.event.repository.name }} ${{ github.event.inputs.branch || 'main' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
