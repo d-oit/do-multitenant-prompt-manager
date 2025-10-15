@@ -1,5 +1,5 @@
-const STATIC_CACHE = "prompt-manager-static-v1";
-const RUNTIME_CACHE = "prompt-manager-runtime-v1";
+const STATIC_CACHE = "do-multitenant-prompt-manager-static-v1";
+const RUNTIME_CACHE = "do-multitenant-prompt-manager-runtime-v1";
 const OFFLINE_URLS = ["/", "/index.html", "/manifest.webmanifest", "/vite.svg"];
 
 self.addEventListener("install", (event) => {

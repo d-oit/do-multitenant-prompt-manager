@@ -2,7 +2,6 @@
  * Service Worker registration and management
  */
 
-/* eslint-disable no-console */
 
 export interface ServiceWorkerConfig {
   onSuccess?: (registration: ServiceWorkerRegistration) => void;
@@ -35,7 +34,6 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
       scope: "/"
     });
 
-    // eslint-disable-next-line no-console
     console.log("[SW] Registration successful:", registration.scope);
 
     // Check for updates

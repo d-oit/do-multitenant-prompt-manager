@@ -28,7 +28,7 @@ import {
   markNotificationRead,
   type NotificationRecord
 } from "../repositories/notificationRepository";
-import type { Prompt } from "../../shared/types";
+import type { Prompt } from "../../shared/types.js";
 
 interface CommentInput {
   promptId: string;
@@ -361,7 +361,7 @@ export async function markNotificationAsRead(
 
 async function appendActivity(
   env: Env,
-  input: Omit<ActivityRecord, "id"> & { createdAt?: string }
+  input: Omit<ActivityRecord, "id" | "createdAt"> & { createdAt?: string }
 ): Promise<void> {
   const createdAt = input.createdAt ?? new Date().toISOString();
   await logActivity(env, {

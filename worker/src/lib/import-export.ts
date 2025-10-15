@@ -41,7 +41,7 @@ const ImportSchema = z.object({
       title: z.string().min(1).max(200),
       body: z.string().min(1),
       tags: z.array(z.string()).optional().default([]),
-      metadata: z.record(z.unknown()).optional(),
+      metadata: z.record(z.string(), z.unknown()).optional(),
       archived: z.boolean().optional().default(false)
     })
   ),

@@ -24,6 +24,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Reinstall frontend dependencies
+        run: |
+          rm -rf frontend/node_modules
+          rm -f frontend/package-lock.json
+          npm install --workspace frontend --include=optional
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 

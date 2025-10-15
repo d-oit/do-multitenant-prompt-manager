@@ -1,5 +1,5 @@
-// Service Worker for Prompt Manager
-const CACHE_NAME = "prompt-manager-v1";
+// Service Worker for do-multitenant-prompt-manager
+const CACHE_NAME = "do-multitenant-prompt-manager-v1";
 const RUNTIME_CACHE = "runtime-cache-v1";
 
 // Assets to cache on install
@@ -162,7 +162,7 @@ self.addEventListener("push", (event) => {
   console.log("[SW] Push notification received:", event);
 
   const data = event.data ? event.data.json() : {};
-  const title = data.title || "Prompt Manager";
+  const title = data.title || "DO Multi-Tenant Prompt Manager";
   const options = {
     body: data.body || "You have a new notification",
     icon: "/icon-192.png",

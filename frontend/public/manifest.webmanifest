@@ -1,11 +1,11 @@
 {
-  "name": "Prompt Manager",
-  "short_name": "Prompts",
+  "name": "DO Multi-Tenant Prompt Manager",
+  "short_name": "DO Prompts",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#101828",
   "theme_color": "#101828",
-  "description": "Production-grade prompt lifecycle management platform.",
+  "description": "A multi-tenant prompt operations suite with dashboarding, analytics, and authoring capabilities.",
   "icons": [
     {
       "src": "/icons/icon-192.png",

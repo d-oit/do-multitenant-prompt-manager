@@ -265,7 +265,7 @@ export default function App(): JSX.Element {
       <header className="app-shell__header">
         <div className="app-header flex items-center justify-between gap-lg">
           <div className="flex items-center gap-md">
-            <h1 className="app-header__title">Prompt Manager</h1>
+            <h1 className="app-header__title">DO Multi-Tenant Prompt Manager</h1>
             <Badge tone="info">Production</Badge>
           </div>
           <div className="flex items-center gap-md">

@@ -515,7 +515,7 @@ function resolveBaseUrl(): string {
   return "";
 }
 
-export function serializeMetadata(metadata: Record<string, unknown> | null): string {
+export function serializeMetadata(metadata: Record<string, unknown> | null | undefined): string {
   if (!metadata) return "";
   return JSON.stringify(metadata, null, 2);
 }

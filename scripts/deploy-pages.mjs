@@ -34,7 +34,7 @@ await run(
   [
     "exec",
     "--workspace",
-    "prompt-manager-worker",
+    "do-multitenant-prompt-manager-worker",
     "--",
     "wrangler",
     "pages",

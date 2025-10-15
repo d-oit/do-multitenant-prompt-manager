@@ -147,7 +147,7 @@ export async function authenticateRequest(
       throw jsonResponse({ error: "Unauthorized" }, 401);
     }
     const payload = await verifyJwt(token, getAccessTokenSecret(env));
-    if (!payload?.sub) {
+    if (!payload?.sub || typeof payload.sub !== "string") {
       throw jsonResponse({ error: "Unauthorized" }, 401);
     }
     const user = await fetchUser(env, payload.sub);

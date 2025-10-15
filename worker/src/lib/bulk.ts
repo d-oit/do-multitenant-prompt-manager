@@ -14,7 +14,7 @@ const BulkCreateSchema = z.object({
         title: z.string().min(1).max(200),
         body: z.string().min(1),
         tags: z.array(z.string()).optional().default([]),
-        metadata: z.record(z.any()).optional()
+        metadata: z.record(z.string(), z.unknown()).optional()
       })
     )
     .min(1)
@@ -29,7 +29,7 @@ const BulkUpdateSchema = z.object({
         title: z.string().min(1).max(200).optional(),
         body: z.string().min(1).optional(),
         tags: z.array(z.string()).optional(),
-        metadata: z.record(z.any()).optional(),
+        metadata: z.record(z.string(), z.unknown()).optional(),
         archived: z.boolean().optional()
       })
     )

@@ -24,7 +24,8 @@ async function apiFetch(path: string, init?: RequestInit) {
     waitUntil(promise) {
       pending.push(promise);
     },
-    passThroughOnException() {}
+    passThroughOnException() {},
+    props: {}
   };
 
   const request = new Request(`https://example.com${path}`, init);

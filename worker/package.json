@@ -1,12 +1,12 @@
 {
-  "name": "prompt-manager-worker",
+  "name": "do-multitenant-prompt-manager-worker",
   "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "wrangler dev --local --persist-to=.wrangler/state",
     "deploy": "wrangler deploy",
-    "migrate": "wrangler d1 migrations apply prompt_manager",
+    "migrate": "wrangler d1 migrations apply do_multitenant_prompt_manager",
     "typecheck": "tsc --noEmit",
     "test": "vitest --run",
     "lint": "eslint \"src/**/*.{ts,tsx}\" \"test/**/*.{ts,tsx}\"",
@@ -14,14 +14,14 @@
   },
   "dependencies": {
     "jose": "^6.1.0",
-    "zod": "^3.23.8"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.5.0",
-    "@cloudflare/workers-types": "^4.20241022.0",
-    "miniflare": "^3.20241022.0",
-    "typescript": "^5.4.5",
-    "vitest": "^2.1.3",
-    "wrangler": "^3.74.0"
+    "@cloudflare/vitest-pool-workers": "^0.9.13",
+    "@cloudflare/workers-types": "^4.20251011.0",
+    "miniflare": "^4.20251008.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.43.0"
   }
 }

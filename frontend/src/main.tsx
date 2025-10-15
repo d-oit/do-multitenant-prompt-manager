@@ -17,16 +17,13 @@ ReactDOM.createRoot(document.getElementById("app") as HTMLElement).render(
 if (import.meta.env.PROD) {
   registerServiceWorker({
     onSuccess: () => {
-      // eslint-disable-next-line no-console
       console.log("[App] Service worker registered successfully");
     },
     onUpdate: () => {
-      // eslint-disable-next-line no-console
       console.log("[App] New version available, please refresh");
       // Could show a toast notification here
     },
     onError: (error) => {
-      // eslint-disable-next-line no-console
       console.error("[App] Service worker registration failed:", error);
     }
   });

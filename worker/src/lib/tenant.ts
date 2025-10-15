@@ -1,4 +1,4 @@
-import type { Tenant } from "../../../shared/types";
+import type { Tenant } from "../../shared/types.js";
 import { DEFAULT_TENANT_ID } from "../constants";
 import type { Env } from "../types";
 import { jsonResponse } from "./json";

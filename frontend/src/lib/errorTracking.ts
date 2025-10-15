@@ -2,7 +2,7 @@
  * Error tracking and reporting utilities
  */
 
-/* eslint-disable no-console, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export interface ErrorReport {
   message: string;
@@ -120,7 +120,6 @@ class ErrorTracker {
 
     // Log to console in development
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
       console.error("[ErrorTracker]", finalReport);
     }
   }
@@ -139,7 +138,7 @@ class ErrorTracker {
     // Store in localStorage
     try {
       localStorage.setItem("error-reports", JSON.stringify(this.errors.slice(-10)));
-    } catch (e) {
+    } catch {
       // Ignore localStorage errors
     }
   }
@@ -182,7 +181,7 @@ class ErrorTracker {
     this.errors = [];
     try {
       localStorage.removeItem("error-reports");
-    } catch (e) {
+    } catch {
       // Ignore
     }
   }

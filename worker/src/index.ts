@@ -10,7 +10,7 @@ import type {
   DashboardStats,
   UsageTrendPoint,
   TopPromptSummary
-} from "../../shared/types";
+} from "../../shared/types.js";
 import {
   authenticateRequest,
   generateSessionTokens,
@@ -118,7 +118,7 @@ const createPromptSchema = z.object({
   title: z.string().min(1).max(200),
   body: z.string().min(1),
   tags: z.array(z.string().min(1).max(64)).max(50).optional(),
-  metadata: z.record(z.any()).nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
   archived: z.boolean().optional(),
   createdBy: userIdentifierSchema.optional()
 });
@@ -138,7 +138,7 @@ const createTenantSchema = z.object({
 });
 
 const usageEventSchema = z.object({
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.string(), z.unknown()).optional()
 });
 
 const commentCreateSchema = z.object({
@@ -1269,8 +1269,13 @@ async function handlePromptSuggestions(url: URL, env: Env, tenantId: string): Pr
   const limitParam = Number.parseInt(url.searchParams.get("limit") || "5", 10);
   const limit = Number.isNaN(limitParam) ? 5 : Math.min(Math.max(limitParam, 1), 20);
 
-  const suggestions = await fetchPromptSuggestions(env, tenantId, normalized, limit);
-  return jsonResponse<{ data: PromptSuggestion[] }>({ data: suggestions });
+  const suggestions: PromptSuggestion[] = await fetchPromptSuggestions(
+    env,
+    tenantId,
+    normalized,
+    limit
+  );
+  return jsonResponse({ data: suggestions });
 }
 
 async function handleBulkCreatePromptsRequest(
@@ -1738,7 +1743,7 @@ async function handleTemplateRender(
   const schema = z.object({
     template: z.string().optional(),
     templateId: z.string().optional(),
-    variables: z.record(z.any()).optional().default({}),
+    variables: z.record(z.string(), z.unknown()).optional().default({}),
     options: z
       .object({
         strict: z.boolean().optional(),
@@ -1785,7 +1790,7 @@ async function handleTemplateValidate(
   const payload = await readJson(request);
   const schema = z.object({
     template: z.string().min(1),
-    sampleData: z.record(z.any()).optional()
+    sampleData: z.record(z.string(), z.unknown()).optional()
   });
   const parsed = schema.parse(payload);
 
@@ -2115,7 +2120,8 @@ async function warmTopPrompts(env: Env, logger: Logger): Promise<void> {
     },
     passThroughOnException() {
       // no-op
-    }
+    },
+    props: {}
   };
 
   for (const tenantId of tenantIds) {

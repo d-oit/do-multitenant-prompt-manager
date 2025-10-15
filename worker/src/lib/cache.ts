@@ -88,14 +88,14 @@ export async function invalidateByTag(env: Env, tag: string, logger?: Logger): P
   const keysToDelete = new Set<string>();
 
   do {
-    const { keys, list_complete, cursor: next } = await env.PROMPT_CACHE.list({ prefix, cursor });
-    keys.forEach((entry) => {
+    const result = await env.PROMPT_CACHE.list({ prefix, cursor });
+    result.keys.forEach((entry) => {
       const cacheKey = entry.name.replace(prefix, "");
       if (cacheKey) {
         keysToDelete.add(cacheKey);
       }
     });
-    cursor = list_complete ? undefined : next;
+    cursor = result.list_complete ? undefined : result.cursor;
   } while (cursor);
 
   if (!keysToDelete.size) {

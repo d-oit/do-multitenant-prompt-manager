@@ -151,5 +151,5 @@ export async function deleteComment(
     .bind(commentId, tenantId)
     .run();
 
-  return Boolean(result.success && (result.changes ?? 0) > 0);
+  return Boolean(result.success && (result.meta?.changes ?? 0) > 0);
 }

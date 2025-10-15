@@ -26,7 +26,7 @@ export interface RenderOptions {
 
 const RenderSchema = z.object({
   template: z.string(),
-  variables: z.record(z.unknown()),
+  variables: z.record(z.string(), z.unknown()),
   options: z
     .object({
       strict: z.boolean().optional(),

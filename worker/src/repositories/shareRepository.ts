@@ -72,5 +72,5 @@ export async function removeShare(env: Env, shareId: string, tenantId: string): 
     .bind(shareId, tenantId)
     .run();
 
-  return Boolean(result.success && (result.changes ?? 0) > 0);
+  return Boolean(result.success && (result.meta?.changes ?? 0) > 0);
 }
