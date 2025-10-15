@@ -95,7 +95,7 @@ export async function invalidateByTag(env: Env, tag: string, logger?: Logger): P
         keysToDelete.add(cacheKey);
       }
     });
-    cursor = result.list_complete ? undefined : result.cursor;
+    cursor = result.list_complete ? undefined : (result as { cursor?: string }).cursor;
   } while (cursor);
 
   if (!keysToDelete.size) {

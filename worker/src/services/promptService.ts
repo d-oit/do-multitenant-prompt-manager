@@ -5,7 +5,7 @@ import type {
   PromptListResponse,
   PromptVersion,
   SortField
-} from "../../shared/types";
+} from "../../../shared/types";
 import type { Env } from "../types";
 import type { Logger } from "../lib/logger";
 import {

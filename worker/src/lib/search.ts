@@ -1,4 +1,4 @@
-import type { Prompt } from "../../shared/types";
+import type { Prompt } from "../../../shared/types";
 import type { Env } from "../types";
 import { deserializePrompt, type PromptRow } from "./prompts";
 
