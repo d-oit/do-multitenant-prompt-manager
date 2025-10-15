@@ -26,10 +26,7 @@ export function getSecurityHeaders(config: SecurityHeadersConfig = {}): Headers 
 
   // Strict Transport Security
   if (enableHSTS) {
-    headers.set(
-      'Strict-Transport-Security',
-      'max-age=31536000; includeSubDomains; preload'
-    );
+    headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
   }
 
   // Content Security Policy
@@ -52,43 +49,43 @@ export function getSecurityHeaders(config: SecurityHeadersConfig = {}): Headers 
       cspDirectives.push(`report-uri ${reportUri}`);
     }
 
-    headers.set('Content-Security-Policy', cspDirectives.join('; '));
+    headers.set("Content-Security-Policy", cspDirectives.join("; "));
   }
 
   // X-Content-Type-Options
-  headers.set('X-Content-Type-Options', 'nosniff');
+  headers.set("X-Content-Type-Options", "nosniff");
 
   // X-Frame-Options
-  headers.set('X-Frame-Options', 'DENY');
+  headers.set("X-Frame-Options", "DENY");
 
   // X-XSS-Protection (legacy, but still useful)
-  headers.set('X-XSS-Protection', '1; mode=block');
+  headers.set("X-XSS-Protection", "1; mode=block");
 
   // Referrer Policy
-  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 
   // Permissions Policy (formerly Feature Policy)
   headers.set(
-    'Permissions-Policy',
-    'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()'
+    "Permissions-Policy",
+    "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
   );
 
   // Cross-Origin-Embedder-Policy
   if (enableCOEP) {
-    headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
+    headers.set("Cross-Origin-Embedder-Policy", "require-corp");
   }
 
   // Cross-Origin-Opener-Policy
   if (enableCORP) {
-    headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+    headers.set("Cross-Origin-Opener-Policy", "same-origin");
   }
 
   // Cross-Origin-Resource-Policy
-  headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+  headers.set("Cross-Origin-Resource-Policy", "same-origin");
 
   // Remove potentially sensitive headers
-  headers.set('X-Powered-By', ''); // Remove if present
-  headers.set('Server', 'Cloudflare'); // Generic server header
+  headers.set("X-Powered-By", ""); // Remove if present
+  headers.set("Server", "Cloudflare"); // Generic server header
 
   return headers;
 }
@@ -96,10 +93,7 @@ export function getSecurityHeaders(config: SecurityHeadersConfig = {}): Headers 
 /**
  * Add security headers to a response
  */
-export function addSecurityHeaders(
-  response: Response,
-  config?: SecurityHeadersConfig
-): Response {
+export function addSecurityHeaders(response: Response, config?: SecurityHeadersConfig): Response {
   const securityHeaders = getSecurityHeaders(config);
   const newHeaders = new Headers(response.headers);
 
@@ -123,12 +117,18 @@ export function getCORSHeaders(origin?: string): Headers {
   const headers = new Headers();
 
   // Allow specific origin or wildcard
-  headers.set('Access-Control-Allow-Origin', origin || '*');
-  headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept-Version');
-  headers.set('Access-Control-Expose-Headers', 'API-Version, API-Version-Info, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset');
-  headers.set('Access-Control-Max-Age', '86400'); // 24 hours
-  headers.set('Access-Control-Allow-Credentials', 'true');
+  headers.set("Access-Control-Allow-Origin", origin || "*");
+  headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, X-Requested-With, Accept-Version"
+  );
+  headers.set(
+    "Access-Control-Expose-Headers",
+    "API-Version, API-Version-Info, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset"
+  );
+  headers.set("Access-Control-Max-Age", "86400"); // 24 hours
+  headers.set("Access-Control-Allow-Credentials", "true");
 
   return headers;
 }
@@ -143,10 +143,10 @@ export function addRateLimitHeaders(
   reset: number
 ): Response {
   const newHeaders = new Headers(response.headers);
-  
-  newHeaders.set('X-RateLimit-Limit', String(limit));
-  newHeaders.set('X-RateLimit-Remaining', String(remaining));
-  newHeaders.set('X-RateLimit-Reset', String(reset));
+
+  newHeaders.set("X-RateLimit-Limit", String(limit));
+  newHeaders.set("X-RateLimit-Remaining", String(remaining));
+  newHeaders.set("X-RateLimit-Reset", String(reset));
 
   return new Response(response.body, {
     status: response.status,

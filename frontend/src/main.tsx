@@ -18,16 +18,16 @@ if (import.meta.env.PROD) {
   registerServiceWorker({
     onSuccess: () => {
       // eslint-disable-next-line no-console
-      console.log('[App] Service worker registered successfully');
+      console.log("[App] Service worker registered successfully");
     },
     onUpdate: () => {
       // eslint-disable-next-line no-console
-      console.log('[App] New version available, please refresh');
+      console.log("[App] New version available, please refresh");
       // Could show a toast notification here
     },
     onError: (error) => {
       // eslint-disable-next-line no-console
-      console.error('[App] Service worker registration failed:', error);
+      console.error("[App] Service worker registration failed:", error);
     }
   });
 }

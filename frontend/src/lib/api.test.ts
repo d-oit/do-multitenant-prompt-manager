@@ -5,7 +5,7 @@ describe("serializeMetadata", () => {
   it("serializes object to formatted JSON string", () => {
     const metadata = { key: "value", nested: { prop: 123 } };
     const result = serializeMetadata(metadata);
-    
+
     expect(result).toContain('"key"');
     expect(result).toContain('"value"');
     expect(result).toContain('"nested"');

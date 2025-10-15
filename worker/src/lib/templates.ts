@@ -3,7 +3,7 @@
  * Handles prompt templates with variable substitution
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 // Template syntax: {{variable_name}} or {{variable_name:default_value}}
 const VARIABLE_REGEX = /\{\{([a-zA-Z_][a-zA-Z0-9_]*(?::.*?)?)\}\}/g;
@@ -30,9 +30,9 @@ const RenderSchema = z.object({
   options: z
     .object({
       strict: z.boolean().optional(),
-      keepUnmatched: z.boolean().optional(),
+      keepUnmatched: z.boolean().optional()
     })
-    .optional(),
+    .optional()
 });
 
 /**
@@ -45,15 +45,15 @@ export function parseTemplate(content: string): Template {
   let match;
   while ((match = VARIABLE_REGEX.exec(content)) !== null) {
     const fullMatch = match[1];
-    const parts = fullMatch.split(':');
+    const parts = fullMatch.split(":");
     const name = parts[0];
-    const defaultValue = parts.length > 1 ? parts.slice(1).join(':') : undefined;
+    const defaultValue = parts.length > 1 ? parts.slice(1).join(":") : undefined;
 
     if (!seen.has(name)) {
       variables.push({
         name,
         defaultValue,
-        required: defaultValue === undefined,
+        required: defaultValue === undefined
       });
       seen.add(name);
     }
@@ -64,7 +64,7 @@ export function parseTemplate(content: string): Template {
 
   return {
     content,
-    variables,
+    variables
   };
 }
 
@@ -86,9 +86,7 @@ export function renderTemplate(
       .map((v) => v.name);
 
     if (missingRequired.length > 0) {
-      throw new Error(
-        `Missing required variables: ${missingRequired.join(', ')}`
-      );
+      throw new Error(`Missing required variables: ${missingRequired.join(", ")}`);
     }
   }
 
@@ -97,13 +95,13 @@ export function renderTemplate(
 
   VARIABLE_REGEX.lastIndex = 0;
   result = result.replace(VARIABLE_REGEX, (match, fullMatch) => {
-    const parts = fullMatch.split(':');
+    const parts = fullMatch.split(":");
     const name = parts[0];
-    const defaultValue = parts.length > 1 ? parts.slice(1).join(':') : undefined;
+    const defaultValue = parts.length > 1 ? parts.slice(1).join(":") : undefined;
 
     if (name in variables) {
       const value = variables[name];
-      return value !== null && value !== undefined ? String(value) : '';
+      return value !== null && value !== undefined ? String(value) : "";
     }
 
     if (defaultValue !== undefined) {
@@ -114,7 +112,7 @@ export function renderTemplate(
       return match;
     }
 
-    return '';
+    return "";
   });
 
   return result;
@@ -150,14 +148,14 @@ export function validateTemplate(template: string): {
     const closeBraces = (template.match(/\}\}/g) || []).length;
 
     if (openBraces !== closeBraces) {
-      errors.push('Unmatched template braces');
+      errors.push("Unmatched template braces");
     }
 
     // Check for invalid variable names
     VARIABLE_REGEX.lastIndex = 0;
     let match;
     while ((match = VARIABLE_REGEX.exec(template)) !== null) {
-      const varName = match[1].split(':')[0];
+      const varName = match[1].split(":")[0];
       if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName)) {
         errors.push(`Invalid variable name: ${varName}`);
       }
@@ -166,15 +164,15 @@ export function validateTemplate(template: string): {
 
     // Check for nested variables
     if (/\{\{.*\{\{.*\}\}.*\}\}/.test(template)) {
-      errors.push('Nested variables are not supported');
+      errors.push("Nested variables are not supported");
     }
   } catch (error) {
-    errors.push(error instanceof Error ? error.message : 'Unknown error');
+    errors.push(error instanceof Error ? error.message : "Unknown error");
   }
 
   return {
     valid: errors.length === 0,
-    errors,
+    errors
   };
 }
 
@@ -190,21 +188,16 @@ export function getTemplateSuggestions(
   const beforeCursor = template.slice(0, cursorPosition);
   const afterCursor = template.slice(cursorPosition);
 
-  const lastOpenBrace = beforeCursor.lastIndexOf('{{');
-  const lastCloseBrace = beforeCursor.lastIndexOf('}}');
-  const nextCloseBrace = afterCursor.indexOf('}}');
+  const lastOpenBrace = beforeCursor.lastIndexOf("{{");
+  const lastCloseBrace = beforeCursor.lastIndexOf("}}");
+  const nextCloseBrace = afterCursor.indexOf("}}");
 
   // Cursor is inside a variable placeholder
-  if (
-    lastOpenBrace > lastCloseBrace &&
-    (nextCloseBrace >= 0 || afterCursor.startsWith('}'))
-  ) {
+  if (lastOpenBrace > lastCloseBrace && (nextCloseBrace >= 0 || afterCursor.startsWith("}"))) {
     const variableStart = lastOpenBrace + 2;
     const partial = beforeCursor.slice(variableStart).toLowerCase();
 
-    return availableVariables.filter((v) =>
-      v.toLowerCase().startsWith(partial)
-    );
+    return availableVariables.filter((v) => v.toLowerCase().startsWith(partial));
   }
 
   return [];
@@ -224,10 +217,10 @@ export interface TemplateDefinition {
 
 export const TEMPLATE_LIBRARY: TemplateDefinition[] = [
   {
-    id: 'customer-support-email',
-    name: 'Customer Support Email',
-    description: 'Professional customer support email template',
-    category: 'Support',
+    id: "customer-support-email",
+    name: "Customer Support Email",
+    description: "Professional customer support email template",
+    category: "Support",
     template: `Dear {{customer_name}},
 
 Thank you for contacting us regarding {{issue_type}}.
@@ -245,13 +238,13 @@ If you have any further questions, please don't hesitate to reach out.
 Best regards,
 {{agent_name}}
 {{company_name}} Support Team`,
-    tags: ['support', 'email', 'customer-service'],
+    tags: ["support", "email", "customer-service"]
   },
   {
-    id: 'code-review',
-    name: 'Code Review Prompt',
-    description: 'Comprehensive code review with best practices',
-    category: 'Development',
+    id: "code-review",
+    name: "Code Review Prompt",
+    description: "Comprehensive code review with best practices",
+    category: "Development",
     template: `Review the following {{language:code}} for:
 
 1. Code quality and readability
@@ -270,13 +263,13 @@ Context: {{context}}
 {{/if}}
 
 Please provide specific recommendations with code examples where applicable.`,
-    tags: ['code', 'review', 'development'],
+    tags: ["code", "review", "development"]
   },
   {
-    id: 'content-generator',
-    name: 'Content Generator',
-    description: 'SEO-optimized content generation',
-    category: 'Content',
+    id: "content-generator",
+    name: "Content Generator",
+    description: "SEO-optimized content generation",
+    category: "Content",
     template: `Generate {{content_type:blog post}} about: {{topic}}
 
 Target audience: {{audience:general}}
@@ -297,8 +290,8 @@ Requirements:
 - Include relevant examples
 - Add actionable takeaways
 - {{custom_requirements}}`,
-    tags: ['content', 'seo', 'writing'],
-  },
+    tags: ["content", "seo", "writing"]
+  }
 ];
 
 /**
@@ -326,26 +319,20 @@ export function searchTemplateLibrary(query: string): TemplateDefinition[] {
  * Get templates by category
  */
 export function getTemplatesByCategory(category: string): TemplateDefinition[] {
-  return TEMPLATE_LIBRARY.filter(
-    (t) => t.category.toLowerCase() === category.toLowerCase()
-  );
+  return TEMPLATE_LIBRARY.filter((t) => t.category.toLowerCase() === category.toLowerCase());
 }
 
 /**
  * Preview template with sample data
  */
-export function previewTemplate(
-  template: string,
-  sampleData?: Record<string, unknown>
-): string {
+export function previewTemplate(template: string, sampleData?: Record<string, unknown>): string {
   const parsed = parseTemplate(template);
 
   // Generate sample data for all variables if not provided
   const data = sampleData || {};
   for (const variable of parsed.variables) {
     if (!(variable.name in data)) {
-      data[variable.name] =
-        variable.defaultValue || `[${variable.name}]`;
+      data[variable.name] = variable.defaultValue || `[${variable.name}]`;
     }
   }
 

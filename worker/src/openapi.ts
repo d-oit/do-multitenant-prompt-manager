@@ -4,7 +4,8 @@ export function getOpenAPIDocument(): Record<string, unknown> {
     info: {
       title: "Prompt Manager API",
       version: "1.0.0",
-      description: "REST API for managing prompt templates, analytics, and tenant resources. The API supports versioning via URL prefix (/v1/) or Accept-Version header."
+      description:
+        "REST API for managing prompt templates, analytics, and tenant resources. The API supports versioning via URL prefix (/v1/) or Accept-Version header."
     },
     servers: [
       { url: "https://api.example.com/v1", description: "Production (v1)" },
@@ -22,7 +23,16 @@ export function getOpenAPIDocument(): Record<string, unknown> {
       schemas: {
         Prompt: {
           type: "object",
-          required: ["id", "tenantId", "title", "body", "tags", "createdAt", "updatedAt", "version"],
+          required: [
+            "id",
+            "tenantId",
+            "title",
+            "body",
+            "tags",
+            "createdAt",
+            "updatedAt",
+            "version"
+          ],
           properties: {
             id: { type: "string", format: "uuid" },
             tenantId: { type: "string" },
@@ -80,7 +90,12 @@ export function getOpenAPIDocument(): Record<string, unknown> {
             { name: "search", in: "query", required: false, schema: { type: "string" } },
             { name: "tag", in: "query", required: false, schema: { type: "string" } },
             { name: "page", in: "query", required: false, schema: { type: "integer", default: 1 } },
-            { name: "pageSize", in: "query", required: false, schema: { type: "integer", default: 20 } }
+            {
+              name: "pageSize",
+              in: "query",
+              required: false,
+              schema: { type: "integer", default: 20 }
+            }
           ],
           responses: {
             200: {
@@ -91,7 +106,9 @@ export function getOpenAPIDocument(): Record<string, unknown> {
                     type: "object",
                     properties: {
                       data: { type: "array", items: { $ref: "#/components/schemas/Prompt" } },
-                      pagination: { $ref: "#/components/schemas/PromptListResponse/properties/pagination" }
+                      pagination: {
+                        $ref: "#/components/schemas/PromptListResponse/properties/pagination"
+                      }
                     }
                   }
                 }
@@ -113,7 +130,10 @@ export function getOpenAPIDocument(): Record<string, unknown> {
               description: "Prompt created",
               content: {
                 "application/json": {
-                  schema: { type: "object", properties: { data: { $ref: "#/components/schemas/Prompt" } } }
+                  schema: {
+                    type: "object",
+                    properties: { data: { $ref: "#/components/schemas/Prompt" } }
+                  }
                 }
               }
             }
@@ -123,13 +143,18 @@ export function getOpenAPIDocument(): Record<string, unknown> {
       "/prompts/{promptId}": {
         get: {
           summary: "Retrieve prompt",
-          parameters: [{ name: "promptId", in: "path", required: true, schema: { type: "string" } }],
+          parameters: [
+            { name: "promptId", in: "path", required: true, schema: { type: "string" } }
+          ],
           responses: {
             200: {
               description: "Prompt",
               content: {
                 "application/json": {
-                  schema: { type: "object", properties: { data: { $ref: "#/components/schemas/Prompt" } } }
+                  schema: {
+                    type: "object",
+                    properties: { data: { $ref: "#/components/schemas/Prompt" } }
+                  }
                 }
               }
             }
@@ -137,7 +162,9 @@ export function getOpenAPIDocument(): Record<string, unknown> {
         },
         put: {
           summary: "Update prompt",
-          parameters: [{ name: "promptId", in: "path", required: true, schema: { type: "string" } }],
+          parameters: [
+            { name: "promptId", in: "path", required: true, schema: { type: "string" } }
+          ],
           requestBody: {
             required: true,
             content: {
@@ -151,7 +178,10 @@ export function getOpenAPIDocument(): Record<string, unknown> {
               description: "Updated prompt",
               content: {
                 "application/json": {
-                  schema: { type: "object", properties: { data: { $ref: "#/components/schemas/Prompt" } } }
+                  schema: {
+                    type: "object",
+                    properties: { data: { $ref: "#/components/schemas/Prompt" } }
+                  }
                 }
               }
             }
@@ -159,7 +189,9 @@ export function getOpenAPIDocument(): Record<string, unknown> {
         },
         delete: {
           summary: "Delete prompt",
-          parameters: [{ name: "promptId", in: "path", required: true, schema: { type: "string" } }],
+          parameters: [
+            { name: "promptId", in: "path", required: true, schema: { type: "string" } }
+          ],
           responses: {
             204: { description: "Prompt deleted" }
           }

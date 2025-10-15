@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { useState, useRef, useEffect, type ReactNode } from "react";
 
 export interface DropdownItem {
   label: string;
@@ -13,11 +13,17 @@ export interface DropdownProps {
   trigger: ReactNode;
   items: DropdownItem[];
   onSelect: (value: string) => void;
-  align?: 'left' | 'right';
+  align?: "left" | "right";
   className?: string;
 }
 
-export function Dropdown({ trigger, items, onSelect, align = 'left', className = '' }: DropdownProps) {
+export function Dropdown({
+  trigger,
+  items,
+  onSelect,
+  align = "left",
+  className = ""
+}: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -29,19 +35,19 @@ export function Dropdown({ trigger, items, onSelect, align = 'left', className =
     };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setIsOpen(false);
       }
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [isOpen]);
 
@@ -53,11 +59,11 @@ export function Dropdown({ trigger, items, onSelect, align = 'left', className =
 
   return (
     <div className={`dropdown ${className}`} ref={dropdownRef}>
-      <div 
+      <div
         className="dropdown-trigger"
         onClick={() => setIsOpen(!isOpen)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             setIsOpen(!isOpen);
           }
@@ -69,19 +75,19 @@ export function Dropdown({ trigger, items, onSelect, align = 'left', className =
       >
         {trigger}
       </div>
-      
+
       {isOpen && (
-        <div 
-          className={`dropdown-menu ${align === 'right' ? 'dropdown-menu-right' : ''}`}
+        <div
+          className={`dropdown-menu ${align === "right" ? "dropdown-menu-right" : ""}`}
           role="menu"
         >
-          {items.map((item, index) => (
+          {items.map((item, index) =>
             item.divider ? (
               <div key={`divider-${index}`} className="dropdown-divider" role="separator" />
             ) : (
               <button
                 key={item.value}
-                className={`dropdown-item ${item.disabled ? 'dropdown-item-disabled' : ''} ${item.danger ? 'dropdown-item-danger' : ''}`}
+                className={`dropdown-item ${item.disabled ? "dropdown-item-disabled" : ""} ${item.danger ? "dropdown-item-danger" : ""}`}
                 onClick={() => handleItemClick(item)}
                 disabled={item.disabled}
                 role="menuitem"
@@ -90,7 +96,7 @@ export function Dropdown({ trigger, items, onSelect, align = 'left', className =
                 <span>{item.label}</span>
               </button>
             )
-          ))}
+          )}
         </div>
       )}
     </div>
@@ -101,10 +107,10 @@ export function Dropdown({ trigger, items, onSelect, align = 'left', className =
 export interface DropdownMenuProps {
   items: DropdownItem[];
   onSelect: (value: string) => void;
-  align?: 'left' | 'right';
+  align?: "left" | "right";
 }
 
-export function DropdownMenu({ items, onSelect, align = 'right' }: DropdownMenuProps) {
+export function DropdownMenu({ items, onSelect, align = "right" }: DropdownMenuProps) {
   return (
     <Dropdown
       trigger={

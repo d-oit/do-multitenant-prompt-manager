@@ -23,7 +23,9 @@ export interface TenantResolution {
 
 export async function ensureTenant(env: Env, tenantIdentifier: string): Promise<Tenant> {
   const candidate = tenantIdentifier || DEFAULT_TENANT_ID;
-  let record = await env.DB.prepare("SELECT * FROM tenants WHERE id = ?").bind(candidate).first<TenantRow>();
+  let record = await env.DB.prepare("SELECT * FROM tenants WHERE id = ?")
+    .bind(candidate)
+    .first<TenantRow>();
 
   if (!record) {
     record = await env.DB.prepare("SELECT * FROM tenants WHERE slug = ?")

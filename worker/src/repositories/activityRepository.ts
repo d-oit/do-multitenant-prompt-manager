@@ -27,7 +27,12 @@ export async function logActivity(env: Env, record: ActivityRecord): Promise<voi
     .run();
 }
 
-export async function listActivity(env: Env, promptId: string, tenantId: string, limit = 100): Promise<ActivityRecord[]> {
+export async function listActivity(
+  env: Env,
+  promptId: string,
+  tenantId: string,
+  limit = 100
+): Promise<ActivityRecord[]> {
   const rows = await env.DB.prepare(
     `SELECT id, prompt_id, tenant_id, actor, action, metadata, created_at
      FROM prompt_activity_log

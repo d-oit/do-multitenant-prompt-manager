@@ -1,5 +1,11 @@
 import type { ExecutionContext } from "@cloudflare/workers-types";
-import type { Prompt, PromptFilters, PromptListResponse, PromptVersion, SortField } from "../../../shared/types";
+import type {
+  Prompt,
+  PromptFilters,
+  PromptListResponse,
+  PromptVersion,
+  SortField
+} from "../../../shared/types";
 import type { Env } from "../types";
 import type { Logger } from "../lib/logger";
 import {
@@ -12,11 +18,7 @@ import {
 } from "../lib/cache";
 import { serializeError, safeJsonParse } from "../lib/json";
 import { searchPrompts } from "../lib/search";
-import {
-  fetchPrompt,
-  invalidatePromptCaches,
-  recordPromptVersion
-} from "../lib/prompts";
+import { fetchPrompt, invalidatePromptCaches, recordPromptVersion } from "../lib/prompts";
 
 const LIST_CACHE_TTL = 60;
 const LIST_CACHE_STALE = 120;
@@ -165,7 +167,11 @@ export async function createPrompt(
   return prompt;
 }
 
-export async function getPrompt(env: Env, promptId: string, tenantId?: string): Promise<Prompt | null> {
+export async function getPrompt(
+  env: Env,
+  promptId: string,
+  tenantId?: string
+): Promise<Prompt | null> {
   return fetchPrompt(promptId, env, tenantId);
 }
 
@@ -236,7 +242,9 @@ export async function updatePrompt(
   params.push(now, existing.id);
 
   const statement = `UPDATE prompts SET ${fields.join(", ")} WHERE id = ?`;
-  await env.DB.prepare(statement).bind(...params).run();
+  await env.DB.prepare(statement)
+    .bind(...params)
+    .run();
 
   await invalidatePromptCaches(env, existing.id, existing.tenantId, logger);
 
@@ -378,7 +386,10 @@ async function revalidateListCache(
   }
 }
 
-async function buildPromptListPayload(env: Env, options: PromptListQueryOptions): Promise<PromptListResponse> {
+async function buildPromptListPayload(
+  env: Env,
+  options: PromptListQueryOptions
+): Promise<PromptListResponse> {
   const filters: PromptFilters = {};
   if (options.search) filters.search = options.search;
   if (options.tag) filters.tag = options.tag;

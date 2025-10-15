@@ -79,7 +79,9 @@ export async function fetchPrompt(id: string, env: Env, tenantId?: string): Prom
     params.push(tenantId);
   }
 
-  const record = await env.DB.prepare(query).bind(...params).first<PromptRow>();
+  const record = await env.DB.prepare(query)
+    .bind(...params)
+    .first<PromptRow>();
   if (!record) {
     return null;
   }
@@ -115,7 +117,12 @@ export async function recordPromptVersion(env: Env, input: PromptVersionInput): 
     .run();
 }
 
-export async function invalidatePromptCaches(env: Env, promptId: string, tenantId: string, logger: Logger): Promise<void> {
+export async function invalidatePromptCaches(
+  env: Env,
+  promptId: string,
+  tenantId: string,
+  logger: Logger
+): Promise<void> {
   await Promise.all([
     env.PROMPT_CACHE.delete(buildPromptCacheKey(promptId)),
     invalidateByTag(env, buildPromptTag(promptId), logger),

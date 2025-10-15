@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type ImgHTMLAttributes } from "react";
 
-interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'srcSet'> {
+interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "srcSet"> {
   src: string;
   alt: string;
   width?: number;
@@ -51,7 +51,7 @@ export function OptimizedImage({
         });
       },
       {
-        rootMargin: '50px' // Start loading 50px before image enters viewport
+        rootMargin: "50px" // Start loading 50px before image enters viewport
       }
     );
 
@@ -75,19 +75,21 @@ export function OptimizedImage({
   };
 
   // Construct responsive srcSet if not provided
-  const responsiveSrcSet = srcSet || (width ? `${src} 1x, ${src.replace(/\.(jpg|png)$/, '@2x.$1')} 2x` : undefined);
+  const responsiveSrcSet =
+    srcSet || (width ? `${src} 1x, ${src.replace(/\.(jpg|png)$/, "@2x.$1")} 2x` : undefined);
 
   // Construct sizes if not provided
-  const responsiveSizes = sizes || (width ? `(max-width: ${width}px) 100vw, ${width}px` : undefined);
+  const responsiveSizes =
+    sizes || (width ? `(max-width: ${width}px) 100vw, ${width}px` : undefined);
 
   return (
     <div
       className={`optimized-image ${className}`}
       style={{
-        width: width ? `${width}px` : '100%',
-        height: height ? `${height}px` : 'auto',
-        position: 'relative',
-        overflow: 'hidden'
+        width: width ? `${width}px` : "100%",
+        height: height ? `${height}px` : "auto",
+        position: "relative",
+        overflow: "hidden"
       }}
     >
       {/* Placeholder */}
@@ -97,14 +99,14 @@ export function OptimizedImage({
           alt=""
           className="optimized-image__placeholder"
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            filter: 'blur(10px)',
-            transform: 'scale(1.1)'
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "blur(10px)",
+            transform: "scale(1.1)"
           }}
         />
       )}
@@ -114,13 +116,13 @@ export function OptimizedImage({
         <div
           className="optimized-image__skeleton"
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'var(--pm-color-surface-alt)',
-            animation: 'pulse 1.5s ease-in-out infinite'
+            width: "100%",
+            height: "100%",
+            background: "var(--pm-color-surface-alt)",
+            animation: "pulse 1.5s ease-in-out infinite"
           }}
         />
       )}
@@ -130,14 +132,14 @@ export function OptimizedImage({
         <div
           className="optimized-image__error"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            height: '100%',
-            background: 'var(--pm-color-surface-alt)',
-            color: 'var(--pm-color-text-muted)',
-            fontSize: 'var(--pm-font-size-sm)'
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            height: "100%",
+            background: "var(--pm-color-surface-alt)",
+            color: "var(--pm-color-text-muted)",
+            fontSize: "var(--pm-font-size-sm)"
           }}
         >
           Failed to load image
@@ -148,14 +150,8 @@ export function OptimizedImage({
       {!hasError && isInView && (
         <picture>
           {/* WebP source for modern browsers */}
-          {webpSrc && (
-            <source
-              type="image/webp"
-              srcSet={webpSrc}
-              sizes={responsiveSizes}
-            />
-          )}
-          
+          {webpSrc && <source type="image/webp" srcSet={webpSrc} sizes={responsiveSizes} />}
+
           {/* Fallback image */}
           <img
             ref={imgRef}
@@ -165,17 +161,17 @@ export function OptimizedImage({
             alt={alt}
             width={width}
             height={height}
-            loading={lazy ? 'lazy' : 'eager'}
+            loading={lazy ? "lazy" : "eager"}
             decoding="async"
             onLoad={handleLoad}
             onError={handleError}
-            className={`optimized-image__img ${isLoaded ? 'optimized-image__img--loaded' : ''}`}
+            className={`optimized-image__img ${isLoaded ? "optimized-image__img--loaded" : ""}`}
             style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
               opacity: isLoaded ? 1 : 0,
-              transition: 'opacity 0.3s ease-in-out'
+              transition: "opacity 0.3s ease-in-out"
             }}
             {...props}
           />
@@ -189,7 +185,7 @@ export function OptimizedImage({
  * Generate WebP URL from standard image URL
  */
 export function getWebPUrl(url: string): string {
-  return url.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+  return url.replace(/\.(jpg|jpeg|png)$/i, ".webp");
 }
 
 /**
@@ -201,29 +197,27 @@ export function generateSrcSet(baseUrl: string, widths: number[]): string {
       const url = baseUrl.replace(/(\.\w+)$/, `_${width}w$1`);
       return `${url} ${width}w`;
     })
-    .join(', ');
+    .join(", ");
 }
 
 /**
  * Generate sizes string based on breakpoints
  */
 export function generateSizes(breakpoints: Array<[number, string]>): string {
-  return breakpoints
-    .map(([width, size]) => `(max-width: ${width}px) ${size}`)
-    .join(', ');
+  return breakpoints.map(([width, size]) => `(max-width: ${width}px) ${size}`).join(", ");
 }
 
 /**
  * Preload critical images
  */
 export function preloadImage(src: string, options?: { as?: string; type?: string }): void {
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
 
-  const link = document.createElement('link');
-  link.rel = 'preload';
-  link.as = options?.as || 'image';
+  const link = document.createElement("link");
+  link.rel = "preload";
+  link.as = options?.as || "image";
   link.href = src;
-  
+
   if (options?.type) {
     link.type = options.type;
   }

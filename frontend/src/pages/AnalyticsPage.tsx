@@ -83,7 +83,9 @@ export default function AnalyticsPage({ tenantId, token }: AnalyticsPageProps): 
       </div>
 
       {loading ? <SkeletonTable rows={6} /> : null}
-      {error ? <ErrorState error={error} onRetry={() => setReloadKey((value) => value + 1)} /> : null}
+      {error ? (
+        <ErrorState error={error} onRetry={() => setReloadKey((value) => value + 1)} />
+      ) : null}
 
       {!loading && !error && (!analytics || analytics.data.length === 0) ? (
         <EmptyState
@@ -98,7 +100,10 @@ export default function AnalyticsPage({ tenantId, token }: AnalyticsPageProps): 
           <Card title="Usage Distribution" subtitle={`Top ${analytics.data.length} prompts`}>
             <div className="dashboard-chart">
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={analytics.data.slice(0, 10)} margin={{ top: 20, right: 24, left: 0, bottom: 0 }}>
+                <BarChart
+                  data={analytics.data.slice(0, 10)}
+                  margin={{ top: 20, right: 24, left: 0, bottom: 0 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="title" interval={0} angle={-20} textAnchor="end" height={60} />
                   <YAxis allowDecimals={false} />
@@ -112,7 +117,10 @@ export default function AnalyticsPage({ tenantId, token }: AnalyticsPageProps): 
           <Card title="Usage Momentum" subtitle="Cumulative engagement">
             <div className="dashboard-chart">
               <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={analytics.data} margin={{ top: 20, right: 24, left: 0, bottom: 0 }}>
+                <AreaChart
+                  data={analytics.data}
+                  margin={{ top: 20, right: 24, left: 0, bottom: 0 }}
+                >
                   <defs>
                     <linearGradient id="usageGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="var(--color-accent)" stopOpacity={0.8} />
@@ -122,8 +130,19 @@ export default function AnalyticsPage({ tenantId, token }: AnalyticsPageProps): 
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="title" hide />
                   <YAxis allowDecimals={false} domain={[0, Math.max(1, maxUsage)]} />
-                  <Tooltip formatter={(value: number, _name, entry) => [`${value} runs`, entry.payload.title]} />
-                  <Area type="monotone" dataKey="usageCount" stroke="var(--color-accent)" fillOpacity={1} fill="url(#usageGradient)" />
+                  <Tooltip
+                    formatter={(value: number, _name, entry) => [
+                      `${value} runs`,
+                      entry.payload.title
+                    ]}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="usageCount"
+                    stroke="var(--color-accent)"
+                    fillOpacity={1}
+                    fill="url(#usageGradient)"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>

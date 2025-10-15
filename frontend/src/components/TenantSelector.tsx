@@ -115,7 +115,11 @@ export default function TenantSelector({
               disabled={submitting}
             />
           </Field>
-          <Field label="Slug" htmlFor={`${formId}-tenant-slug`} description="Defaults to a URL-safe version of the name">
+          <Field
+            label="Slug"
+            htmlFor={`${formId}-tenant-slug`}
+            description="Defaults to a URL-safe version of the name"
+          >
             <Input
               id={`${formId}-tenant-slug`}
               type="text"

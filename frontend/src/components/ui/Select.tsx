@@ -7,7 +7,11 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, invalid = false, ...props }, ref) => (
-    <select ref={ref} className={cn("pm-select", invalid && "pm-select--invalid", className)} {...props} />
+    <select
+      ref={ref}
+      className={cn("pm-select", invalid && "pm-select--invalid", className)}
+      {...props}
+    />
   )
 );
 

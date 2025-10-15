@@ -67,7 +67,10 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return body as T;
 }
 
-export async function listPrompts(params: PromptQuery, token?: string): Promise<PromptListResponse> {
+export async function listPrompts(
+  params: PromptQuery,
+  token?: string
+): Promise<PromptListResponse> {
   const query = buildQuery(params);
   const headers: HeadersInit = {};
   if (params.tenantId) {
@@ -311,7 +314,11 @@ export async function updatePromptComment(
   return response.data;
 }
 
-export async function deletePromptComment(commentId: string, tenantId: string, token?: string): Promise<void> {
+export async function deletePromptComment(
+  commentId: string,
+  tenantId: string,
+  token?: string
+): Promise<void> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
@@ -344,7 +351,12 @@ export async function fetchPromptShares(
 export async function createPromptShare(
   promptId: string,
   tenantId: string,
-  payload: { targetType: ShareTargetType; targetIdentifier: string; role: ShareRole; expiresAt?: string | null },
+  payload: {
+    targetType: ShareTargetType;
+    targetIdentifier: string;
+    role: ShareRole;
+    expiresAt?: string | null;
+  },
   token?: string
 ): Promise<PromptShare[]> {
   const headers: HeadersInit = {
@@ -373,10 +385,13 @@ export async function removePromptShare(
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
-  const response = await request<{ data: PromptShare[] }>(`/prompts/${promptId}/shares/${shareId}`, {
-    method: "DELETE",
-    headers
-  });
+  const response = await request<{ data: PromptShare[] }>(
+    `/prompts/${promptId}/shares/${shareId}`,
+    {
+      method: "DELETE",
+      headers
+    }
+  );
   return response.data;
 }
 
@@ -483,9 +498,11 @@ function resolveBaseUrl(): string {
     return envValue.replace(/\/$/, "");
   }
 
-  const globalValue = (globalThis as Record<string, unknown> & {
-    __PROMPT_MANAGER_API_BASE__?: string;
-  }).__PROMPT_MANAGER_API_BASE__;
+  const globalValue = (
+    globalThis as Record<string, unknown> & {
+      __PROMPT_MANAGER_API_BASE__?: string;
+    }
+  ).__PROMPT_MANAGER_API_BASE__;
 
   if (typeof globalValue === "string" && globalValue.trim()) {
     return globalValue.trim().replace(/\/$/, "");

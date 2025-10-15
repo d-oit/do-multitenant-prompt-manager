@@ -29,7 +29,13 @@ import {
   fetchRoleAssignments,
   hasPermission
 } from "./auth";
-import { DEFAULT_PAGE_SIZE, DEFAULT_TENANT_ID, MAX_PAGE_SIZE, MAX_TENANT_ID_LENGTH, MAX_USER_IDENTIFIER_LENGTH } from "./constants";
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_TENANT_ID,
+  MAX_PAGE_SIZE,
+  MAX_TENANT_ID_LENGTH,
+  MAX_USER_IDENTIFIER_LENGTH
+} from "./constants";
 import type { Env } from "./types";
 import { createLogger, type Logger } from "./lib/logger";
 import { jsonResponse, readJson, serializeError } from "./lib/json";
@@ -64,7 +70,12 @@ import {
 } from "./lib/templates";
 import { getOpenAPIDocument } from "./openapi";
 import { getSwaggerUIHTML } from "./lib/swagger";
-import { normalizeVersionedPath, getRequestedVersion, addVersionHeaders, isVersionSupported } from "./lib/versioning";
+import {
+  normalizeVersionedPath,
+  getRequestedVersion,
+  addVersionHeaders,
+  isVersionSupported
+} from "./lib/versioning";
 import { addSecurityHeaders } from "./lib/securityHeaders";
 import {
   createPrompt as createPromptService,
@@ -112,10 +123,9 @@ const createPromptSchema = z.object({
   createdBy: userIdentifierSchema.optional()
 });
 
-const updatePromptSchema = createPromptSchema.partial().refine(
-  (value) => Object.keys(value).length > 0,
-  "At least one field must be provided"
-);
+const updatePromptSchema = createPromptSchema
+  .partial()
+  .refine((value) => Object.keys(value).length > 0, "At least one field must be provided");
 
 const createTenantSchema = z.object({
   name: z.string().min(1).max(200),
@@ -221,12 +231,12 @@ export default {
     const start = Date.now();
     const url = new URL(request.url);
     const originalPath = url.pathname.replace(/\/$/, "") || "/";
-    
+
     // Handle API versioning - normalize path and extract version
     const { normalizedPath, version: pathVersion } = normalizeVersionedPath(originalPath);
     const apiVersion = getRequestedVersion(request, originalPath);
     const path = normalizedPath;
-    
+
     // Check if version is supported (only for versioned paths)
     if (pathVersion && !isVersionSupported(pathVersion)) {
       return withCors(jsonResponse({ error: `API version ${pathVersion} is not supported` }, 400));
@@ -237,7 +247,12 @@ export default {
       return withCors(new Response(null, { status: 204, headers: corsHeaders }));
     }
 
-    logger.info("request.start", { requestId, method: request.method, path: originalPath, apiVersion });
+    logger.info("request.start", {
+      requestId,
+      method: request.method,
+      path: originalPath,
+      apiVersion
+    });
 
     ctx.waitUntil(warmCacheIfNeeded(env, logger));
 
@@ -464,7 +479,13 @@ export default {
             ensureTenantAccess(auth, tenantResolution.tenantId);
             requirePermission(auth, "prompt:write", tenantResolution.tenantId);
             const actor = getActorFromAuth(auth);
-            const shares = await removePromptShare(env, promptId, tenantResolution.tenantId, shareId, actor);
+            const shares = await removePromptShare(
+              env,
+              promptId,
+              tenantResolution.tenantId,
+              shareId,
+              actor
+            );
             response = jsonResponse({ data: shares });
           } else if (approvalsMatch) {
             const promptId = approvalsMatch[1];
@@ -508,7 +529,12 @@ export default {
             });
             ensureTenantAccess(auth, tenantResolution.tenantId);
             requirePermission(auth, "prompt:read", tenantResolution.tenantId);
-            response = await handleListVersions(versionMatch[1], env, tenantResolution.tenantId, url);
+            response = await handleListVersions(
+              versionMatch[1],
+              env,
+              tenantResolution.tenantId,
+              url
+            );
           } else if (usageMatch && request.method === "POST") {
             const tenantResolution = await resolveTenantId(request, url, env, {
               allowDefault: true,
@@ -516,7 +542,12 @@ export default {
             });
             ensureTenantAccess(auth, tenantResolution.tenantId);
             requirePermission(auth, "prompt:write", tenantResolution.tenantId);
-            response = await handleRecordUsage(usageMatch[1], request, env, tenantResolution.tenantId);
+            response = await handleRecordUsage(
+              usageMatch[1],
+              request,
+              env,
+              tenantResolution.tenantId
+            );
           } else if (idMatch) {
             const tenantResolution = await resolveTenantId(request, url, env, {
               allowDefault: true,
@@ -553,7 +584,13 @@ export default {
             ensureTenantAccess(auth, tenantResolution.tenantId);
             requirePermission(auth, "prompt:write", tenantResolution.tenantId);
             const actor = getActorFromAuth(auth);
-            const comment = await updatePromptComment(env, commentId, tenantResolution.tenantId, actor, payload);
+            const comment = await updatePromptComment(
+              env,
+              commentId,
+              tenantResolution.tenantId,
+              actor,
+              payload
+            );
             response = jsonResponse({ data: comment });
           } else if (request.method === "DELETE") {
             const tenantResolution = await resolveTenantId(request, url, env, {
@@ -673,12 +710,12 @@ function withCors(response: Response): Response {
   // Add CORS headers
   const headers = new Headers(response.headers);
   corsHeaders.forEach((value, key) => headers.set(key, value));
-  
+
   const responseWithCors = new Response(response.body, {
     status: response.status,
     headers
   });
-  
+
   // Add security headers
   return addSecurityHeaders(responseWithCors, {
     enableHSTS: true,
@@ -688,7 +725,13 @@ function withCors(response: Response): Response {
   });
 }
 
-async function handleList(url: URL, env: Env, tenantId: string, logger: Logger, ctx: ExecutionContext): Promise<Response> {
+async function handleList(
+  url: URL,
+  env: Env,
+  tenantId: string,
+  logger: Logger,
+  ctx: ExecutionContext
+): Promise<Response> {
   const tenant = await ensureTenant(env, tenantId);
 
   const search = url.searchParams.get("search") || undefined;
@@ -703,7 +746,10 @@ async function handleList(url: URL, env: Env, tenantId: string, logger: Logger, 
   const sortOrder: "ASC" | "DESC" = orderParam === "asc" ? "ASC" : "DESC";
 
   const page = Math.max(1, Number.parseInt(url.searchParams.get("page") || "1", 10));
-  const requestedPageSize = Number.parseInt(url.searchParams.get("pageSize") || String(DEFAULT_PAGE_SIZE), 10);
+  const requestedPageSize = Number.parseInt(
+    url.searchParams.get("pageSize") || String(DEFAULT_PAGE_SIZE),
+    10
+  );
   const pageSize = Math.min(Math.max(1, requestedPageSize || DEFAULT_PAGE_SIZE), MAX_PAGE_SIZE);
   const offset = (page - 1) * pageSize;
 
@@ -758,7 +804,12 @@ async function handleCreate(
   return jsonResponse({ data: prompt }, 201);
 }
 
-async function handleRetrieve(id: string, env: Env, tenantId: string | undefined, auth: AuthContext): Promise<Response> {
+async function handleRetrieve(
+  id: string,
+  env: Env,
+  tenantId: string | undefined,
+  auth: AuthContext
+): Promise<Response> {
   const targetTenantId = tenantId ?? DEFAULT_TENANT_ID;
   const prompt = await getPromptService(env, id, targetTenantId);
   if (!prompt) {
@@ -827,8 +878,9 @@ async function handleDelete(
 }
 
 async function handleTenantList(env: Env, auth: AuthContext): Promise<Response> {
-  const results = await env.DB.prepare("SELECT id, name, slug, created_at FROM tenants ORDER BY name ASC")
-    .all<{ id: string; name: string; slug: string; created_at: string }>();
+  const results = await env.DB.prepare(
+    "SELECT id, name, slug, created_at FROM tenants ORDER BY name ASC"
+  ).all<{ id: string; name: string; slug: string; created_at: string }>();
 
   let tenants: Tenant[] = (results.results || []).map((row) => ({
     id: row.id,
@@ -848,7 +900,11 @@ async function handleTenantList(env: Env, auth: AuthContext): Promise<Response> 
   return jsonResponse({ data: tenants });
 }
 
-async function handleTenantCreate(request: Request, env: Env, auth: AuthContext): Promise<Response> {
+async function handleTenantCreate(
+  request: Request,
+  env: Env,
+  auth: AuthContext
+): Promise<Response> {
   const payload = await readJson(request);
   const parsed = createTenantSchema.parse(payload);
   const normalizedName = parsed.name.trim();
@@ -891,9 +947,17 @@ async function handleTenantCreate(request: Request, env: Env, auth: AuthContext)
   return jsonResponse({ data: tenant }, 201);
 }
 
-async function handleListVersions(id: string, env: Env, tenantId: string, url: URL): Promise<Response> {
+async function handleListVersions(
+  id: string,
+  env: Env,
+  tenantId: string,
+  url: URL
+): Promise<Response> {
   const tenant = await ensureTenant(env, tenantId);
-  const limit = Math.min(Math.max(1, Number.parseInt(url.searchParams.get("limit") || "20", 10)), 100);
+  const limit = Math.min(
+    Math.max(1, Number.parseInt(url.searchParams.get("limit") || "20", 10)),
+    100
+  );
 
   try {
     const { prompt, versions } = await listPromptVersionsService(env, id, tenant.id, limit);
@@ -926,7 +990,10 @@ async function handleRecordUsage(
 
 async function handlePromptAnalytics(env: Env, tenantId: string, url: URL): Promise<Response> {
   const tenant = await ensureTenant(env, tenantId);
-  const rangeDays = Math.min(Math.max(1, Number.parseInt(url.searchParams.get("range") || "7", 10)), 90);
+  const rangeDays = Math.min(
+    Math.max(1, Number.parseInt(url.searchParams.get("range") || "7", 10)),
+    90
+  );
   const since = new Date(Date.now() - rangeDays * 24 * 60 * 60 * 1000).toISOString();
 
   const analytics = await env.DB.prepare(
@@ -976,7 +1043,10 @@ async function handlePromptAnalytics(env: Env, tenantId: string, url: URL): Prom
 
 async function handleAnalyticsOverview(env: Env, tenantId: string, url: URL): Promise<Response> {
   const tenant = await ensureTenant(env, tenantId);
-  const rangeDays = Math.min(Math.max(7, Number.parseInt(url.searchParams.get("range") || "14", 10)), 90);
+  const rangeDays = Math.min(
+    Math.max(7, Number.parseInt(url.searchParams.get("range") || "14", 10)),
+    90
+  );
 
   const now = new Date();
   const today = startOfUtcDay(now);
@@ -1136,7 +1206,13 @@ async function handleAnalyticsOverview(env: Env, tenantId: string, url: URL): Pr
       LIMIT 5`
   )
     .bind(isoString(weekStart), tenant.id)
-    .all<{ id: string; title: string; version: number; usage_count: number; last_used: string | null }>();
+    .all<{
+      id: string;
+      title: string;
+      version: number;
+      usage_count: number;
+      last_used: string | null;
+    }>();
 
   const topPrompts: TopPromptSummary[] = (topPromptsQuery.results || []).map((row) => ({
     promptId: row.id,
@@ -1438,7 +1514,12 @@ async function handleBulkArchivePromptsRequest(
     archived: z.boolean().optional().default(true)
   });
   const parsed = archiveSchema.parse(payload);
-  const result = await bulkArchivePrompts(env.DB, tenantResolution.tenantId, parsed.ids, parsed.archived);
+  const result = await bulkArchivePrompts(
+    env.DB,
+    tenantResolution.tenantId,
+    parsed.ids,
+    parsed.archived
+  );
 
   const successEntries = (result.results ?? []).filter((entry) => entry.success);
   if (!successEntries.length) {
@@ -1695,7 +1776,11 @@ async function handleTemplateRender(
   });
 }
 
-async function handleTemplateValidate(request: Request, env: Env, auth: AuthContext): Promise<Response> {
+async function handleTemplateValidate(
+  request: Request,
+  env: Env,
+  auth: AuthContext
+): Promise<Response> {
   requirePermission(auth, "prompt:read");
   const payload = await readJson(request);
   const schema = z.object({
@@ -1724,7 +1809,11 @@ async function handleTemplateValidate(request: Request, env: Env, auth: AuthCont
   });
 }
 
-async function handleTemplateVariables(request: Request, env: Env, auth: AuthContext): Promise<Response> {
+async function handleTemplateVariables(
+  request: Request,
+  env: Env,
+  auth: AuthContext
+): Promise<Response> {
   requirePermission(auth, "prompt:read");
   const payload = await readJson(request);
   const schema = z.object({
@@ -1881,7 +1970,15 @@ async function handleApiKeyList(env: Env, auth: AuthContext): Promise<Response> 
      ORDER BY ak.created_at DESC`
   )
     .bind(auth.user.id)
-    .all<{ id: string; name: string; created_at: string; last_used_at: string | null; revoked: number; tenant_id: string | null; role_name: string }>();
+    .all<{
+      id: string;
+      name: string;
+      created_at: string;
+      last_used_at: string | null;
+      revoked: number;
+      tenant_id: string | null;
+      role_name: string;
+    }>();
 
   const data = (rows.results || []).map((row) => ({
     id: row.id,
@@ -1896,7 +1993,11 @@ async function handleApiKeyList(env: Env, auth: AuthContext): Promise<Response> 
   return jsonResponse({ data });
 }
 
-async function handleApiKeyCreate(request: Request, env: Env, auth: AuthContext): Promise<Response> {
+async function handleApiKeyCreate(
+  request: Request,
+  env: Env,
+  auth: AuthContext
+): Promise<Response> {
   const payload = await readJson(request);
   const parsed = apiKeyCreateSchema.parse(payload);
 
@@ -1931,10 +2032,12 @@ async function handleApiKeyCreate(request: Request, env: Env, auth: AuthContext)
   );
 }
 
-async function handleApiKeyRotate(env: Env, auth: AuthContext, apiKeyId: string): Promise<Response> {
-  const record = await env.DB.prepare(
-    `SELECT id, user_id, revoked FROM api_keys WHERE id = ?`
-  )
+async function handleApiKeyRotate(
+  env: Env,
+  auth: AuthContext,
+  apiKeyId: string
+): Promise<Response> {
+  const record = await env.DB.prepare(`SELECT id, user_id, revoked FROM api_keys WHERE id = ?`)
     .bind(apiKeyId)
     .first<{ id: string; user_id: string; revoked: number }>();
 
@@ -1952,10 +2055,12 @@ async function handleApiKeyRotate(env: Env, auth: AuthContext, apiKeyId: string)
   });
 }
 
-async function handleApiKeyRevoke(env: Env, auth: AuthContext, apiKeyId: string): Promise<Response> {
-  const record = await env.DB.prepare(
-    `SELECT id, user_id, revoked FROM api_keys WHERE id = ?`
-  )
+async function handleApiKeyRevoke(
+  env: Env,
+  auth: AuthContext,
+  apiKeyId: string
+): Promise<Response> {
+  const record = await env.DB.prepare(`SELECT id, user_id, revoked FROM api_keys WHERE id = ?`)
     .bind(apiKeyId)
     .first<{ id: string; user_id: string; revoked: number }>();
 
@@ -2004,7 +2109,9 @@ async function warmTopPrompts(env: Env, logger: Logger): Promise<void> {
 
   const warmCtx: ExecutionContext = {
     waitUntil(promise) {
-      void promise.catch((error) => logger.debug("cache.warm.deferred_error", { error: serializeError(error) }));
+      void promise.catch((error) =>
+        logger.debug("cache.warm.deferred_error", { error: serializeError(error) })
+      );
     },
     passThroughOnException() {
       // no-op

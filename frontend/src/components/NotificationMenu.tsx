@@ -63,7 +63,12 @@ export default function NotificationMenu({ token }: NotificationMenuProps): JSX.
 
   return (
     <div className="notification-menu">
-      <Button variant="ghost" size="sm" onClick={() => setOpen((prev) => !prev)} aria-label="Notifications">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-label="Notifications"
+      >
         🔔
         {unread ? <Badge tone="info">{unread}</Badge> : null}
       </Button>
@@ -71,7 +76,12 @@ export default function NotificationMenu({ token }: NotificationMenuProps): JSX.
         <div className="notification-menu__panel">
           <header className="notification-menu__header">
             <h4>Notifications</h4>
-            <Button variant="ghost" size="xs" onClick={() => void loadNotifications()} disabled={loading}>
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={() => void loadNotifications()}
+              disabled={loading}
+            >
               {loading ? "Loading…" : "Refresh"}
             </Button>
           </header>
@@ -79,13 +89,24 @@ export default function NotificationMenu({ token }: NotificationMenuProps): JSX.
           {notifications.length ? (
             <ul>
               {notifications.map((notification) => (
-                <li key={notification.id} className={notification.readAt ? "notification-menu__item" : "notification-menu__item notification-menu__item--unread"}>
+                <li
+                  key={notification.id}
+                  className={
+                    notification.readAt
+                      ? "notification-menu__item"
+                      : "notification-menu__item notification-menu__item--unread"
+                  }
+                >
                   <div>
                     <p className="notification-menu__message">{notification.message}</p>
                     <p className="notification-menu__meta">{formatDate(notification.createdAt)}</p>
                   </div>
                   {!notification.readAt ? (
-                    <Button variant="ghost" size="xs" onClick={() => void handleMarkRead(notification.id)}>
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => void handleMarkRead(notification.id)}
+                    >
                       Mark read
                     </Button>
                   ) : null}

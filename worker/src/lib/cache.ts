@@ -72,9 +72,11 @@ export async function writeJsonCache<T>(
   if (envelope.tags.length) {
     await Promise.all(
       envelope.tags.map((tag) =>
-        env.PROMPT_CACHE.put(tagKey(tag, key), "1", { expirationTtl: ttl + staleWindow }).catch((error) => {
-          logger?.warn("cache.tag_error", { tag, key, error: String(error) });
-        })
+        env.PROMPT_CACHE.put(tagKey(tag, key), "1", { expirationTtl: ttl + staleWindow }).catch(
+          (error) => {
+            logger?.warn("cache.tag_error", { tag, key, error: String(error) });
+          }
+        )
       )
     );
   }
@@ -124,7 +126,11 @@ export async function recordCacheMetric(env: Env, event: string, logger?: Logger
   try {
     const key = "meta:cache:metrics";
     const current = await env.PROMPT_CACHE.get<Record<string, number>>(key, { type: "json" });
-    const next = { ...(current ?? {}), [event]: (current?.[event] ?? 0) + 1, updatedAt: Date.now() };
+    const next = {
+      ...(current ?? {}),
+      [event]: (current?.[event] ?? 0) + 1,
+      updatedAt: Date.now()
+    };
     await env.PROMPT_CACHE.put(key, JSON.stringify(next), { expirationTtl: 24 * 60 * 60 });
   } catch (error) {
     logger?.debug("cache.metric.error", { event, error: String(error) });

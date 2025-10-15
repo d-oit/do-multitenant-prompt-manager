@@ -24,11 +24,7 @@ export function RateLimitDashboard({ token }: RateLimitDashboardProps): JSX.Elem
     setLoading(true);
     try {
       // Fetch from multiple endpoints to get rate limit info
-      const endpoints = [
-        '/prompts',
-        '/analytics/overview',
-        '/tenants'
-      ];
+      const endpoints = ["/prompts", "/analytics/overview", "/tenants"];
 
       const results = await Promise.all(
         endpoints.map(async (endpoint) => {
@@ -39,9 +35,9 @@ export function RateLimitDashboard({ token }: RateLimitDashboardProps): JSX.Elem
               }
             });
 
-            const limit = parseInt(response.headers.get('X-RateLimit-Limit') || '0', 10);
-            const remaining = parseInt(response.headers.get('X-RateLimit-Remaining') || '0', 10);
-            const reset = parseInt(response.headers.get('X-RateLimit-Reset') || '0', 10);
+            const limit = parseInt(response.headers.get("X-RateLimit-Limit") || "0", 10);
+            const remaining = parseInt(response.headers.get("X-RateLimit-Remaining") || "0", 10);
+            const reset = parseInt(response.headers.get("X-RateLimit-Reset") || "0", 10);
 
             if (limit > 0) {
               return {
@@ -78,24 +74,24 @@ export function RateLimitDashboard({ token }: RateLimitDashboardProps): JSX.Elem
   const formatResetTime = (reset: number): string => {
     const now = Math.floor(Date.now() / 1000);
     const seconds = reset - now;
-    
+
     if (seconds < 60) {
       return `${seconds}s`;
     }
-    
+
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) {
       return `${minutes}m`;
     }
-    
+
     const hours = Math.floor(minutes / 60);
     return `${hours}h ${minutes % 60}m`;
   };
 
   const getStatusColor = (percentage: number): string => {
-    if (percentage > 50) return 'var(--pm-color-success)';
-    if (percentage > 20) return 'var(--pm-color-warning)';
-    return 'var(--pm-color-error)';
+    if (percentage > 50) return "var(--pm-color-success)";
+    if (percentage > 20) return "var(--pm-color-warning)";
+    return "var(--pm-color-error)";
   };
 
   if (!token) {
@@ -115,13 +111,8 @@ export function RateLimitDashboard({ token }: RateLimitDashboardProps): JSX.Elem
     <Card>
       <div className="pm-card__header">
         <h3>Rate Limit Monitor</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => void fetchRateLimits()}
-          disabled={loading}
-        >
-          {loading ? 'Refreshing...' : 'Refresh'}
+        <Button variant="ghost" size="sm" onClick={() => void fetchRateLimits()} disabled={loading}>
+          {loading ? "Refreshing..." : "Refresh"}
         </Button>
       </div>
       <div className="pm-card__content">
@@ -150,10 +141,7 @@ export function RateLimitDashboard({ token }: RateLimitDashboardProps): JSX.Elem
                   <span className="pm-text-muted pm-text-xs">
                     Resets in {formatResetTime(limit.reset)}
                   </span>
-                  <span
-                    className="pm-text-xs"
-                    style={{ color: getStatusColor(limit.percentage) }}
-                  >
+                  <span className="pm-text-xs" style={{ color: getStatusColor(limit.percentage) }}>
                     {limit.percentage.toFixed(0)}% remaining
                   </span>
                 </div>

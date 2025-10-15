@@ -12,10 +12,10 @@ describe("Button", () => {
   it("handles click events", async () => {
     const user = userEvent.setup();
     const handleClick = vi.fn();
-    
+
     render(<Button onClick={handleClick}>Click me</Button>);
     await user.click(screen.getByRole("button"));
-    
+
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
@@ -51,7 +51,7 @@ describe("Button", () => {
     const { rerender } = render(<Button size="sm">Small</Button>);
     expect(screen.getByRole("button")).toHaveClass("pm-button--sm");
     expect(screen.getByRole("button")).toHaveClass("pm-button");
-    
+
     rerender(<Button size="lg">Large</Button>);
     expect(screen.getByRole("button")).toHaveClass("pm-button--lg");
     expect(screen.getByRole("button")).toHaveClass("pm-button");
@@ -71,10 +71,14 @@ describe("Button", () => {
   it("does not call onClick when disabled", async () => {
     const user = userEvent.setup();
     const handleClick = vi.fn();
-    
-    render(<Button disabled onClick={handleClick}>Disabled</Button>);
+
+    render(
+      <Button disabled onClick={handleClick}>
+        Disabled
+      </Button>
+    );
     await user.click(screen.getByRole("button"));
-    
+
     expect(handleClick).not.toHaveBeenCalled();
   });
 

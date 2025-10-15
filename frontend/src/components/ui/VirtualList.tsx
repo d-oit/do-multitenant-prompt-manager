@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode
+} from "react";
 
 interface VirtualListProps<T> {
   items: T[];
@@ -29,24 +36,27 @@ export function VirtualList<T>({
   // Calculate visible range
   const visibleStart = Math.floor(scrollTop / itemHeight);
   const visibleEnd = Math.ceil((scrollTop + height) / itemHeight);
-  
+
   // Apply overscan
   const start = Math.max(0, visibleStart - overscan);
   const end = Math.min(items.length, visibleEnd + overscan);
-  
+
   // Get visible items
   const visibleItems = items.slice(start, end);
-  
+
   // Calculate total height and offset
   const totalHeight = items.length * itemHeight;
   const offsetY = start * itemHeight;
 
   // Handle scroll
-  const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
-    const newScrollTop = event.currentTarget.scrollTop;
-    setScrollTop(newScrollTop);
-    onScroll?.(newScrollTop);
-  }, [onScroll]);
+  const handleScroll = useCallback(
+    (event: React.UIEvent<HTMLDivElement>) => {
+      const newScrollTop = event.currentTarget.scrollTop;
+      setScrollTop(newScrollTop);
+      onScroll?.(newScrollTop);
+    },
+    [onScroll]
+  );
 
   // Scroll to top when items change
   useEffect(() => {
@@ -58,18 +68,18 @@ export function VirtualList<T>({
 
   const containerStyle: CSSProperties = {
     height: `${height}px`,
-    overflow: 'auto',
-    position: 'relative',
-    willChange: 'transform'
+    overflow: "auto",
+    position: "relative",
+    willChange: "transform"
   };
 
   const spacerStyle: CSSProperties = {
     height: `${totalHeight}px`,
-    position: 'relative'
+    position: "relative"
   };
 
   const contentStyle: CSSProperties = {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
@@ -77,12 +87,7 @@ export function VirtualList<T>({
   };
 
   return (
-    <div
-      ref={containerRef}
-      className={className}
-      style={containerStyle}
-      onScroll={handleScroll}
-    >
+    <div ref={containerRef} className={className} style={containerStyle} onScroll={handleScroll}>
       <div style={spacerStyle}>
         <div style={contentStyle}>
           {visibleItems.map((item, index) => (
@@ -128,22 +133,22 @@ export function VirtualGrid<T>({
   // Calculate rows
   const rows = Math.ceil(items.length / columns);
   const rowHeight = itemHeight + gap;
-  
+
   // Calculate visible range
   const visibleStartRow = Math.floor(scrollTop / rowHeight);
   const visibleEndRow = Math.ceil((scrollTop + height) / rowHeight);
-  
+
   // Apply overscan
   const startRow = Math.max(0, visibleStartRow - overscan);
   const endRow = Math.min(rows, visibleEndRow + overscan);
-  
+
   // Calculate item indices
   const startIndex = startRow * columns;
   const endIndex = Math.min(items.length, endRow * columns);
-  
+
   // Get visible items
   const visibleItems = items.slice(startIndex, endIndex);
-  
+
   // Calculate total height and offset
   const totalHeight = rows * rowHeight;
   const offsetY = startRow * rowHeight;
@@ -154,39 +159,32 @@ export function VirtualGrid<T>({
 
   const containerStyle: CSSProperties = {
     height: `${height}px`,
-    overflow: 'auto',
-    position: 'relative'
+    overflow: "auto",
+    position: "relative"
   };
 
   const spacerStyle: CSSProperties = {
     height: `${totalHeight}px`,
-    position: 'relative'
+    position: "relative"
   };
 
   const contentStyle: CSSProperties = {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     transform: `translateY(${offsetY}px)`,
-    display: 'grid',
+    display: "grid",
     gridTemplateColumns: `repeat(${columns}, ${itemWidth}px)`,
     gap: `${gap}px`
   };
 
   return (
-    <div
-      ref={containerRef}
-      className={className}
-      style={containerStyle}
-      onScroll={handleScroll}
-    >
+    <div ref={containerRef} className={className} style={containerStyle} onScroll={handleScroll}>
       <div style={spacerStyle}>
         <div style={contentStyle}>
           {visibleItems.map((item, index) => (
-            <div key={startIndex + index}>
-              {renderItem(item, startIndex + index)}
-            </div>
+            <div key={startIndex + index}>{renderItem(item, startIndex + index)}</div>
           ))}
         </div>
       </div>
@@ -207,10 +205,10 @@ export function useVirtualScroll(
 
   const visibleStart = Math.floor(scrollTop / itemHeight);
   const visibleEnd = Math.ceil((scrollTop + containerHeight) / itemHeight);
-  
+
   const start = Math.max(0, visibleStart - overscan);
   const end = Math.min(itemCount, visibleEnd + overscan);
-  
+
   const totalHeight = itemCount * itemHeight;
   const offsetY = start * itemHeight;
 

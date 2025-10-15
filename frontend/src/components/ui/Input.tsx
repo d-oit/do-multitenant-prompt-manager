@@ -7,7 +7,11 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, invalid = false, ...props }, ref) => (
-    <input ref={ref} className={cn("pm-input", invalid && "pm-input--invalid", className)} {...props} />
+    <input
+      ref={ref}
+      className={cn("pm-input", invalid && "pm-input--invalid", className)}
+      {...props}
+    />
   )
 );
 

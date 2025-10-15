@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { Prompt } from '../types';
+import { useState } from "react";
+import type { Prompt } from "../types";
 
 interface VersionComparisonProps {
   versions: Prompt[];
@@ -9,13 +9,18 @@ interface VersionComparisonProps {
 }
 
 interface Change {
-  type: 'added' | 'removed' | 'modified';
+  type: "added" | "removed" | "modified";
   field: string;
   oldValue?: string;
   newValue?: string;
 }
 
-export function VersionComparison({ versions, currentVersionId, onRestore, onClose }: VersionComparisonProps) {
+export function VersionComparison({
+  versions,
+  currentVersionId,
+  onRestore,
+  onClose
+}: VersionComparisonProps) {
   const [selectedVersionId, setSelectedVersionId] = useState<string>(
     versions.length > 1 ? versions[1].id : versions[0].id
   );
@@ -37,7 +42,7 @@ export function VersionComparison({ versions, currentVersionId, onRestore, onClo
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'just now';
+    if (diffMins < 1) return "just now";
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;
@@ -75,7 +80,11 @@ export function VersionComparison({ versions, currentVersionId, onRestore, onClo
             className="input"
           >
             {versions.map((version, idx) => (
-              <option key={version.id} value={version.id} disabled={version.id === currentVersionId}>
+              <option
+                key={version.id}
+                value={version.id}
+                disabled={version.id === currentVersionId}
+              >
                 v{idx + 1} - {formatDate(version.updatedAt)}
               </option>
             ))}
@@ -92,7 +101,9 @@ export function VersionComparison({ versions, currentVersionId, onRestore, onClo
           </div>
           <div className="version-comparison__field">
             <div className="version-comparison__field-label">Body</div>
-            <div className="version-comparison__value version-comparison__body">{currentVersion.body}</div>
+            <div className="version-comparison__value version-comparison__body">
+              {currentVersion.body}
+            </div>
           </div>
           <div className="version-comparison__field">
             <div className="version-comparison__field-label">Tags</div>
@@ -110,7 +121,10 @@ export function VersionComparison({ versions, currentVersionId, onRestore, onClo
           <h3>
             Previous (v{versions.indexOf(selectedVersion) + 1})
             {onRestore && (
-              <button onClick={() => onRestore(selectedVersionId)} className="btn btn-secondary btn-sm">
+              <button
+                onClick={() => onRestore(selectedVersionId)}
+                className="btn btn-secondary btn-sm"
+              >
                 Restore
               </button>
             )}
@@ -121,7 +135,9 @@ export function VersionComparison({ versions, currentVersionId, onRestore, onClo
           </div>
           <div className="version-comparison__field">
             <div className="version-comparison__field-label">Body</div>
-            <div className="version-comparison__value version-comparison__body">{selectedVersion.body}</div>
+            <div className="version-comparison__value version-comparison__body">
+              {selectedVersion.body}
+            </div>
           </div>
           <div className="version-comparison__field">
             <div className="version-comparison__field-label">Tags</div>
@@ -143,11 +159,14 @@ export function VersionComparison({ versions, currentVersionId, onRestore, onClo
         ) : (
           <ul className="version-comparison__changes-list">
             {changes.map((change, idx) => (
-              <li key={idx} className={`version-comparison__change version-comparison__change--${change.type}`}>
+              <li
+                key={idx}
+                className={`version-comparison__change version-comparison__change--${change.type}`}
+              >
                 <span className="version-comparison__change-icon">
-                  {change.type === 'added' && '+'}
-                  {change.type === 'removed' && '-'}
-                  {change.type === 'modified' && '~'}
+                  {change.type === "added" && "+"}
+                  {change.type === "removed" && "-"}
+                  {change.type === "modified" && "~"}
                 </span>
                 <span className="version-comparison__change-text">{formatChange(change)}</span>
               </li>
@@ -165,20 +184,20 @@ function compareVersions(current: Prompt, previous: Prompt): Change[] {
   // Compare title
   if (current.title !== previous.title) {
     changes.push({
-      type: 'modified',
-      field: 'title',
+      type: "modified",
+      field: "title",
       oldValue: previous.title,
-      newValue: current.title,
+      newValue: current.title
     });
   }
 
   // Compare body
   if (current.body !== previous.body) {
     changes.push({
-      type: 'modified',
-      field: 'body',
-      oldValue: previous.body.slice(0, 50) + '...',
-      newValue: current.body.slice(0, 50) + '...',
+      type: "modified",
+      field: "body",
+      oldValue: previous.body.slice(0, 50) + "...",
+      newValue: current.body.slice(0, 50) + "..."
     });
   }
 
@@ -189,9 +208,9 @@ function compareVersions(current: Prompt, previous: Prompt): Change[] {
   previousTags.forEach((tag) => {
     if (!currentTags.has(tag)) {
       changes.push({
-        type: 'removed',
-        field: 'tag',
-        oldValue: tag,
+        type: "removed",
+        field: "tag",
+        oldValue: tag
       });
     }
   });
@@ -199,9 +218,9 @@ function compareVersions(current: Prompt, previous: Prompt): Change[] {
   currentTags.forEach((tag) => {
     if (!previousTags.has(tag)) {
       changes.push({
-        type: 'added',
-        field: 'tag',
-        newValue: tag,
+        type: "added",
+        field: "tag",
+        newValue: tag
       });
     }
   });
@@ -213,16 +232,16 @@ function compareVersions(current: Prompt, previous: Prompt): Change[] {
   Object.keys(previousMetadata).forEach((key) => {
     if (!(key in currentMetadata)) {
       changes.push({
-        type: 'removed',
+        type: "removed",
         field: `metadata.${key}`,
-        oldValue: String(previousMetadata[key]),
+        oldValue: String(previousMetadata[key])
       });
     } else if (currentMetadata[key] !== previousMetadata[key]) {
       changes.push({
-        type: 'modified',
+        type: "modified",
         field: `metadata.${key}`,
         oldValue: String(previousMetadata[key]),
-        newValue: String(currentMetadata[key]),
+        newValue: String(currentMetadata[key])
       });
     }
   });
@@ -230,9 +249,9 @@ function compareVersions(current: Prompt, previous: Prompt): Change[] {
   Object.keys(currentMetadata).forEach((key) => {
     if (!(key in previousMetadata)) {
       changes.push({
-        type: 'added',
+        type: "added",
         field: `metadata.${key}`,
-        newValue: String(currentMetadata[key]),
+        newValue: String(currentMetadata[key])
       });
     }
   });
@@ -242,13 +261,13 @@ function compareVersions(current: Prompt, previous: Prompt): Change[] {
 
 function formatChange(change: Change): string {
   switch (change.type) {
-    case 'added':
+    case "added":
       return `Added ${change.field}: ${change.newValue}`;
-    case 'removed':
+    case "removed":
       return `Removed ${change.field}: ${change.oldValue}`;
-    case 'modified':
+    case "modified":
       return `Changed ${change.field}: ${change.oldValue} → ${change.newValue}`;
     default:
-      return '';
+      return "";
   }
 }

@@ -11,42 +11,42 @@ import {
 describe("normalizeVersionedPath", () => {
   it("extracts version from /v1/ prefix", () => {
     const result = normalizeVersionedPath("/v1/prompts");
-    
+
     expect(result.version).toBe("v1");
     expect(result.normalizedPath).toBe("/prompts");
   });
 
   it("handles /v1 without trailing path", () => {
     const result = normalizeVersionedPath("/v1");
-    
+
     expect(result.version).toBe("v1");
     expect(result.normalizedPath).toBe("/");
   });
 
   it("returns null version for non-versioned paths", () => {
     const result = normalizeVersionedPath("/prompts");
-    
+
     expect(result.version).toBeNull();
     expect(result.normalizedPath).toBe("/prompts");
   });
 
   it("handles root path", () => {
     const result = normalizeVersionedPath("/");
-    
+
     expect(result.version).toBeNull();
     expect(result.normalizedPath).toBe("/");
   });
 
   it("handles /v2/ prefix", () => {
     const result = normalizeVersionedPath("/v2/prompts");
-    
+
     expect(result.version).toBe("v2");
     expect(result.normalizedPath).toBe("/prompts");
   });
 
   it("handles nested paths", () => {
     const result = normalizeVersionedPath("/v1/prompts/123/versions");
-    
+
     expect(result.version).toBe("v1");
     expect(result.normalizedPath).toBe("/prompts/123/versions");
   });
@@ -57,9 +57,9 @@ describe("getRequestedVersion", () => {
     const request = new Request("http://example.com/v1/prompts", {
       headers: { "Accept-Version": "v2" }
     });
-    
+
     const version = getRequestedVersion(request, "/v1/prompts");
-    
+
     expect(version).toBe("v1");
   });
 
@@ -67,17 +67,17 @@ describe("getRequestedVersion", () => {
     const request = new Request("http://example.com/prompts", {
       headers: { "Accept-Version": "v1" }
     });
-    
+
     const version = getRequestedVersion(request, "/prompts");
-    
+
     expect(version).toBe("v1");
   });
 
   it("returns default v1 when neither path nor header present", () => {
     const request = new Request("http://example.com/prompts");
-    
+
     const version = getRequestedVersion(request, "/prompts");
-    
+
     expect(version).toBe("v1");
   });
 
@@ -85,16 +85,16 @@ describe("getRequestedVersion", () => {
     const request = new Request("http://example.com/prompts", {
       headers: { "Accept-Version": "v99" }
     });
-    
+
     const version = getRequestedVersion(request, "/prompts");
-    
+
     expect(version).toBe("v1");
   });
 });
 
 describe("isVersionSupported", () => {
   it("returns true for supported versions", () => {
-    SUPPORTED_VERSIONS.forEach(version => {
+    SUPPORTED_VERSIONS.forEach((version) => {
       expect(isVersionSupported(version)).toBe(true);
     });
   });
@@ -114,25 +114,25 @@ describe("isVersionSupported", () => {
 describe("addVersionHeaders", () => {
   it("adds API-Version header", () => {
     const response = new Response("test");
-    
+
     const updatedResponse = addVersionHeaders(response, "v1");
-    
+
     expect(updatedResponse.headers.get("API-Version")).toBe("v1");
   });
 
   it("adds API-Version-Info header", () => {
     const response = new Response("test");
-    
+
     const updatedResponse = addVersionHeaders(response, "v1");
-    
+
     expect(updatedResponse.headers.get("API-Version-Info")).toBe(API_VERSION);
   });
 
   it("preserves original response body and status", async () => {
     const response = new Response("test content", { status: 201 });
-    
+
     const updatedResponse = addVersionHeaders(response, "v1");
-    
+
     expect(updatedResponse.status).toBe(201);
     expect(await updatedResponse.text()).toBe("test content");
   });
@@ -141,9 +141,9 @@ describe("addVersionHeaders", () => {
     const response = new Response("test", {
       headers: { "Content-Type": "application/json" }
     });
-    
+
     const updatedResponse = addVersionHeaders(response, "v1");
-    
+
     expect(updatedResponse.headers.get("Content-Type")).toBe("application/json");
   });
 });

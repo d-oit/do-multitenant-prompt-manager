@@ -9,7 +9,12 @@ import {
 } from "../repositories/commentRepository";
 import { logCommentActivity } from "../repositories/commentActivityRepository";
 import { logActivity, type ActivityRecord, listActivity } from "../repositories/activityRepository";
-import { addShare, listShares, removeShare, type ShareRecord } from "../repositories/shareRepository";
+import {
+  addShare,
+  listShares,
+  removeShare,
+  type ShareRecord
+} from "../repositories/shareRepository";
 import {
   createApproval,
   listApprovals,
@@ -51,7 +56,11 @@ interface ApprovalInput {
   actor: string;
 }
 
-export async function getPromptOrThrow(env: Env, promptId: string, tenantId: string): Promise<Prompt> {
+export async function getPromptOrThrow(
+  env: Env,
+  promptId: string,
+  tenantId: string
+): Promise<Prompt> {
   const prompt = await assertPromptTenant(env, promptId, tenantId);
   if (!prompt) {
     throw new Error("Prompt not found");
@@ -59,7 +68,11 @@ export async function getPromptOrThrow(env: Env, promptId: string, tenantId: str
   return prompt;
 }
 
-export async function listPromptComments(env: Env, promptId: string, tenantId: string): Promise<CommentRecord[]> {
+export async function listPromptComments(
+  env: Env,
+  promptId: string,
+  tenantId: string
+): Promise<CommentRecord[]> {
   await getPromptOrThrow(env, promptId, tenantId);
   return listComments(env, promptId, tenantId);
 }
@@ -142,7 +155,12 @@ export async function updatePromptComment(
   return updated;
 }
 
-export async function removePromptComment(env: Env, commentId: string, tenantId: string, actor: string): Promise<void> {
+export async function removePromptComment(
+  env: Env,
+  commentId: string,
+  tenantId: string,
+  actor: string
+): Promise<void> {
   const comment = await updateComment(env, commentId, tenantId, {});
   if (!comment) {
     throw new Error("Comment not found");
@@ -170,7 +188,11 @@ export async function removePromptComment(env: Env, commentId: string, tenantId:
   });
 }
 
-export async function listPromptShares(env: Env, promptId: string, tenantId: string): Promise<ShareRecord[]> {
+export async function listPromptShares(
+  env: Env,
+  promptId: string,
+  tenantId: string
+): Promise<ShareRecord[]> {
   await getPromptOrThrow(env, promptId, tenantId);
   return listShares(env, promptId, tenantId);
 }
@@ -208,7 +230,13 @@ export async function addPromptShare(env: Env, input: ShareInput): Promise<Share
   return listShares(env, input.promptId, input.tenantId);
 }
 
-export async function removePromptShare(env: Env, promptId: string, tenantId: string, shareId: string, actor: string): Promise<ShareRecord[]> {
+export async function removePromptShare(
+  env: Env,
+  promptId: string,
+  tenantId: string,
+  shareId: string,
+  actor: string
+): Promise<ShareRecord[]> {
   await getPromptOrThrow(env, promptId, tenantId);
   const removed = await removeShare(env, shareId, tenantId);
   if (!removed) {
@@ -294,21 +322,36 @@ export async function updateApproval(
   return updated;
 }
 
-export async function listPromptApprovals(env: Env, promptId: string, tenantId: string): Promise<ApprovalRecord[]> {
+export async function listPromptApprovals(
+  env: Env,
+  promptId: string,
+  tenantId: string
+): Promise<ApprovalRecord[]> {
   await getPromptOrThrow(env, promptId, tenantId);
   return listApprovals(env, promptId, tenantId);
 }
 
-export async function listPromptActivity(env: Env, promptId: string, tenantId: string): Promise<ActivityRecord[]> {
+export async function listPromptActivity(
+  env: Env,
+  promptId: string,
+  tenantId: string
+): Promise<ActivityRecord[]> {
   await getPromptOrThrow(env, promptId, tenantId);
   return listActivity(env, promptId, tenantId, 200);
 }
 
-export async function listUserNotifications(env: Env, recipient: string): Promise<NotificationRecord[]> {
+export async function listUserNotifications(
+  env: Env,
+  recipient: string
+): Promise<NotificationRecord[]> {
   return listNotifications(env, recipient, 100);
 }
 
-export async function markNotificationAsRead(env: Env, notificationId: string, recipient: string): Promise<NotificationRecord> {
+export async function markNotificationAsRead(
+  env: Env,
+  notificationId: string,
+  recipient: string
+): Promise<NotificationRecord> {
   const note = await markNotificationRead(env, notificationId, recipient);
   if (!note) {
     throw new Error("Notification not found");

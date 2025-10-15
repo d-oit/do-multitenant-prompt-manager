@@ -11,7 +11,10 @@ export interface NotificationRecord {
   createdAt: string;
 }
 
-export async function createNotification(env: Env, notification: NotificationRecord): Promise<void> {
+export async function createNotification(
+  env: Env,
+  notification: NotificationRecord
+): Promise<void> {
   await env.DB.prepare(
     `INSERT INTO notifications (id, tenant_id, recipient, type, message, metadata, read_at, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
@@ -29,7 +32,11 @@ export async function createNotification(env: Env, notification: NotificationRec
     .run();
 }
 
-export async function listNotifications(env: Env, recipient: string, limit = 50): Promise<NotificationRecord[]> {
+export async function listNotifications(
+  env: Env,
+  recipient: string,
+  limit = 50
+): Promise<NotificationRecord[]> {
   const rows = await env.DB.prepare(
     `SELECT id, tenant_id, recipient, type, message, metadata, read_at, created_at
      FROM notifications
@@ -61,7 +68,11 @@ export async function listNotifications(env: Env, recipient: string, limit = 50)
   }));
 }
 
-export async function markNotificationRead(env: Env, notificationId: string, recipient: string): Promise<NotificationRecord | null> {
+export async function markNotificationRead(
+  env: Env,
+  notificationId: string,
+  recipient: string
+): Promise<NotificationRecord | null> {
   const existing = await env.DB.prepare(
     `SELECT id, tenant_id, recipient, type, message, metadata, read_at, created_at
      FROM notifications
@@ -85,9 +96,7 @@ export async function markNotificationRead(env: Env, notificationId: string, rec
 
   const readAt = existing.read_at ?? new Date().toISOString();
 
-  await env.DB.prepare(
-    `UPDATE notifications SET read_at = ? WHERE id = ?`
-  )
+  await env.DB.prepare(`UPDATE notifications SET read_at = ? WHERE id = ?`)
     .bind(readAt, notificationId)
     .run();
 

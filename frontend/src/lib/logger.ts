@@ -70,7 +70,11 @@ export function logWarn(message: string, context?: Record<string, unknown>): voi
   console.warn(namespace, message, sanitizeContext(context));
 }
 
-export function logError(message: string, error?: unknown, context?: Record<string, unknown>): void {
+export function logError(
+  message: string,
+  error?: unknown,
+  context?: Record<string, unknown>
+): void {
   if (!shouldLog("error")) return;
   const payload = {
     ...sanitizeContext(context),

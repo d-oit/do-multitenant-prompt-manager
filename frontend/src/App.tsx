@@ -11,7 +11,11 @@ import Input from "./components/ui/Input";
 import Badge from "./components/ui/Badge";
 import { DarkModeToggle } from "./components/ui/DarkModeToggle";
 import { ToastContainer, useToast } from "./components/ui/Toast";
-import { KeyboardShortcutsHelp, type KeyboardShortcut, useKeyboardShortcuts } from "./components/ui/KeyboardShortcuts";
+import {
+  KeyboardShortcutsHelp,
+  type KeyboardShortcut,
+  useKeyboardShortcuts
+} from "./components/ui/KeyboardShortcuts";
 import { LoadingOverlay, Spinner } from "./components/ui/LoadingState";
 import { ErrorState, NoTenants } from "./components/ui/EmptyState";
 import { cn } from "./design-system/utils";
@@ -80,7 +84,10 @@ export default function App(): JSX.Element {
         setTenants(response);
         if (!response.length) {
           setSelectedTenantId("");
-        } else if (!selectedTenantId || !response.some((tenant) => tenant.id === selectedTenantId)) {
+        } else if (
+          !selectedTenantId ||
+          !response.some((tenant) => tenant.id === selectedTenantId)
+        ) {
           setSelectedTenantId(response[0].id);
         }
       } catch (error) {
@@ -223,9 +230,7 @@ export default function App(): JSX.Element {
     }
 
     if (!selectedTenantId) {
-      return (
-        <LoadingOverlay message="Select a tenant to continue" />
-      );
+      return <LoadingOverlay message="Select a tenant to continue" />;
     }
 
     return (
@@ -259,10 +264,10 @@ export default function App(): JSX.Element {
       <ToastContainer toasts={toast.toasts} onDismiss={toast.dismissToast} />
       <header className="app-shell__header">
         <div className="app-header flex items-center justify-between gap-lg">
-            <div className="flex items-center gap-md">
-              <h1 className="app-header__title">Prompt Manager</h1>
-              <Badge tone="info">Production</Badge>
-            </div>
+          <div className="flex items-center gap-md">
+            <h1 className="app-header__title">Prompt Manager</h1>
+            <Badge tone="info">Production</Badge>
+          </div>
           <div className="flex items-center gap-md">
             <div className="app-header__token-input">
               <Input
@@ -328,15 +333,16 @@ export default function App(): JSX.Element {
           </div>
         </div>
       </aside>
-      <main className="app-shell__main">
-        {renderMainContent()}
-      </main>
+      <main className="app-shell__main">{renderMainContent()}</main>
       <nav className="app-bottom-nav">
         {navItems.map((item) => (
           <Button
             key={`mobile-${item.id}`}
             variant={activeView === item.id ? "primary" : "ghost"}
-            className={cn("app-bottom-nav__item", activeView === item.id && "app-bottom-nav__item--active")}
+            className={cn(
+              "app-bottom-nav__item",
+              activeView === item.id && "app-bottom-nav__item--active"
+            )}
             onClick={() => setActiveView(item.id)}
           >
             <span aria-hidden="true">{item.icon}</span>

@@ -15,13 +15,9 @@ describe("cn (className utility)", () => {
   it("handles conditional classes", () => {
     const isActive = true;
     const isDisabled = false;
-    
-    const result = cn(
-      "base-class",
-      isActive && "active",
-      isDisabled && "disabled"
-    );
-    
+
+    const result = cn("base-class", isActive && "active", isDisabled && "disabled");
+
     expect(result).toBe("base-class active");
   });
 

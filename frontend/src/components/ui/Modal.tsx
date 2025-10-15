@@ -3,15 +3,15 @@
  * Accessible modal dialog with backdrop and focus management
  */
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
   children: ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: "sm" | "md" | "lg" | "xl";
   showCloseButton?: boolean;
   closeOnBackdropClick?: boolean;
   closeOnEscape?: boolean;
@@ -22,10 +22,10 @@ export function Modal({
   onClose,
   title,
   children,
-  size = 'md',
+  size = "md",
   showCloseButton = true,
   closeOnBackdropClick = true,
-  closeOnEscape = true,
+  closeOnEscape = true
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
@@ -36,7 +36,7 @@ export function Modal({
       previousActiveElement.current = document.activeElement as HTMLElement;
 
       // Prevent body scroll
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
 
       // Focus modal
       setTimeout(() => {
@@ -45,16 +45,16 @@ export function Modal({
 
       // Handle escape key
       const handleEscape = (e: KeyboardEvent) => {
-        if (closeOnEscape && e.key === 'Escape') {
+        if (closeOnEscape && e.key === "Escape") {
           onClose();
         }
       };
 
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
 
       return () => {
-        document.removeEventListener('keydown', handleEscape);
-        document.body.style.overflow = '';
+        document.removeEventListener("keydown", handleEscape);
+        document.body.style.overflow = "";
 
         // Restore focus
         previousActiveElement.current?.focus();
@@ -65,10 +65,10 @@ export function Modal({
   if (!isOpen) return null;
 
   const sizeClasses = {
-    sm: 'modal--sm',
-    md: 'modal--md',
-    lg: 'modal--lg',
-    xl: 'modal--xl',
+    sm: "modal--sm",
+    md: "modal--md",
+    lg: "modal--lg",
+    xl: "modal--xl"
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -84,7 +84,7 @@ export function Modal({
         className={`modal ${sizeClasses[size]}`}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? 'modal-title' : undefined}
+        aria-labelledby={title ? "modal-title" : undefined}
         ref={modalRef}
         tabIndex={-1}
       >
@@ -125,7 +125,7 @@ export interface ConfirmDialogProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
-  variant?: 'danger' | 'warning' | 'info';
+  variant?: "danger" | "warning" | "info";
   requireConfirmText?: string; // If provided, user must type this to confirm
 }
 
@@ -135,12 +135,12 @@ export function ConfirmDialog({
   onConfirm,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
-  variant = 'info',
-  requireConfirmText,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  variant = "info",
+  requireConfirmText
 }: ConfirmDialogProps) {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
 
   const canConfirm = requireConfirmText ? inputValue === requireConfirmText : true;
 
@@ -151,7 +151,7 @@ export function ConfirmDialog({
     }
   };
 
-  const variantClass = variant === 'danger' ? 'btn-danger' : 'btn-primary';
+  const variantClass = variant === "danger" ? "btn-danger" : "btn-primary";
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">

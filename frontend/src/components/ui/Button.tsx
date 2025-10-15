@@ -25,7 +25,10 @@ const sizeClassMap: Record<ButtonSize, string> = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", size = "md", fullWidth = false, type = "button", ...props }, ref) => {
+  (
+    { className, variant = "primary", size = "md", fullWidth = false, type = "button", ...props },
+    ref
+  ) => {
     return (
       <button
         ref={ref}

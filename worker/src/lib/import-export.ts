@@ -72,7 +72,8 @@ export async function exportPromptsJSON(
     tags?: string[];
   }
 ): Promise<ExportFormat> {
-  let query = "SELECT id, title, body, tags, metadata, created_at, updated_at, archived FROM prompts WHERE tenant_id = ?";
+  let query =
+    "SELECT id, title, body, tags, metadata, created_at, updated_at, archived FROM prompts WHERE tenant_id = ?";
   const bindings: unknown[] = [tenantId];
 
   if (!options?.includeArchived) {
@@ -90,7 +91,10 @@ export async function exportPromptsJSON(
 
   query += " ORDER BY created_at DESC";
 
-  const result = await db.prepare(query).bind(...bindings).all<Prompt>();
+  const result = await db
+    .prepare(query)
+    .bind(...bindings)
+    .all<Prompt>();
 
   const prompts = result.results.map((p) => {
     let tags: string[] = [];
@@ -164,7 +168,7 @@ export async function exportPromptsCSV(
  * Helper function to escape CSV fields
  */
 function escapeCSV(field: string): string {
-  if (field.includes(",") || field.includes("\"") || field.includes("\n")) {
+  if (field.includes(",") || field.includes('"') || field.includes("\n")) {
     return `"${field.replace(/"/g, '""')}"`;
   }
   return field;
@@ -264,7 +268,10 @@ export async function importPrompts(
           result.skipped++;
           continue;
         } else if (validated.conflictStrategy === "overwrite") {
-          const nextVersion = (typeof existing.version === "number" ? existing.version : Number(existing.version ?? 1)) + 1;
+          const nextVersion =
+            (typeof existing.version === "number"
+              ? existing.version
+              : Number(existing.version ?? 1)) + 1;
           // Update existing prompt
           await db
             .prepare(
@@ -350,7 +357,7 @@ export function parseCSVToJSON(csvContent: string): {
     const fields = parseCSVLine(line);
     if (fields.length < 2) continue; // Skip invalid lines
 
-    const [title, body, tagsStr = '', metadataStr = '', archivedStr = 'false'] = fields;
+    const [title, body, tagsStr = "", metadataStr = "", archivedStr = "false"] = fields;
 
     let tags: string[] = [];
     if (tagsStr) {
@@ -389,10 +396,10 @@ function parseCSVLine(line: string): string[] {
   for (let i = 0; i < line.length; i++) {
     const char = line[i];
 
-    if (char === "\"") {
-      if (inQuotes && line[i + 1] === "\"") {
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
         // Escaped quote
-        currentField += "\"";
+        currentField += '"';
         i++;
       } else {
         inQuotes = !inQuotes;

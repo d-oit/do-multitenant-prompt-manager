@@ -90,13 +90,15 @@ export async function searchPrompts(
        LIMIT ? OFFSET ?`
   )
     .bind(...bindings, params.limit, params.offset)
-    .all<PromptRow & {
-      relevance: number;
-      title_highlight: string | null;
-      body_snippet: string | null;
-      tags_snippet: string | null;
-      metadata_snippet: string | null;
-    }>();
+    .all<
+      PromptRow & {
+        relevance: number;
+        title_highlight: string | null;
+        body_snippet: string | null;
+        tags_snippet: string | null;
+        metadata_snippet: string | null;
+      }
+    >();
 
   const totalRow = await env.DB.prepare(
     `SELECT COUNT(*) as count
@@ -124,7 +126,12 @@ export async function searchPrompts(
   };
 }
 
-export async function fetchPromptSuggestions(env: Env, tenantId: string, query: string, limit = 5): Promise<PromptSuggestion[]> {
+export async function fetchPromptSuggestions(
+  env: Env,
+  tenantId: string,
+  query: string,
+  limit = 5
+): Promise<PromptSuggestion[]> {
   const match = buildFtsMatch(query);
   if (!match) {
     return [];

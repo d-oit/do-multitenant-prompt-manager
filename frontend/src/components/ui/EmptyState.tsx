@@ -3,7 +3,7 @@
  * Friendly empty states with actions
  */
 
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 
 export interface EmptyStateProps {
   icon?: ReactNode | string;
@@ -20,24 +20,20 @@ export interface EmptyStateProps {
 }
 
 export function EmptyState({
-  icon = '📋',
+  icon = "📋",
   title,
   description,
   action,
-  secondaryActions,
+  secondaryActions
 }: EmptyStateProps) {
   return (
     <div className="empty-state">
       <div className="empty-state__icon">{icon}</div>
       <h2 className="empty-state__title">{title}</h2>
       {description && <p className="empty-state__description">{description}</p>}
-      
+
       {action && (
-        <button
-          onClick={action.onClick}
-          className="btn btn-primary mt-6"
-          type="button"
-        >
+        <button onClick={action.onClick} className="btn btn-primary mt-6" type="button">
           {action.label}
         </button>
       )}
@@ -68,18 +64,18 @@ export function NoPromptsFound({ onCreatePrompt }: { onCreatePrompt: () => void 
       title="No prompts found"
       description="Get started by creating your first prompt!"
       action={{
-        label: '+ Create Your First Prompt',
-        onClick: onCreatePrompt,
+        label: "+ Create Your First Prompt",
+        onClick: onCreatePrompt
       }}
       secondaryActions={[
         {
-          label: 'Import from template',
-          onClick: () => undefined,
+          label: "Import from template",
+          onClick: () => undefined
         },
         {
-          label: 'Browse examples',
-          onClick: () => undefined,
-        },
+          label: "Browse examples",
+          onClick: () => undefined
+        }
       ]}
     />
   );
@@ -92,8 +88,8 @@ export function NoSearchResults({ onClearFilters }: { onClearFilters: () => void
       title="No results found"
       description="Try adjusting your search or filters"
       action={{
-        label: 'Clear Filters',
-        onClick: onClearFilters,
+        label: "Clear Filters",
+        onClick: onClearFilters
       }}
     />
   );
@@ -106,8 +102,8 @@ export function NoTenants({ onCreateTenant }: { onCreateTenant: () => void }) {
       title="No tenants yet"
       description="Create your first tenant to start managing prompts"
       action={{
-        label: '+ Create Tenant',
-        onClick: onCreateTenant,
+        label: "+ Create Tenant",
+        onClick: onCreateTenant
       }}
     />
   );
@@ -122,8 +118,8 @@ export function ErrorState({ error, onRetry }: { error: string; onRetry?: () => 
       action={
         onRetry
           ? {
-              label: 'Try Again',
-              onClick: onRetry,
+              label: "Try Again",
+              onClick: onRetry
             }
           : undefined
       }

@@ -32,7 +32,11 @@ export async function findPromptById(env: Env, promptId: string): Promise<Prompt
   return deserializePrompt(row);
 }
 
-export async function assertPromptTenant(env: Env, promptId: string, tenantId: string): Promise<Prompt | null> {
+export async function assertPromptTenant(
+  env: Env,
+  promptId: string,
+  tenantId: string
+): Promise<Prompt | null> {
   const row = await env.DB.prepare(
     `SELECT id, tenant_id, title, body, tags, metadata, created_at, updated_at, version, archived, created_by
      FROM prompts

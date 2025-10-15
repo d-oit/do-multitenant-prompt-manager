@@ -95,13 +95,19 @@ export default function PromptTable({
                   </td>
                   <td data-label="Version">v{prompt.version ?? 1}</td>
                   <td data-label="Created by">
-                    {prompt.createdBy ? <span>{prompt.createdBy}</span> : <span className="pm-muted">—</span>}
+                    {prompt.createdBy ? (
+                      <span>{prompt.createdBy}</span>
+                    ) : (
+                      <span className="pm-muted">—</span>
+                    )}
                   </td>
                   <td data-label="Created">{formatDate(prompt.createdAt)}</td>
                   <td data-label="Updated">{formatDate(prompt.updatedAt)}</td>
                   <td data-label="Metadata">
                     {prompt.metadata ? (
-                      <pre className="prompt-table__metadata">{JSON.stringify(prompt.metadata, null, 2)}</pre>
+                      <pre className="prompt-table__metadata">
+                        {JSON.stringify(prompt.metadata, null, 2)}
+                      </pre>
                     ) : (
                       <span className="pm-muted">—</span>
                     )}

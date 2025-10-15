@@ -3,9 +3,9 @@
  * Displays temporary notifications with different variants
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from "react";
 
-export type ToastVariant = 'success' | 'error' | 'warning' | 'info';
+export type ToastVariant = "success" | "error" | "warning" | "info";
 
 export interface Toast {
   id: string;
@@ -43,22 +43,22 @@ function ToastItem({ toast, onDismiss }: ToastProps) {
   }, [toast.duration, toast.id, handleDismiss]);
 
   const variantStyles = {
-    success: 'alert-success',
-    error: 'alert-error',
-    warning: 'alert-warning',
-    info: 'alert-info',
+    success: "alert-success",
+    error: "alert-error",
+    warning: "alert-warning",
+    info: "alert-info"
   };
 
   const icons = {
-    success: '✓',
-    error: '⚠',
-    warning: '⚠',
-    info: 'ℹ',
+    success: "✓",
+    error: "⚠",
+    warning: "⚠",
+    info: "ℹ"
   };
 
   return (
     <div
-      className={`toast ${variantStyles[toast.variant]} ${isExiting ? 'toast-exit' : ''}`}
+      className={`toast ${variantStyles[toast.variant]} ${isExiting ? "toast-exit" : ""}`}
       role="alert"
       aria-live="polite"
     >
@@ -129,8 +129,8 @@ export function useToast() {
   const showToast = useCallback(
     (
       message: string,
-      variant: ToastVariant = 'info',
-      options?: { duration?: number; action?: Toast['action'] }
+      variant: ToastVariant = "info",
+      options?: { duration?: number; action?: Toast["action"] }
     ) => {
       const id = `toast-${++toastId}`;
       const newToast: Toast = {
@@ -138,7 +138,7 @@ export function useToast() {
         message,
         variant,
         duration: options?.duration,
-        action: options?.action,
+        action: options?.action
       };
 
       toasts = [...toasts, newToast];
@@ -155,26 +155,26 @@ export function useToast() {
   }, []);
 
   const success = useCallback(
-    (message: string, options?: { duration?: number; action?: Toast['action'] }) =>
-      showToast(message, 'success', options),
+    (message: string, options?: { duration?: number; action?: Toast["action"] }) =>
+      showToast(message, "success", options),
     [showToast]
   );
 
   const error = useCallback(
-    (message: string, options?: { duration?: number; action?: Toast['action'] }) =>
-      showToast(message, 'error', options),
+    (message: string, options?: { duration?: number; action?: Toast["action"] }) =>
+      showToast(message, "error", options),
     [showToast]
   );
 
   const warning = useCallback(
-    (message: string, options?: { duration?: number; action?: Toast['action'] }) =>
-      showToast(message, 'warning', options),
+    (message: string, options?: { duration?: number; action?: Toast["action"] }) =>
+      showToast(message, "warning", options),
     [showToast]
   );
 
   const info = useCallback(
-    (message: string, options?: { duration?: number; action?: Toast['action'] }) =>
-      showToast(message, 'info', options),
+    (message: string, options?: { duration?: number; action?: Toast["action"] }) =>
+      showToast(message, "info", options),
     [showToast]
   );
 
@@ -185,6 +185,6 @@ export function useToast() {
     success,
     error,
     warning,
-    info,
+    info
   };
 }

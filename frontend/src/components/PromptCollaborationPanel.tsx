@@ -57,7 +57,12 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "activity", label: "Activity" }
 ];
 
-export default function PromptCollaborationPanel({ prompt, tenantId, token, toast }: PromptCollaborationPanelProps): JSX.Element {
+export default function PromptCollaborationPanel({
+  prompt,
+  tenantId,
+  token,
+  toast
+}: PromptCollaborationPanelProps): JSX.Element {
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [versions, setVersions] = useState<PromptVersion[]>([]);
   const [versionsLoading, setVersionsLoading] = useState(false);
@@ -196,7 +201,21 @@ export default function PromptCollaborationPanel({ prompt, tenantId, token, toas
     } else if (activeTab === "activity" && !activityLoading && activity.length === 0) {
       void refreshActivity();
     }
-  }, [activeTab, commentsLoading, comments.length, refreshComments, sharesLoading, shares.length, refreshShares, approvalsLoading, approvals.length, refreshApprovals, activityLoading, activity.length, refreshActivity]);
+  }, [
+    activeTab,
+    commentsLoading,
+    comments.length,
+    refreshComments,
+    sharesLoading,
+    shares.length,
+    refreshShares,
+    approvalsLoading,
+    approvals.length,
+    refreshApprovals,
+    activityLoading,
+    activity.length,
+    refreshActivity
+  ]);
 
   const commentTree = useMemo(() => buildCommentTree(comments), [comments]);
 
@@ -316,7 +335,11 @@ export default function PromptCollaborationPanel({ prompt, tenantId, token, toas
     }
   }
 
-  async function handleUpdateApproval(approval: PromptApproval, status: PromptApproval["status"], message?: string) {
+  async function handleUpdateApproval(
+    approval: PromptApproval,
+    status: PromptApproval["status"],
+    message?: string
+  ) {
     try {
       await updatePromptApproval(
         approval.id,
@@ -380,10 +403,19 @@ export default function PromptCollaborationPanel({ prompt, tenantId, token, toas
                 rows={4}
               />
               <div className="prompt-comments__actions">
-                <Button size="sm" onClick={() => void handleSubmitComment()} disabled={commentsLoading}>
+                <Button
+                  size="sm"
+                  onClick={() => void handleSubmitComment()}
+                  disabled={commentsLoading}
+                >
                   {commentsLoading ? "Posting…" : "Post comment"}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => void refreshComments(true)} disabled={commentsLoading}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => void refreshComments(true)}
+                  disabled={commentsLoading}
+                >
                   Refresh
                 </Button>
               </div>
@@ -415,7 +447,10 @@ export default function PromptCollaborationPanel({ prompt, tenantId, token, toas
         {activeTab === "shares" ? (
           <Card title="Sharing" className="prompt-collaboration-panel__card">
             <div className="prompt-share__form">
-              <Select value={shareTargetType} onChange={(event) => setShareTargetType(event.target.value)}>
+              <Select
+                value={shareTargetType}
+                onChange={(event) => setShareTargetType(event.target.value)}
+              >
                 <option value="user">User ID</option>
                 <option value="email">Email</option>
                 <option value="tenant">Tenant</option>
@@ -482,7 +517,11 @@ export default function PromptCollaborationPanel({ prompt, tenantId, token, toas
                 placeholder="Optional message"
                 rows={3}
               />
-              <Button size="sm" onClick={() => void handleRequestApproval()} disabled={approvalsLoading}>
+              <Button
+                size="sm"
+                onClick={() => void handleRequestApproval()}
+                disabled={approvalsLoading}
+              >
                 {approvalsLoading ? "Requesting…" : "Request approval"}
               </Button>
             </div>
@@ -496,16 +535,28 @@ export default function PromptCollaborationPanel({ prompt, tenantId, token, toas
                     <div>
                       <div className="prompt-approvals__header">
                         <span>
-                          Requested by <strong>{approval.requestedBy}</strong> · Approver {approval.approver}
+                          Requested by <strong>{approval.requestedBy}</strong> · Approver{" "}
+                          {approval.approver}
                         </span>
-                        <Badge tone={approval.status === "approved" ? "success" : approval.status === "rejected" ? "danger" : "info"}>
+                        <Badge
+                          tone={
+                            approval.status === "approved"
+                              ? "success"
+                              : approval.status === "rejected"
+                                ? "danger"
+                                : "info"
+                          }
+                        >
                           {approval.status.replace("_", " ")}
                         </Badge>
                       </div>
                       <div className="pm-muted">
-                        Requested {formatDate(approval.createdAt)} · Updated {formatDate(approval.updatedAt)}
+                        Requested {formatDate(approval.createdAt)} · Updated{" "}
+                        {formatDate(approval.updatedAt)}
                       </div>
-                      {approval.message ? <p className="prompt-approvals__message">{approval.message}</p> : null}
+                      {approval.message ? (
+                        <p className="prompt-approvals__message">{approval.message}</p>
+                      ) : null}
                     </div>
                     <div className="prompt-approvals__actions">
                       <Button
@@ -541,7 +592,12 @@ export default function PromptCollaborationPanel({ prompt, tenantId, token, toas
 
         {activeTab === "activity" ? (
           <Card title="Recent activity" className="prompt-collaboration-panel__card">
-            <Button variant="ghost" size="sm" onClick={() => void refreshActivity(true)} disabled={activityLoading}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => void refreshActivity(true)}
+              disabled={activityLoading}
+            >
               {activityLoading ? "Refreshing…" : "Refresh"}
             </Button>
             {activityLoading && activity.length === 0 ? (
@@ -555,7 +611,11 @@ export default function PromptCollaborationPanel({ prompt, tenantId, token, toas
                       <span className="pm-muted"> · {formatDate(entry.createdAt)}</span>
                     </div>
                     <div className="pm-muted">{entry.actor ?? "system"}</div>
-                    {entry.metadata ? <pre className="prompt-activity__metadata">{JSON.stringify(entry.metadata, null, 2)}</pre> : null}
+                    {entry.metadata ? (
+                      <pre className="prompt-activity__metadata">
+                        {JSON.stringify(entry.metadata, null, 2)}
+                      </pre>
+                    ) : null}
                   </li>
                 ))}
               </ul>
@@ -641,7 +701,9 @@ function CommentItem({ node, onReply, onResolveToggle, onDelete }: CommentItemPr
 }
 
 function tabButtonClass(active: boolean): string {
-  return active ? "prompt-collaboration-panel__tab prompt-collaboration-panel__tab--active" : "prompt-collaboration-panel__tab";
+  return active
+    ? "prompt-collaboration-panel__tab prompt-collaboration-panel__tab--active"
+    : "prompt-collaboration-panel__tab";
 }
 
 function formatDate(value: string): string {

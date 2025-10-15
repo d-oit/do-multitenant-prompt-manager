@@ -19,7 +19,7 @@ export default defineConfig({
           // Separate vendor chunks for better caching
           "react-vendor": ["react", "react-dom"],
           "monaco-editor": ["@monaco-editor/react", "monaco-editor"],
-          "charts": ["recharts"]
+          charts: ["recharts"]
         }
       }
     },

@@ -1,6 +1,6 @@
 /* Component Styles - Prompt Manager Design System */
 
-@import './tokens.css';
+@import "./tokens.css";
 
 /* ============================================
    RESET & BASE STYLES
@@ -25,7 +25,9 @@ body {
   line-height: var(--line-height-normal);
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
-  transition: background-color var(--transition-base), color var(--transition-base);
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
 }
 
 /* ============================================
@@ -146,7 +148,7 @@ body {
 }
 
 .btn.loading::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 1rem;
   height: 1rem;
@@ -157,7 +159,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ============================================
@@ -373,8 +377,12 @@ body {
 }
 
 @keyframes skeleton-loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .skeleton-text {
@@ -421,8 +429,12 @@ body {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scale-up {
@@ -1110,37 +1122,37 @@ body {
     height: var(--size-button-height-lg);
     padding: 0 var(--space-4);
   }
-  
+
   .input,
   .textarea,
   .select {
     height: var(--size-input-height-lg);
     font-size: 16px; /* Prevents iOS zoom */
   }
-  
+
   .card-header,
   .card-body,
   .card-footer {
     padding: var(--space-4);
   }
-  
+
   .modal {
     width: 95%;
     max-height: 95vh;
   }
-  
+
   .modal__header,
   .modal__body {
     padding: var(--space-4);
   }
-  
+
   .toast-container {
     top: var(--space-4);
     right: var(--space-4);
     left: var(--space-4);
     max-width: none;
   }
-  
+
   .toast {
     min-width: auto;
     max-width: none;
@@ -1267,7 +1279,9 @@ body {
   overflow: hidden;
   background: var(--color-bg-secondary);
   min-height: 240px;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .rich-text-editor:focus-within {
@@ -1417,7 +1431,9 @@ body {
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: color var(--transition-fast), transform var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .prompt-collaboration-panel__tab::after {
@@ -1499,7 +1515,9 @@ body {
   border-radius: var(--border-radius-md);
   padding: var(--space-3) var(--space-4);
   box-shadow: var(--shadow-xs);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .prompt-comments__item:hover {
@@ -2098,7 +2116,9 @@ body {
 
 .rate-limit-item__bar-fill {
   height: 100%;
-  transition: width 0.3s ease, background-color 0.3s ease;
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
   border-radius: var(--pm-radius-full);
 }
 

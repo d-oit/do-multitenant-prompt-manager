@@ -5,7 +5,15 @@ import Editor from "@monaco-editor/react";
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
-  language?: "markdown" | "json" | "javascript" | "typescript" | "html" | "css" | "python" | "plaintext";
+  language?:
+    | "markdown"
+    | "json"
+    | "javascript"
+    | "typescript"
+    | "html"
+    | "css"
+    | "python"
+    | "plaintext";
   height?: number | string;
   placeholder?: string;
   readOnly?: boolean;
@@ -56,9 +64,10 @@ export function RichTextEditor({
   // Detect system theme and theme changes
   useEffect(() => {
     const updateTheme = () => {
-      const isDark = document.documentElement.classList.contains("dark") ||
-                     document.documentElement.dataset.theme === "dark" ||
-                     (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      const isDark =
+        document.documentElement.classList.contains("dark") ||
+        document.documentElement.dataset.theme === "dark" ||
+        (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
       setTheme(isDark ? "vs-dark" : "vs-light");
     };
 
@@ -82,13 +91,16 @@ export function RichTextEditor({
     };
   }, []);
 
-  const options = useMemo(() => ({
-    ...defaultOptions,
-    readOnly,
-    ariaLabel,
-    lineNumbers: showLineNumbers ? "on" as const : "off" as const,
-    minimap: { enabled: showMinimap }
-  }), [ariaLabel, readOnly, showLineNumbers, showMinimap]);
+  const options = useMemo(
+    () => ({
+      ...defaultOptions,
+      readOnly,
+      ariaLabel,
+      lineNumbers: showLineNumbers ? ("on" as const) : ("off" as const),
+      minimap: { enabled: showMinimap }
+    }),
+    [ariaLabel, readOnly, showLineNumbers, showMinimap]
+  );
 
   const handleChange = useCallback(
     (content?: string | undefined) => {
@@ -106,9 +118,13 @@ export function RichTextEditor({
         height={height}
         options={options}
         theme={theme}
-        loading={<div style={{ padding: "12px", color: "var(--color-text-muted)" }}>Loading editor...</div>}
+        loading={
+          <div style={{ padding: "12px", color: "var(--color-text-muted)" }}>Loading editor...</div>
+        }
       />
-      {placeholder && !value ? <div className="rich-text-editor__placeholder">{placeholder}</div> : null}
+      {placeholder && !value ? (
+        <div className="rich-text-editor__placeholder">{placeholder}</div>
+      ) : null}
     </div>
   );
 }

@@ -3,8 +3,8 @@
  * Slide-up sheet optimized for mobile interactions
  */
 
-import { useEffect, useRef, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 export interface BottomSheetProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ export function BottomSheet({
   title,
   children,
   snapPoints = [90, 50],
-  defaultSnap = 1,
+  defaultSnap = 1
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const startY = useRef<number>(0);
@@ -30,19 +30,19 @@ export function BottomSheet({
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
 
       const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
+        if (e.key === "Escape") {
           onClose();
         }
       };
 
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
 
       return () => {
-        document.removeEventListener('keydown', handleEscape);
-        document.body.style.overflow = '';
+        document.removeEventListener("keydown", handleEscape);
+        document.body.style.overflow = "";
       };
     }
   }, [isOpen, onClose]);
@@ -81,18 +81,17 @@ export function BottomSheet({
     }
 
     // Reset
-    sheetRef.current.style.transition = 'transform 0.3s ease-out';
+    sheetRef.current.style.transition = "transform 0.3s ease-out";
     setTimeout(() => {
       if (sheetRef.current) {
-        sheetRef.current.style.transition = '';
+        sheetRef.current.style.transition = "";
       }
     }, 300);
   };
 
   const findClosestSnapPoint = (dragDelta: number): number => {
-    const currentHeight =
-      ((window.innerHeight - dragDelta) / window.innerHeight) * 100;
-    
+    const currentHeight = ((window.innerHeight - dragDelta) / window.innerHeight) * 100;
+
     let closest = snapPoints[0];
     let minDiff = Math.abs(currentHeight - closest);
 
@@ -113,20 +112,16 @@ export function BottomSheet({
 
   return createPortal(
     <>
-      <div
-        className="bottom-sheet-backdrop"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="bottom-sheet-backdrop" onClick={onClose} aria-hidden="true" />
       <div
         ref={sheetRef}
         className="bottom-sheet"
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? 'sheet-title' : undefined}
+        aria-labelledby={title ? "sheet-title" : undefined}
         style={{
           height: `${initialHeight}vh`,
-          transform: `translateY(${100 - initialHeight}%)`,
+          transform: `translateY(${100 - initialHeight}%)`
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -160,18 +155,13 @@ export interface BottomSheetMenuProps {
     label: string;
     onClick: () => void;
     icon?: ReactNode;
-    variant?: 'default' | 'danger';
+    variant?: "default" | "danger";
     disabled?: boolean;
   }>;
 }
 
-export function BottomSheetMenu({
-  isOpen,
-  onClose,
-  title,
-  items,
-}: BottomSheetMenuProps) {
-  const handleItemClick = (item: BottomSheetMenuProps['items'][0]) => {
+export function BottomSheetMenu({ isOpen, onClose, title, items }: BottomSheetMenuProps) {
+  const handleItemClick = (item: BottomSheetMenuProps["items"][0]) => {
     if (!item.disabled) {
       item.onClick();
       onClose();
@@ -186,14 +176,12 @@ export function BottomSheetMenu({
             key={index}
             onClick={() => handleItemClick(item)}
             className={`bottom-sheet-menu__item ${
-              item.variant === 'danger' ? 'bottom-sheet-menu__item--danger' : ''
+              item.variant === "danger" ? "bottom-sheet-menu__item--danger" : ""
             }`}
             disabled={item.disabled}
             type="button"
           >
-            {item.icon && (
-              <span className="bottom-sheet-menu__icon">{item.icon}</span>
-            )}
+            {item.icon && <span className="bottom-sheet-menu__icon">{item.icon}</span>}
             <span className="bottom-sheet-menu__label">{item.label}</span>
           </button>
         ))}

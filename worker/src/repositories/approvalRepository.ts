@@ -83,7 +83,11 @@ export async function updateApprovalStatus(
   };
 }
 
-export async function listApprovals(env: Env, promptId: string, tenantId: string): Promise<ApprovalRecord[]> {
+export async function listApprovals(
+  env: Env,
+  promptId: string,
+  tenantId: string
+): Promise<ApprovalRecord[]> {
   const rows = await env.DB.prepare(
     `SELECT id, prompt_id, tenant_id, requested_by, approver, status, message, created_at, updated_at
      FROM prompt_approval_requests

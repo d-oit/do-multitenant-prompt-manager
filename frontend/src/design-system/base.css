@@ -12,7 +12,11 @@ body {
   font-size: var(--pm-font-size-base);
   line-height: var(--pm-line-height-normal);
   color: var(--pm-color-text);
-  background: radial-gradient(circle at top left, var(--pm-color-overlay), var(--pm-color-background));
+  background: radial-gradient(
+    circle at top left,
+    var(--pm-color-overlay),
+    var(--pm-color-background)
+  );
   min-height: 100vh;
   /* Mobile optimizations */
   -webkit-font-smoothing: antialiased;
@@ -174,7 +178,11 @@ a:hover {
   font-size: var(--pm-font-size-sm);
   font-weight: var(--pm-font-weight-semibold);
   cursor: pointer;
-  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease, color 150ms ease;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease,
+    color 150ms ease;
   background: var(--pm-color-surface-alt);
   color: var(--pm-color-text);
   border: 1px solid var(--pm-color-border);
@@ -260,7 +268,10 @@ a:hover {
   padding: 0 var(--pm-spacing-4);
   height: 2.75rem;
   font-size: var(--pm-font-size-sm);
-  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
 }
 
 .pm-textarea {
@@ -338,7 +349,7 @@ a:hover {
 }
 
 .pm-checkbox input[type="checkbox"]:checked::after {
-  content: '';
+  content: "";
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 2px;

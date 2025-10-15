@@ -57,7 +57,8 @@ export default function DashboardPage({ tenantId, token }: DashboardPageProps): 
       metric.previous !== undefined && metric.previous !== null
         ? metric.value - metric.previous
         : null;
-    const deltaFormatted = delta !== null && delta !== undefined ? `${delta >= 0 ? "+" : ""}${delta}` : null;
+    const deltaFormatted =
+      delta !== null && delta !== undefined ? `${delta >= 0 ? "+" : ""}${delta}` : null;
     return { value: metric.value, delta: deltaFormatted, positive: delta ? delta >= 0 : true };
   };
 
@@ -66,7 +67,9 @@ export default function DashboardPage({ tenantId, token }: DashboardPageProps): 
   return (
     <div className="pm-dashboard pm-stack pm-stack--lg">
       {loading ? <SkeletonDashboard /> : null}
-      {error ? <ErrorState error={error} onRetry={() => setReloadKey((value) => value + 1)} /> : null}
+      {error ? (
+        <ErrorState error={error} onRetry={() => setReloadKey((value) => value + 1)} />
+      ) : null}
       {!loading && !error && !overview ? (
         <EmptyState
           icon="📊"
@@ -87,13 +90,15 @@ export default function DashboardPage({ tenantId, token }: DashboardPageProps): 
 
           {stats ? (
             <div className="grid grid-cols-4 gap-lg dashboard-stats">
-              {([
-                ["totalPrompts", "Total Prompts"],
-                ["usageToday", "Usage Today"],
-                ["usageThisWeek", "Usage This Week"],
-                ["activePrompts", "Active Prompts"],
-                ["recentlyUpdated", "Recently Updated"]
-              ] as const)
+              {(
+                [
+                  ["totalPrompts", "Total Prompts"],
+                  ["usageToday", "Usage Today"],
+                  ["usageThisWeek", "Usage This Week"],
+                  ["activePrompts", "Active Prompts"],
+                  ["recentlyUpdated", "Recently Updated"]
+                ] as const
+              )
                 .filter(([key]) => stats[key])
                 .map(([key, label]) => {
                   const metric = stats[key];
@@ -105,7 +110,11 @@ export default function DashboardPage({ tenantId, token }: DashboardPageProps): 
                         <strong className="stat-card__value">{formatted.value}</strong>
                         {formatted.delta ? (
                           <span
-                            className={formatted.positive ? "stat-card__delta" : "stat-card__delta stat-card__delta--negative"}
+                            className={
+                              formatted.positive
+                                ? "stat-card__delta"
+                                : "stat-card__delta stat-card__delta--negative"
+                            }
                           >
                             {formatted.delta}
                           </span>
@@ -120,7 +129,10 @@ export default function DashboardPage({ tenantId, token }: DashboardPageProps): 
           <Card title="Usage Trend" subtitle="Daily runs">
             <div className="dashboard-chart">
               <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={overview.trend} margin={{ top: 16, right: 24, left: 0, bottom: 0 }}>
+                <LineChart
+                  data={overview.trend}
+                  margin={{ top: 16, right: 24, left: 0, bottom: 0 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="date"
@@ -131,7 +143,13 @@ export default function DashboardPage({ tenantId, token }: DashboardPageProps): 
                     labelFormatter={(value) => new Date(value).toLocaleDateString()}
                     formatter={(value: number) => [`${value} runs`, "Usage"]}
                   />
-                  <Line type="monotone" dataKey="count" stroke="var(--color-accent)" strokeWidth={2} dot={false} />
+                  <Line
+                    type="monotone"
+                    dataKey="count"
+                    stroke="var(--color-accent)"
+                    strokeWidth={2}
+                    dot={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -141,7 +159,11 @@ export default function DashboardPage({ tenantId, token }: DashboardPageProps): 
             <Card title="Top Prompts" subtitle="Usage by prompt">
               <div className="dashboard-chart">
                 <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={overview.topPrompts} layout="vertical" margin={{ top: 16, right: 24, bottom: 0, left: 80 }}>
+                  <BarChart
+                    data={overview.topPrompts}
+                    layout="vertical"
+                    margin={{ top: 16, right: 24, bottom: 0, left: 80 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" allowDecimals={false} />
                     <YAxis type="category" dataKey="title" width={150} />
@@ -157,7 +179,10 @@ export default function DashboardPage({ tenantId, token }: DashboardPageProps): 
                   <li key={prompt.promptId} className="dashboard-list__item">
                     <div>
                       <strong>{prompt.title}</strong>
-                      <p className="pm-muted">Last used: {prompt.lastUsed ? new Date(prompt.lastUsed).toLocaleString() : "—"}</p>
+                      <p className="pm-muted">
+                        Last used:{" "}
+                        {prompt.lastUsed ? new Date(prompt.lastUsed).toLocaleString() : "—"}
+                      </p>
                     </div>
                     <Badge tone="info">{prompt.usageCount} runs</Badge>
                   </li>

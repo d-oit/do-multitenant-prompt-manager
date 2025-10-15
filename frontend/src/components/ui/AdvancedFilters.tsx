@@ -3,11 +3,11 @@
  * Provides comprehensive filtering options for prompts
  */
 
-import { useState } from 'react';
+import { useState } from "react";
 
 export interface FilterOptions {
   search?: string;
-  searchIn?: Array<'title' | 'body' | 'tags' | 'metadata'>;
+  searchIn?: Array<"title" | "body" | "tags" | "metadata">;
   tags?: string[];
   dateRange?: {
     from?: string;
@@ -15,13 +15,13 @@ export interface FilterOptions {
   };
   metadata?: Array<{
     key: string;
-    operator: 'equals' | 'contains' | 'not_equals';
+    operator: "equals" | "contains" | "not_equals";
     value: string;
   }>;
   archived?: boolean;
   owner?: string;
-  sortBy?: 'created_at' | 'updated_at' | 'title';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "created_at" | "updated_at" | "title";
+  sortOrder?: "asc" | "desc";
 }
 
 export interface AdvancedFiltersProps {
@@ -39,21 +39,21 @@ export function AdvancedFilters({
   onApply,
   onReset,
   isOpen = false,
-  onToggle,
+  onToggle
 }: AdvancedFiltersProps) {
   const [filters, setFilters] = useState<FilterOptions>(initialFilters);
 
-  const handleSearchInChange = (field: 'title' | 'body' | 'tags' | 'metadata') => {
-    const current = filters.searchIn || ['title', 'body', 'tags'];
+  const handleSearchInChange = (field: "title" | "body" | "tags" | "metadata") => {
+    const current = filters.searchIn || ["title", "body", "tags"];
     if (current.includes(field)) {
       setFilters({
         ...filters,
-        searchIn: current.filter((f) => f !== field),
+        searchIn: current.filter((f) => f !== field)
       });
     } else {
       setFilters({
         ...filters,
-        searchIn: [...current, field],
+        searchIn: [...current, field]
       });
     }
   };
@@ -63,12 +63,12 @@ export function AdvancedFilters({
     if (current.includes(tag)) {
       setFilters({
         ...filters,
-        tags: current.filter((t) => t !== tag),
+        tags: current.filter((t) => t !== tag)
       });
     } else {
       setFilters({
         ...filters,
-        tags: [...current, tag],
+        tags: [...current, tag]
       });
     }
   };
@@ -77,23 +77,20 @@ export function AdvancedFilters({
     const current = filters.metadata || [];
     setFilters({
       ...filters,
-      metadata: [
-        ...current,
-        { key: '', operator: 'equals', value: '' },
-      ],
+      metadata: [...current, { key: "", operator: "equals", value: "" }]
     });
   };
 
   const handleMetadataFilterChange = (
     index: number,
-    field: 'key' | 'operator' | 'value',
+    field: "key" | "operator" | "value",
     value: string
   ) => {
     const current = filters.metadata || [];
     const updated = [...current];
     updated[index] = {
       ...updated[index],
-      [field]: value,
+      [field]: value
     };
     setFilters({ ...filters, metadata: updated });
   };
@@ -102,7 +99,7 @@ export function AdvancedFilters({
     const current = filters.metadata || [];
     setFilters({
       ...filters,
-      metadata: current.filter((_, i) => i !== index),
+      metadata: current.filter((_, i) => i !== index)
     });
   };
 
@@ -115,15 +112,11 @@ export function AdvancedFilters({
     onReset();
   };
 
-  const searchIn = filters.searchIn || ['title', 'body', 'tags'];
+  const searchIn = filters.searchIn || ["title", "body", "tags"];
 
   if (!isOpen) {
     return (
-      <button
-        onClick={onToggle}
-        className="btn btn-secondary btn-sm"
-        type="button"
-      >
+      <button onClick={onToggle} className="btn btn-secondary btn-sm" type="button">
         Advanced Filters
       </button>
     );
@@ -148,7 +141,7 @@ export function AdvancedFilters({
         <fieldset className="pm-field">
           <legend className="pm-field__label">Search in:</legend>
           <div className="flex flex-wrap gap-sm">
-            {(['title', 'body', 'tags', 'metadata'] as const).map((field) => (
+            {(["title", "body", "tags", "metadata"] as const).map((field) => (
               <label key={field} className="pm-checkbox">
                 <input
                   type="checkbox"
@@ -173,14 +166,14 @@ export function AdvancedFilters({
                 id="advanced-filters-date-from"
                 type="date"
                 className="pm-input input-sm"
-                value={filters.dateRange?.from || ''}
+                value={filters.dateRange?.from || ""}
                 onChange={(e) =>
                   setFilters({
                     ...filters,
                     dateRange: {
                       ...filters.dateRange,
-                      from: e.target.value,
-                    },
+                      from: e.target.value
+                    }
                   })
                 }
                 placeholder="From"
@@ -194,14 +187,14 @@ export function AdvancedFilters({
                 id="advanced-filters-date-to"
                 type="date"
                 className="pm-input input-sm"
-                value={filters.dateRange?.to || ''}
+                value={filters.dateRange?.to || ""}
                 onChange={(e) =>
                   setFilters({
                     ...filters,
                     dateRange: {
                       ...filters.dateRange,
-                      to: e.target.value,
-                    },
+                      to: e.target.value
+                    }
                   })
                 }
                 placeholder="To"
@@ -240,19 +233,15 @@ export function AdvancedFilters({
                     type="text"
                     className="pm-input input-sm"
                     value={filter.key}
-                    onChange={(e) =>
-                      handleMetadataFilterChange(index, 'key', e.target.value)
-                    }
+                    onChange={(e) => handleMetadataFilterChange(index, "key", e.target.value)}
                     placeholder="Key"
                   />
                 </div>
-                <div style={{ width: '120px' }}>
+                <div style={{ width: "120px" }}>
                   <select
                     className="pm-select input-sm"
                     value={filter.operator}
-                    onChange={(e) =>
-                      handleMetadataFilterChange(index, 'operator', e.target.value)
-                    }
+                    onChange={(e) => handleMetadataFilterChange(index, "operator", e.target.value)}
                   >
                     <option value="equals">Equals</option>
                     <option value="contains">Contains</option>
@@ -264,9 +253,7 @@ export function AdvancedFilters({
                     type="text"
                     className="pm-input input-sm"
                     value={filter.value}
-                    onChange={(e) =>
-                      handleMetadataFilterChange(index, 'value', e.target.value)
-                    }
+                    onChange={(e) => handleMetadataFilterChange(index, "value", e.target.value)}
                     placeholder="Value"
                   />
                 </div>
@@ -324,11 +311,11 @@ export function AdvancedFilters({
             <select
               className="pm-select input-sm flex-1"
               id="advanced-filters-sort-by"
-              value={filters.sortBy || 'created_at'}
+              value={filters.sortBy || "created_at"}
               onChange={(e) =>
                 setFilters({
                   ...filters,
-                  sortBy: e.target.value as FilterOptions['sortBy'],
+                  sortBy: e.target.value as FilterOptions["sortBy"]
                 })
               }
             >
@@ -339,11 +326,11 @@ export function AdvancedFilters({
             <select
               className="pm-select input-sm"
               aria-label="Sort order"
-              value={filters.sortOrder || 'desc'}
+              value={filters.sortOrder || "desc"}
               onChange={(e) =>
                 setFilters({
                   ...filters,
-                  sortOrder: e.target.value as FilterOptions['sortOrder'],
+                  sortOrder: e.target.value as FilterOptions["sortOrder"]
                 })
               }
             >

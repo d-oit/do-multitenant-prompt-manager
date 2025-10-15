@@ -10,7 +10,9 @@ import Checkbox from "./ui/Checkbox";
 import Button from "./ui/Button";
 
 // Lazy load Monaco editor for better performance
-const RichTextEditor = lazy(() => import("./RichTextEditor").then((module) => ({ default: module.RichTextEditor })));
+const RichTextEditor = lazy(() =>
+  import("./RichTextEditor").then((module) => ({ default: module.RichTextEditor }))
+);
 
 interface PromptFormProps {
   mode: "create" | "update";
@@ -76,8 +78,8 @@ export default function PromptForm({
     setLocalError(error);
   }, [error]);
 
-  const handleChange = (field: keyof FormState) =>
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange =
+    (field: keyof FormState) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setValues((prev) => ({ ...prev, [field]: event.target.value }));
       if (localError) setLocalError(null);
     };
@@ -153,7 +155,13 @@ export default function PromptForm({
         />
       </Field>
       <Field label="Body">
-        <Suspense fallback={<div style={{ padding: "12px", color: "var(--pm-color-text-muted)" }}>Loading editor...</div>}>
+        <Suspense
+          fallback={
+            <div style={{ padding: "12px", color: "var(--pm-color-text-muted)" }}>
+              Loading editor...
+            </div>
+          }
+        >
           <RichTextEditor
             value={values.body}
             onChange={handleBodyChange}

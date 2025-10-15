@@ -12,7 +12,11 @@ export interface CommentRecord {
   resolved: boolean;
 }
 
-export async function listComments(env: Env, promptId: string, tenantId: string): Promise<CommentRecord[]> {
+export async function listComments(
+  env: Env,
+  promptId: string,
+  tenantId: string
+): Promise<CommentRecord[]> {
   const rows = await env.DB.prepare(
     `SELECT id, prompt_id, tenant_id, parent_id, body, created_by, created_at, updated_at, resolved
      FROM prompt_comments
@@ -47,7 +51,10 @@ export async function listComments(env: Env, promptId: string, tenantId: string)
 
 export async function createComment(
   env: Env,
-  input: Omit<CommentRecord, "id" | "createdAt" | "updatedAt" | "resolved"> & { id: string; resolved?: boolean }
+  input: Omit<CommentRecord, "id" | "createdAt" | "updatedAt" | "resolved"> & {
+    id: string;
+    resolved?: boolean;
+  }
 ): Promise<CommentRecord> {
   const createdAt = new Date().toISOString();
   const resolved = input.resolved ?? false;
@@ -111,7 +118,7 @@ export async function updateComment(
   }
 
   const nextBody = updates.body ?? current.body;
-  const nextResolved = updates.resolved ?? (current.resolved === 1);
+  const nextResolved = updates.resolved ?? current.resolved === 1;
   const updatedAt = new Date().toISOString();
 
   await env.DB.prepare(
@@ -135,10 +142,12 @@ export async function updateComment(
   };
 }
 
-export async function deleteComment(env: Env, commentId: string, tenantId: string): Promise<boolean> {
-  const result = await env.DB.prepare(
-    `DELETE FROM prompt_comments WHERE id = ? AND tenant_id = ?`
-  )
+export async function deleteComment(
+  env: Env,
+  commentId: string,
+  tenantId: string
+): Promise<boolean> {
+  const result = await env.DB.prepare(`DELETE FROM prompt_comments WHERE id = ? AND tenant_id = ?`)
     .bind(commentId, tenantId)
     .run();
 

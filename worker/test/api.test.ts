@@ -246,9 +246,12 @@ describe("prompt API", () => {
     expect(created.data.tenantId).toBe("default");
     expect(created.data.version).toBe(1);
 
-    const listResponse = await apiFetch("/prompts?tenantId=default&sortBy=created_at&order=desc&page=1&pageSize=10", {
-      headers: authorizedHeaders()
-    });
+    const listResponse = await apiFetch(
+      "/prompts?tenantId=default&sortBy=created_at&order=desc&page=1&pageSize=10",
+      {
+        headers: authorizedHeaders()
+      }
+    );
     expect(listResponse.status).toBe(200);
     const listBody = await listResponse.json();
     expect(listBody.data).toHaveLength(1);
@@ -297,9 +300,12 @@ describe("prompt API", () => {
     expect(searchBody.data).toHaveLength(1);
     expect(searchBody.data[0].title).toBe("Product pitch");
 
-    const metadataResponse = await apiFetch("/prompts?tenantId=default&metadataKey=category&metadataValue=support", {
-      headers: authorizedHeaders()
-    });
+    const metadataResponse = await apiFetch(
+      "/prompts?tenantId=default&metadataKey=category&metadataValue=support",
+      {
+        headers: authorizedHeaders()
+      }
+    );
     const metadataBody = await metadataResponse.json();
     expect(metadataBody.data).toHaveLength(1);
     expect(metadataBody.data[0].metadata.category).toBe("support");
@@ -326,7 +332,9 @@ describe("prompt API", () => {
     expect(searchResponse.status).toBe(200);
     const searchBody = await searchResponse.json();
     expect(searchBody.highlights).toBeDefined();
-    const highlight = (searchBody.highlights || []).find((entry: { promptId: string }) => entry.promptId === createdPrompt.id);
+    const highlight = (searchBody.highlights || []).find(
+      (entry: { promptId: string }) => entry.promptId === createdPrompt.id
+    );
     expect(highlight).toBeDefined();
     expect((highlight?.body || "").toLowerCase()).toContain("<mark>assist</mark>");
 
@@ -523,9 +531,12 @@ describe("prompt API", () => {
     const created = await create.json();
     const promptId = created.data.id;
 
-    const listResponse = await apiFetch(`/prompts?tenantId=default&sortBy=created_at&order=desc&page=1&pageSize=${DEFAULT_PAGE_SIZE}`, {
-      headers: authorizedHeaders()
-    });
+    const listResponse = await apiFetch(
+      `/prompts?tenantId=default&sortBy=created_at&order=desc&page=1&pageSize=${DEFAULT_PAGE_SIZE}`,
+      {
+        headers: authorizedHeaders()
+      }
+    );
     expect(listResponse.status).toBe(200);
 
     const cacheKey = buildCacheKey({
@@ -542,7 +553,9 @@ describe("prompt API", () => {
       };
     } | null;
 
-    const initialCache = (await env.PROMPT_CACHE.get(cacheKey, { type: "json" })) as PromptCacheEntry;
+    const initialCache = (await env.PROMPT_CACHE.get(cacheKey, {
+      type: "json"
+    })) as PromptCacheEntry;
     expect(initialCache).toBeTruthy();
     expect(initialCache?.payload?.data?.[0]?.title).toBe("Cache sample");
 
@@ -553,14 +566,19 @@ describe("prompt API", () => {
     });
     expect(update.status).toBe(200);
 
-    const updatedList = await apiFetch(`/prompts?tenantId=default&sortBy=created_at&order=desc&page=1&pageSize=${DEFAULT_PAGE_SIZE}`, {
-      headers: authorizedHeaders()
-    });
+    const updatedList = await apiFetch(
+      `/prompts?tenantId=default&sortBy=created_at&order=desc&page=1&pageSize=${DEFAULT_PAGE_SIZE}`,
+      {
+        headers: authorizedHeaders()
+      }
+    );
     expect(updatedList.status).toBe(200);
     const updatedBody = await updatedList.json();
     expect(updatedBody.data[0].title).toBe("Cache sample updated");
 
-    const refreshedCache = (await env.PROMPT_CACHE.get(cacheKey, { type: "json" })) as PromptCacheEntry;
+    const refreshedCache = (await env.PROMPT_CACHE.get(cacheKey, {
+      type: "json"
+    })) as PromptCacheEntry;
     expect(refreshedCache?.payload?.data?.[0]?.title).toBe("Cache sample updated");
   });
 

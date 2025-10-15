@@ -8,29 +8,33 @@ import { z } from "zod";
 
 // Validation schemas
 const BulkCreateSchema = z.object({
-  prompts: z.array(
-    z.object({
-      title: z.string().min(1).max(200),
-      body: z.string().min(1),
-      tags: z.array(z.string()).optional().default([]),
-      metadata: z.record(z.any()).optional()
-    })
-  )
+  prompts: z
+    .array(
+      z.object({
+        title: z.string().min(1).max(200),
+        body: z.string().min(1),
+        tags: z.array(z.string()).optional().default([]),
+        metadata: z.record(z.any()).optional()
+      })
+    )
     .min(1)
     .max(100) // Limit to 100 items per bulk operation
 });
 
 const BulkUpdateSchema = z.object({
-  updates: z.array(
-    z.object({
-      id: z.string(),
-      title: z.string().min(1).max(200).optional(),
-      body: z.string().min(1).optional(),
-      tags: z.array(z.string()).optional(),
-      metadata: z.record(z.any()).optional(),
-      archived: z.boolean().optional(),
-    })
-  ).min(1).max(100),
+  updates: z
+    .array(
+      z.object({
+        id: z.string(),
+        title: z.string().min(1).max(200).optional(),
+        body: z.string().min(1).optional(),
+        tags: z.array(z.string()).optional(),
+        metadata: z.record(z.any()).optional(),
+        archived: z.boolean().optional()
+      })
+    )
+    .min(1)
+    .max(100)
 });
 
 const BulkDeleteSchema = z.object({
@@ -85,7 +89,18 @@ export async function bulkCreatePrompts(
           `INSERT INTO prompts (id, tenant_id, title, body, tags, metadata, created_at, updated_at, version, archived, created_by)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)`
         )
-        .bind(id, tenantId, prompt.title, prompt.body, tags, metadata, timestamp, timestamp, 1, createdBy ?? null)
+        .bind(
+          id,
+          tenantId,
+          prompt.title,
+          prompt.body,
+          tags,
+          metadata,
+          timestamp,
+          timestamp,
+          1,
+          createdBy ?? null
+        )
         .run();
 
       results.success++;
@@ -206,9 +221,18 @@ export async function bulkUpdatePrompts(
         continue;
       }
 
-      if (updatedFields.length > 0 && (update.title !== undefined || update.body !== undefined || update.tags !== undefined || update.metadata !== undefined)) {
+      if (
+        updatedFields.length > 0 &&
+        (update.title !== undefined ||
+          update.body !== undefined ||
+          update.tags !== undefined ||
+          update.metadata !== undefined)
+      ) {
         updates.push("version = ?");
-        const nextVersion = (typeof existing.version === "number" ? existing.version : Number(existing.version ?? 1)) + 1;
+        const nextVersion =
+          (typeof existing.version === "number"
+            ? existing.version
+            : Number(existing.version ?? 1)) + 1;
         bindings.push(nextVersion);
         versionIncremented = true;
       }
@@ -220,7 +244,10 @@ export async function bulkUpdatePrompts(
       bindings.push(update.id, tenantId);
 
       const query = `UPDATE prompts SET ${updates.join(", ")} WHERE id = ? AND tenant_id = ?`;
-      await db.prepare(query).bind(...bindings).run();
+      await db
+        .prepare(query)
+        .bind(...bindings)
+        .run();
 
       results.success++;
       results.results?.push({
@@ -356,7 +383,9 @@ export async function bulkManageTags(
       }
 
       await db
-        .prepare("UPDATE prompts SET tags = ?, updated_at = ?, version = version + 1 WHERE id = ? AND tenant_id = ?")
+        .prepare(
+          "UPDATE prompts SET tags = ?, updated_at = ?, version = version + 1 WHERE id = ? AND tenant_id = ?"
+        )
         .bind(JSON.stringify(newTags), timestamp, promptId, tenantId)
         .run();
 

@@ -9,13 +9,7 @@ import { Modal, ConfirmDialog } from "../components/ui/Modal";
 import { ErrorState, NoPromptsFound, NoSearchResults } from "../components/ui/EmptyState";
 import { SkeletonTable } from "../components/ui/LoadingState";
 import { createPrompt, deletePrompt, listPrompts, updatePrompt } from "../lib/api";
-import type {
-  Prompt,
-  PromptInput,
-  PromptListResponse,
-  SortField,
-  SortOrder
-} from "../types";
+import type { Prompt, PromptInput, PromptListResponse, SortField, SortOrder } from "../types";
 import PromptCollaborationPanel from "../components/PromptCollaborationPanel";
 
 interface ToastApi {
@@ -34,7 +28,12 @@ interface PromptsPageProps {
 
 const PAGE_SIZE = 20;
 
-export default function PromptsPage({ tenantId, token, toast, createSignal }: PromptsPageProps): JSX.Element {
+export default function PromptsPage({
+  tenantId,
+  token,
+  toast,
+  createSignal
+}: PromptsPageProps): JSX.Element {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [pagination, setPagination] = useState<PromptListResponse["pagination"] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -91,8 +90,12 @@ export default function PromptsPage({ tenantId, token, toast, createSignal }: Pr
             tenantId,
             search: debouncedSearch || undefined,
             tag: filters.tags && filters.tags.length ? filters.tags[0] : undefined,
-            metadataKey: filters.metadata && filters.metadata[0]?.key ? filters.metadata[0].key : undefined,
-            metadataValue: filters.metadata && filters.metadata[0]?.value ? filters.metadata[0].value : undefined,
+            metadataKey:
+              filters.metadata && filters.metadata[0]?.key ? filters.metadata[0].key : undefined,
+            metadataValue:
+              filters.metadata && filters.metadata[0]?.value
+                ? filters.metadata[0].value
+                : undefined,
             sortBy,
             order,
             page,
@@ -115,7 +118,9 @@ export default function PromptsPage({ tenantId, token, toast, createSignal }: Pr
 
         if (filters.owner) {
           const normalizedOwner = filters.owner.toLowerCase();
-          data = data.filter((prompt) => (prompt.createdBy ?? "").toLowerCase().includes(normalizedOwner));
+          data = data.filter((prompt) =>
+            (prompt.createdBy ?? "").toLowerCase().includes(normalizedOwner)
+          );
         }
 
         if (filters.searchIn && filters.searchIn.length && debouncedSearch) {
@@ -124,7 +129,8 @@ export default function PromptsPage({ tenantId, token, toast, createSignal }: Pr
             return filters.searchIn?.some((field) => {
               if (field === "title") return prompt.title.toLowerCase().includes(lowered);
               if (field === "body") return prompt.body.toLowerCase().includes(lowered);
-              if (field === "tags") return prompt.tags.some((tag) => tag.toLowerCase().includes(lowered));
+              if (field === "tags")
+                return prompt.tags.some((tag) => tag.toLowerCase().includes(lowered));
               if (field === "metadata")
                 return JSON.stringify(prompt.metadata ?? {})
                   .toLowerCase()
@@ -292,7 +298,9 @@ export default function PromptsPage({ tenantId, token, toast, createSignal }: Pr
         </div>
       </div>
 
-      {error ? <ErrorState error={error} onRetry={() => setReloadKey((count) => count + 1)} /> : null}
+      {error ? (
+        <ErrorState error={error} onRetry={() => setReloadKey((count) => count + 1)} />
+      ) : null}
 
       {loading ? (
         <SkeletonTable rows={PAGE_SIZE} />
@@ -369,7 +377,12 @@ export default function PromptsPage({ tenantId, token, toast, createSignal }: Pr
         size="xl"
       >
         {detailPrompt ? (
-          <PromptCollaborationPanel prompt={detailPrompt} tenantId={tenantId} token={token} toast={toast} />
+          <PromptCollaborationPanel
+            prompt={detailPrompt}
+            tenantId={tenantId}
+            token={token}
+            toast={toast}
+          />
         ) : null}
       </Modal>
     </div>

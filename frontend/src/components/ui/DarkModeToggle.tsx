@@ -3,25 +3,25 @@
  * Manages theme switching with system preference detection
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-type Theme = 'light' | 'dark' | 'system';
+type Theme = "light" | "dark" | "system";
 
 export function DarkModeToggle() {
   const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem('theme') as Theme;
-    return stored || 'system';
+    const stored = localStorage.getItem("theme") as Theme;
+    return stored || "system";
   });
 
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
     // Get system preference
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
     const updateResolvedTheme = () => {
-      if (theme === 'system') {
-        setResolvedTheme(mediaQuery.matches ? 'dark' : 'light');
+      if (theme === "system") {
+        setResolvedTheme(mediaQuery.matches ? "dark" : "light");
       } else {
         setResolvedTheme(theme);
       }
@@ -31,41 +31,39 @@ export function DarkModeToggle() {
 
     // Listen for system preference changes
     const handleChange = () => {
-      if (theme === 'system') {
+      if (theme === "system") {
         updateResolvedTheme();
       }
     };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme]);
 
   useEffect(() => {
     // Apply theme to document
-    if (resolvedTheme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
+    if (resolvedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
     } else {
-      document.documentElement.removeAttribute('data-theme');
+      document.documentElement.removeAttribute("data-theme");
     }
   }, [resolvedTheme]);
 
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
+    localStorage.setItem("theme", newTheme);
   };
 
   return (
     <div className="dark-mode-toggle">
       <button
-        onClick={() =>
-          handleThemeChange(resolvedTheme === 'dark' ? 'light' : 'dark')
-        }
+        onClick={() => handleThemeChange(resolvedTheme === "dark" ? "light" : "dark")}
         className="dark-mode-toggle__button"
-        aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+        aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
         title={`Currently ${resolvedTheme} mode`}
         type="button"
       >
-        {resolvedTheme === 'dark' ? (
+        {resolvedTheme === "dark" ? (
           <svg
             className="dark-mode-toggle__icon"
             fill="none"
@@ -100,27 +98,27 @@ export function DarkModeToggle() {
       <div className="dark-mode-toggle__dropdown">
         <button
           className={`dark-mode-toggle__option ${
-            theme === 'light' ? 'dark-mode-toggle__option--active' : ''
+            theme === "light" ? "dark-mode-toggle__option--active" : ""
           }`}
-          onClick={() => handleThemeChange('light')}
+          onClick={() => handleThemeChange("light")}
           type="button"
         >
           ☀️ Light
         </button>
         <button
           className={`dark-mode-toggle__option ${
-            theme === 'dark' ? 'dark-mode-toggle__option--active' : ''
+            theme === "dark" ? "dark-mode-toggle__option--active" : ""
           }`}
-          onClick={() => handleThemeChange('dark')}
+          onClick={() => handleThemeChange("dark")}
           type="button"
         >
           🌙 Dark
         </button>
         <button
           className={`dark-mode-toggle__option ${
-            theme === 'system' ? 'dark-mode-toggle__option--active' : ''
+            theme === "system" ? "dark-mode-toggle__option--active" : ""
           }`}
-          onClick={() => handleThemeChange('system')}
+          onClick={() => handleThemeChange("system")}
           type="button"
         >
           💻 System
@@ -133,18 +131,18 @@ export function DarkModeToggle() {
 // Hook for using theme in components
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem('theme') as Theme;
-    return stored || 'system';
+    const stored = localStorage.getItem("theme") as Theme;
+    return stored || "system";
   });
 
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
     const updateResolvedTheme = () => {
-      if (theme === 'system') {
-        setResolvedTheme(mediaQuery.matches ? 'dark' : 'light');
+      if (theme === "system") {
+        setResolvedTheme(mediaQuery.matches ? "dark" : "light");
       } else {
         setResolvedTheme(theme);
       }
@@ -153,23 +151,23 @@ export function useTheme() {
     updateResolvedTheme();
 
     const handleChange = () => {
-      if (theme === 'system') {
+      if (theme === "system") {
         updateResolvedTheme();
       }
     };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme]);
 
   const setThemeValue = (newTheme: Theme) => {
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
+    localStorage.setItem("theme", newTheme);
   };
 
   return {
     theme,
     resolvedTheme,
-    setTheme: setThemeValue,
+    setTheme: setThemeValue
   };
 }

@@ -24,7 +24,9 @@ export default function PromptDetailPanel({
   if (!prompt) {
     return (
       <Card title="Prompt details" className="prompt-detail">
-        <p className="pm-muted">Select a prompt to inspect metadata, version history, and usage controls.</p>
+        <p className="pm-muted">
+          Select a prompt to inspect metadata, version history, and usage controls.
+        </p>
       </Card>
     );
   }
@@ -75,7 +77,11 @@ export default function PromptDetailPanel({
       <section className="prompt-detail__section">
         <h4>Tags</h4>
         <div className="prompt-detail__tags">
-          {prompt.tags.length ? prompt.tags.map((tag) => <Tag key={tag}>{tag}</Tag>) : <span className="pm-muted">No tags</span>}
+          {prompt.tags.length ? (
+            prompt.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)
+          ) : (
+            <span className="pm-muted">No tags</span>
+          )}
         </div>
       </section>
 
@@ -101,11 +107,16 @@ export default function PromptDetailPanel({
               <li key={`${version.version}-${version.createdAt}`}>
                 <div>
                   <strong>v{version.version}</strong>
-                  <span className="pm-muted"> · {new Date(version.createdAt).toLocaleString()}</span>
+                  <span className="pm-muted">
+                    {" "}
+                    · {new Date(version.createdAt).toLocaleString()}
+                  </span>
                 </div>
                 <div className="pm-muted">by {version.createdBy ?? "unknown"}</div>
                 {version.metadata ? (
-                  <pre className="prompt-detail__metadata-small">{JSON.stringify(version.metadata, null, 2)}</pre>
+                  <pre className="prompt-detail__metadata-small">
+                    {JSON.stringify(version.metadata, null, 2)}
+                  </pre>
                 ) : null}
               </li>
             ))}

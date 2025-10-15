@@ -31,7 +31,11 @@ export async function addShare(env: Env, record: ShareRecord): Promise<void> {
     .run();
 }
 
-export async function listShares(env: Env, promptId: string, tenantId: string): Promise<ShareRecord[]> {
+export async function listShares(
+  env: Env,
+  promptId: string,
+  tenantId: string
+): Promise<ShareRecord[]> {
   const rows = await env.DB.prepare(
     `SELECT id, prompt_id, tenant_id, target_type, target_identifier, role, created_by, created_at, expires_at
      FROM prompt_shares
@@ -64,9 +68,7 @@ export async function listShares(env: Env, promptId: string, tenantId: string): 
 }
 
 export async function removeShare(env: Env, shareId: string, tenantId: string): Promise<boolean> {
-  const result = await env.DB.prepare(
-    `DELETE FROM prompt_shares WHERE id = ? AND tenant_id = ?`
-  )
+  const result = await env.DB.prepare(`DELETE FROM prompt_shares WHERE id = ? AND tenant_id = ?`)
     .bind(shareId, tenantId)
     .run();
 

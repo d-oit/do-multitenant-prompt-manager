@@ -1,4 +1,10 @@
-import type { PromptAnalyticsEntry, PromptFilters, SortField, SortOrder, Tenant } from "@shared/types";
+import type {
+  PromptAnalyticsEntry,
+  PromptFilters,
+  SortField,
+  SortOrder,
+  Tenant
+} from "@shared/types";
 
 export type {
   Prompt,

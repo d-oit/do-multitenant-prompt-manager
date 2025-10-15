@@ -11,7 +11,7 @@ export interface ErrorReport {
   timestamp: string;
   userAgent: string;
   url: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
 }
 
 export interface ErrorTrackingConfig {
@@ -29,8 +29,8 @@ class ErrorTracker {
 
   constructor(config: ErrorTrackingConfig) {
     this.config = config;
-    
-    if (config.enabled && typeof window !== 'undefined') {
+
+    if (config.enabled && typeof window !== "undefined") {
       this.setupGlobalHandlers();
     }
   }
@@ -40,17 +40,17 @@ class ErrorTracker {
    */
   private setupGlobalHandlers(): void {
     // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener("unhandledrejection", (event) => {
       this.captureError(event.reason, {
-        type: 'unhandledRejection',
+        type: "unhandledRejection",
         promise: event.promise
       });
     });
 
     // Handle global errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener("error", (event) => {
       this.captureError(event.error || event.message, {
-        type: 'globalError',
+        type: "globalError",
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno
@@ -58,9 +58,11 @@ class ErrorTracker {
     });
 
     // Handle React error boundary errors
-    window.addEventListener('react-error', ((event: CustomEvent<{error: Error; componentStack?: string}>) => {
+    window.addEventListener("react-error", ((
+      event: CustomEvent<{ error: Error; componentStack?: string }>
+    ) => {
       this.captureError(event.detail.error, {
-        type: 'reactError',
+        type: "reactError",
         componentStack: event.detail.componentStack
       });
     }) as EventListener);
@@ -72,7 +74,7 @@ class ErrorTracker {
   captureError(
     error: Error | string,
     context?: Record<string, unknown>,
-    severity: ErrorReport['severity'] = 'medium'
+    severity: ErrorReport["severity"] = "medium"
   ): void {
     if (!this.config.enabled) {
       return;
@@ -103,7 +105,7 @@ class ErrorTracker {
 
     // Allow modification or filtering via beforeSend
     const finalReport = this.config.beforeSend ? this.config.beforeSend(report) : report;
-    
+
     if (!finalReport) {
       return;
     }
@@ -119,7 +121,7 @@ class ErrorTracker {
     // Log to console in development
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
-      console.error('[ErrorTracker]', finalReport);
+      console.error("[ErrorTracker]", finalReport);
     }
   }
 
@@ -128,7 +130,7 @@ class ErrorTracker {
    */
   private storeError(report: ErrorReport): void {
     this.errors.push(report);
-    
+
     // Keep only the most recent errors
     if (this.errors.length > this.maxStoredErrors) {
       this.errors.shift();
@@ -136,7 +138,7 @@ class ErrorTracker {
 
     // Store in localStorage
     try {
-      localStorage.setItem('error-reports', JSON.stringify(this.errors.slice(-10)));
+      localStorage.setItem("error-reports", JSON.stringify(this.errors.slice(-10)));
     } catch (e) {
       // Ignore localStorage errors
     }
@@ -152,9 +154,9 @@ class ErrorTracker {
 
     try {
       await fetch(this.config.endpoint, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(report),
         // Use keepalive to ensure request completes even if page unloads
@@ -162,7 +164,7 @@ class ErrorTracker {
       });
     } catch (error) {
       // Silently fail - don't want error tracking to cause more errors
-      console.warn('[ErrorTracker] Failed to send error report:', error);
+      console.warn("[ErrorTracker] Failed to send error report:", error);
     }
   }
 
@@ -179,7 +181,7 @@ class ErrorTracker {
   clearErrors(): void {
     this.errors = [];
     try {
-      localStorage.removeItem('error-reports');
+      localStorage.removeItem("error-reports");
     } catch (e) {
       // Ignore
     }
@@ -191,7 +193,7 @@ class ErrorTracker {
   addBreadcrumb(message: string, data?: Record<string, unknown>): void {
     // This could be enhanced to store breadcrumbs
     if (import.meta.env.DEV) {
-      console.log('[Breadcrumb]', message, data);
+      console.log("[Breadcrumb]", message, data);
     }
   }
 
@@ -200,7 +202,7 @@ class ErrorTracker {
    */
   setUser(user: { id: string; email?: string; [key: string]: unknown }): void {
     // Store user context for error reports
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       (window as any).__errorTrackerUser = user;
     }
   }
@@ -242,7 +244,7 @@ export function getErrorTracker(): ErrorTracker | null {
 export function captureError(
   error: Error | string,
   context?: Record<string, unknown>,
-  severity?: ErrorReport['severity']
+  severity?: ErrorReport["severity"]
 ): void {
   errorTracker?.captureError(error, context, severity);
 }
@@ -312,7 +314,7 @@ export class PerformanceMonitor {
    * Get web vitals
    */
   getWebVitals(): void {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
 
@@ -320,17 +322,17 @@ export class PerformanceMonitor {
     new PerformanceObserver((list) => {
       const entries = list.getEntries();
       const lastEntry = entries[entries.length - 1];
-      console.log('[WebVitals] LCP:', lastEntry.startTime);
-    }).observe({ entryTypes: ['largest-contentful-paint'] });
+      console.log("[WebVitals] LCP:", lastEntry.startTime);
+    }).observe({ entryTypes: ["largest-contentful-paint"] });
 
     // First Input Delay
     new PerformanceObserver((list) => {
       const entries = list.getEntries();
       entries.forEach((entry: any) => {
         const fid = entry.processingStart - entry.startTime;
-        console.log('[WebVitals] FID:', fid);
+        console.log("[WebVitals] FID:", fid);
       });
-    }).observe({ entryTypes: ['first-input'] });
+    }).observe({ entryTypes: ["first-input"] });
 
     // Cumulative Layout Shift
     new PerformanceObserver((list) => {
@@ -340,8 +342,8 @@ export class PerformanceMonitor {
           cls += entry.value;
         }
       });
-      console.log('[WebVitals] CLS:', cls);
-    }).observe({ entryTypes: ['layout-shift'] });
+      console.log("[WebVitals] CLS:", cls);
+    }).observe({ entryTypes: ["layout-shift"] });
   }
 }
 

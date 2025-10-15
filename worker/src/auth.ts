@@ -85,7 +85,13 @@ const API_KEY_BYTES = 32;
 
 export async function hashPassword(password: string, salt?: Uint8Array): Promise<string> {
   const saltBytes = salt ?? crypto.getRandomValues(new Uint8Array(16));
-  const keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
   const derivedBits = await crypto.subtle.deriveBits(
     {
       name: "PBKDF2",
@@ -127,7 +133,11 @@ export async function verifyPassword(password: string, stored: string): Promise<
   return subtleTimingSafeEqual(candidateBytes, expected);
 }
 
-export async function authenticateRequest(request: Request, env: Env, options: AuthOptions = {}): Promise<AuthContext | null> {
+export async function authenticateRequest(
+  request: Request,
+  env: Env,
+  options: AuthOptions = {}
+): Promise<AuthContext | null> {
   const authHeader = request.headers.get("authorization");
   const apiKeyHeader = request.headers.get("x-api-key");
 
@@ -190,12 +200,19 @@ export async function generateSessionTokens(env: Env, userId: string): Promise<S
 
 export async function invalidateRefreshToken(env: Env, token: string): Promise<void> {
   const hash = await sha256(token);
-  await env.DB.prepare("UPDATE refresh_tokens SET revoked = 1 WHERE token_hash = ?").bind(hash).run();
+  await env.DB.prepare("UPDATE refresh_tokens SET revoked = 1 WHERE token_hash = ?")
+    .bind(hash)
+    .run();
 }
 
-export async function authenticateRefreshToken(env: Env, token: string): Promise<RefreshTokenRow | null> {
+export async function authenticateRefreshToken(
+  env: Env,
+  token: string
+): Promise<RefreshTokenRow | null> {
   const hash = await sha256(token);
-  const record = await env.DB.prepare("SELECT * FROM refresh_tokens WHERE token_hash = ? AND revoked = 0")
+  const record = await env.DB.prepare(
+    "SELECT * FROM refresh_tokens WHERE token_hash = ? AND revoked = 0"
+  )
     .bind(hash)
     .first<RefreshTokenRow>();
 
@@ -205,7 +222,9 @@ export async function authenticateRefreshToken(env: Env, token: string): Promise
 
   const expiresAt = new Date(record.expires_at);
   if (Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() <= Date.now()) {
-    await env.DB.prepare("UPDATE refresh_tokens SET revoked = 1 WHERE id = ?").bind(record.id).run();
+    await env.DB.prepare("UPDATE refresh_tokens SET revoked = 1 WHERE id = ?")
+      .bind(record.id)
+      .run();
     return null;
   }
 
@@ -213,7 +232,9 @@ export async function authenticateRefreshToken(env: Env, token: string): Promise
 }
 
 export async function revokeUserRefreshTokens(env: Env, userId: string): Promise<void> {
-  await env.DB.prepare("UPDATE refresh_tokens SET revoked = 1 WHERE user_id = ?").bind(userId).run();
+  await env.DB.prepare("UPDATE refresh_tokens SET revoked = 1 WHERE user_id = ?")
+    .bind(userId)
+    .run();
 }
 
 export async function fetchUser(env: Env, id: string): Promise<AuthenticatedUser | null> {
@@ -230,8 +251,13 @@ export async function fetchUser(env: Env, id: string): Promise<AuthenticatedUser
   };
 }
 
-export async function fetchUserByEmailWithPassword(env: Env, email: string): Promise<{ user: AuthenticatedUser; passwordHash: string } | null> {
-  const row = await env.DB.prepare("SELECT id, email, name, password_hash FROM users WHERE email = ? COLLATE NOCASE")
+export async function fetchUserByEmailWithPassword(
+  env: Env,
+  email: string
+): Promise<{ user: AuthenticatedUser; passwordHash: string } | null> {
+  const row = await env.DB.prepare(
+    "SELECT id, email, name, password_hash FROM users WHERE email = ? COLLATE NOCASE"
+  )
     .bind(email)
     .first<UserRow>();
   if (!row) {
@@ -303,8 +329,11 @@ export async function fetchRoleAssignments(env: Env, userId: string): Promise<Ro
   }));
 }
 
-export function buildAuthContext(user: AuthenticatedUser, assignments: RoleAssignment[], source: "jwt" | "api-key"):
-  AuthContext {
+export function buildAuthContext(
+  user: AuthenticatedUser,
+  assignments: RoleAssignment[],
+  source: "jwt" | "api-key"
+): AuthContext {
   const globalPermissions = new Set<string>();
   const tenantPermissions = new Map<string, Set<string>>();
 
@@ -329,8 +358,15 @@ export function buildAuthContext(user: AuthenticatedUser, assignments: RoleAssig
   };
 }
 
-export function hasPermission(context: AuthContext, permission: string, tenantId?: string | null): boolean {
-  if (context.globalPermissions.has("*") || context.tenantPermissions.get(tenantId ?? "")?.has("*")) {
+export function hasPermission(
+  context: AuthContext,
+  permission: string,
+  tenantId?: string | null
+): boolean {
+  if (
+    context.globalPermissions.has("*") ||
+    context.tenantPermissions.get(tenantId ?? "")?.has("*")
+  ) {
     return true;
   }
 
@@ -348,7 +384,11 @@ export function hasPermission(context: AuthContext, permission: string, tenantId
   return false;
 }
 
-export function requirePermission(context: AuthContext, permission: string, tenantId?: string | null): void {
+export function requirePermission(
+  context: AuthContext,
+  permission: string,
+  tenantId?: string | null
+): void {
   if (!hasPermission(context, permission, tenantId)) {
     throw jsonResponse({ error: "Forbidden" }, 403);
   }
@@ -376,7 +416,11 @@ function parseInteger(value: string | undefined, fallback: number): number {
   return parsed;
 }
 
-async function generateRefreshToken(env: Env, userId: string, expiresAt: Date): Promise<{ token: string; expiresAt: string }> {
+async function generateRefreshToken(
+  env: Env,
+  userId: string,
+  expiresAt: Date
+): Promise<{ token: string; expiresAt: string }> {
   const randomBytes = crypto.getRandomValues(new Uint8Array(32));
   const token = bytesToHex(randomBytes);
   const hash = await sha256(token);
@@ -396,7 +440,11 @@ async function generateRefreshToken(env: Env, userId: string, expiresAt: Date): 
   };
 }
 
-async function signJwt(payload: Record<string, unknown>, secret: string, ttlSeconds: number): Promise<string> {
+async function signJwt(
+  payload: Record<string, unknown>,
+  secret: string,
+  ttlSeconds: number
+): Promise<string> {
   const issuedAt = Math.floor(Date.now() / 1000);
   const key = encoder.encode(secret);
 
@@ -441,9 +489,7 @@ function getAccessTokenSecret(env: Env): string {
 }
 
 export async function revokeApiKey(env: Env, apiKeyId: string): Promise<void> {
-  await env.DB.prepare("UPDATE api_keys SET revoked = 1 WHERE id = ?")
-    .bind(apiKeyId)
-    .run();
+  await env.DB.prepare("UPDATE api_keys SET revoked = 1 WHERE id = ?").bind(apiKeyId).run();
 }
 
 async function generateApiKeySecret(): Promise<{ key: string; hash: string }> {
@@ -453,7 +499,13 @@ async function generateApiKeySecret(): Promise<{ key: string; hash: string }> {
   return { key, hash };
 }
 
-export async function createApiKey(env: Env, userId: string, roleId: string, tenantId: string | null, name: string): Promise<{ id: string; key: string }> {
+export async function createApiKey(
+  env: Env,
+  userId: string,
+  roleId: string,
+  tenantId: string | null,
+  name: string
+): Promise<{ id: string; key: string }> {
   const { key, hash } = await generateApiKeySecret();
   const id = crypto.randomUUID();
   await env.DB.prepare(
@@ -468,7 +520,9 @@ export async function createApiKey(env: Env, userId: string, roleId: string, ten
 
 export async function rotateApiKey(env: Env, apiKeyId: string): Promise<string> {
   const { key, hash } = await generateApiKeySecret();
-  await env.DB.prepare("UPDATE api_keys SET key_hash = ?, revoked = 0, last_used_at = NULL WHERE id = ?")
+  await env.DB.prepare(
+    "UPDATE api_keys SET key_hash = ?, revoked = 0, last_used_at = NULL WHERE id = ?"
+  )
     .bind(hash, apiKeyId)
     .run();
   return key;

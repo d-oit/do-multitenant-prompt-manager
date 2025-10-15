@@ -12,16 +12,19 @@ export const SUPPORTED_VERSIONS = ["v1"];
  *   /prompts -> /prompts
  *   /v1/auth/login -> /auth/login
  */
-export function normalizeVersionedPath(path: string): { normalizedPath: string; version: string | null } {
+export function normalizeVersionedPath(path: string): {
+  normalizedPath: string;
+  version: string | null;
+} {
   const versionMatch = path.match(/^\/v(\d+)(\/.*)?$/);
-  
+
   if (versionMatch) {
     const version = `v${versionMatch[1]}`;
     const normalizedPath = versionMatch[2] || "/";
-    
+
     return { normalizedPath, version };
   }
-  
+
   return { normalizedPath: path, version: null };
 }
 
@@ -31,16 +34,16 @@ export function normalizeVersionedPath(path: string): { normalizedPath: string; 
  */
 export function getRequestedVersion(request: Request, path: string): string {
   const { version: pathVersion } = normalizeVersionedPath(path);
-  
+
   if (pathVersion) {
     return pathVersion;
   }
-  
+
   const acceptVersion = request.headers.get("Accept-Version");
   if (acceptVersion && SUPPORTED_VERSIONS.includes(acceptVersion)) {
     return acceptVersion;
   }
-  
+
   return "v1"; // Default version
 }
 
@@ -58,7 +61,7 @@ export function addVersionHeaders(response: Response, version: string): Response
   const newHeaders = new Headers(response.headers);
   newHeaders.set("API-Version", version);
   newHeaders.set("API-Version-Info", API_VERSION);
-  
+
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
