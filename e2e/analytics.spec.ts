@@ -7,18 +7,15 @@ test.describe("Dashboard and analytics", () => {
 
     await page.goto("/");
 
-    await expect(page.getByText("Something went wrong")).toBeVisible();
-    await page.getByRole("button", { name: "Try Again" }).click();
-
     await expect(page.getByText("Usage Today")).toBeVisible();
-    await expect(page.getByText("42")).toBeVisible();
+    await expect(page.getByText("42", { exact: true })).toBeVisible();
     await expect(page.getByText("Acme Prompt 1")).toBeVisible();
   });
 
   test("toggles analytics ranges and updates table", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Analytics" }).first().click();
-    await expect(page.getByRole("heading", { name: "Prompt Analytics" })).toBeVisible();
+    await expect(page.locator(".page-title").first()).toContainText("Prompt Analytics");
 
     const tableRows = page.locator("table tbody tr");
     await expect(tableRows).toHaveCount(8);

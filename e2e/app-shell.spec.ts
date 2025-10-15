@@ -13,16 +13,16 @@ test.describe("App shell", () => {
     await expect(tenantSelect).toHaveValue(apiState.tenants[1].id);
 
     await page.getByRole("button", { name: "Prompts" }).first().click();
-    await expect(page.getByRole("heading", { name: "Prompts" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Prompts" }).first()).toBeVisible();
 
     await page.getByRole("button", { name: "Analytics" }).first().click();
-    await expect(page.getByRole("heading", { name: "Prompt Analytics" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Prompt Analytics" }).first()).toBeVisible();
 
     await page.getByRole("button", { name: "Tenants" }).first().click();
-    await expect(page.getByRole("heading", { name: "Tenants" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Tenants" }).first()).toBeVisible();
 
     await page.getByRole("button", { name: "Dashboard" }).first().click();
-    await expect(page.locator(".page-title")).toContainText("overview");
+    await expect(page.locator(".page-title").first()).toContainText("overview");
   });
 
   test("creates a tenant from the sidebar form", async ({ page, apiState }) => {

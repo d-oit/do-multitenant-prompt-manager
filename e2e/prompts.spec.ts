@@ -8,7 +8,7 @@ const selectAllShortcut = `${isMac ? "Meta" : "Control"}+A`;
 async function openPrompts(page: Page) {
   await page.goto("/");
   await page.getByRole("button", { name: "Prompts" }).first().click();
-  await expect(page.getByRole("heading", { name: "Prompts" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Prompts" }).first()).toBeVisible();
 }
 
 function buildPrompt(overrides: Partial<Prompt> & { tenantId: string }): Prompt {

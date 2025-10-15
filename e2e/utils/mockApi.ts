@@ -175,8 +175,8 @@ export interface ApiState {
 
 export function createDefaultApiState(): ApiState {
   const baseDate = new Date("2024-03-01T12:00:00.000Z");
-  let nextIdCounter = 1;
-  const nextId = (prefix: string) => `${prefix}_${nextIdCounter++}`;
+  let __nextIdCounter = 1;
+  const __nextId = (prefix: string) => `${prefix}_${__nextIdCounter++}`;
 
   const tenants: Tenant[] = [
     {
@@ -436,7 +436,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
   };
 
   const idCounters: Record<string, number> = {};
-  const nextId = (prefix: string) => {
+  const __nextId = (prefix: string) => {
     idCounters[prefix] = (idCounters[prefix] ?? 0) + 1;
     return `${prefix}_${Date.now()}_${idCounters[prefix]}`;
   };
@@ -503,7 +503,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
       const payload = JSON.parse(request.postData() || "{}");
       const now = new Date().toISOString();
       const tenant: Tenant = {
-        id: nextId("tenant"),
+        id: _nextId("tenant"),
         name: payload.name,
         slug: payload.slug,
         createdAt: now
@@ -631,7 +631,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         }
         const now = new Date().toISOString();
         const prompt: Prompt = {
-          id: nextId("prompt"),
+          id: _nextId("prompt"),
           tenantId,
           title: payload.title,
           body: payload.body,
@@ -735,7 +735,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
       const now = new Date().toISOString();
       state.promptActivity[promptId] = state.promptActivity[promptId] ?? [];
       state.promptActivity[promptId].unshift({
-        id: nextId("activity"),
+        id: _nextId("activity"),
         promptId,
         tenantId,
         actor: request.headers()["authorization"] ? "authenticated" : "system",
@@ -757,7 +757,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const comment: PromptComment = {
-          id: nextId("comment"),
+          id: _nextId("comment"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           parentId: payload.parentId ?? null,
@@ -784,7 +784,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const share: PromptShare = {
-          id: nextId("share"),
+          id: _nextId("share"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           targetType: payload.targetType,
@@ -826,7 +826,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const approval: PromptApproval = {
-          id: nextId("approval"),
+          id: _nextId("approval"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           requestedBy: "e2e-user",
