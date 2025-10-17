@@ -206,8 +206,21 @@ beforeEach(async () => {
   });
 
   expect(response.status).toBe(200);
-  const body = (await response.json()) as TestResponse;
-  authToken = body.data.accessToken;
+  
+  // Extract access token from the Set-Cookie header
+  const setCookieHeader = response.headers.get("set-cookie");
+  expect(setCookieHeader).toBeTruthy();
+  
+  // Parse the pm_access cookie from the Set-Cookie header
+  const cookies = setCookieHeader?.split(", ") || [];
+  const accessCookie = cookies.find(cookie => cookie.startsWith("pm_access="));
+  expect(accessCookie).toBeTruthy();
+  
+  // Extract the token value from the cookie
+  const tokenMatch = accessCookie?.match(/pm_access=([^;]+)/);
+  expect(tokenMatch).toBeTruthy();
+  authToken = decodeURIComponent(tokenMatch![1]);
+  console.log("🔐 Login successful - Token:", authToken);
 });
 
 afterEach(async () => {
@@ -235,6 +248,7 @@ afterEach(async () => {
 
 describe("prompt API", () => {
   it("creates and returns a prompt", async () => {
+    console.log("🔐 Using token for prompt creation:", authToken);
     const createResponse = await apiFetch("/prompts", {
       method: "POST",
       headers: authorizedHeaders(),
@@ -247,6 +261,7 @@ describe("prompt API", () => {
       })
     });
 
+    console.log("📊 Prompt creation response status:", createResponse.status);
     expect(createResponse.status).toBe(201);
     const created = (await createResponse.json()) as TestResponse;
     expect(created.data.title).toBe("Greeting");
@@ -670,5 +685,92 @@ describe("prompt API", () => {
       }
     });
     expect(third.status).toBe(429);
+  });
+});
+
+describe("bearer token authentication", () => {
+  it("generates and validates bearer tokens", async () => {
+    // First authenticate via cookies to get a session
+    const loginResponse = await apiFetch("/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(adminCredentials)
+    });
+    expect(loginResponse.status).toBe(200);
+    const cookieHeader = loginResponse.headers.get("set-cookie");
+    expect(cookieHeader).toBeTruthy();
+
+    // Generate a bearer token using the authenticated session
+    const bearerResponse = await apiFetch("/auth/bearer-token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Cookie": cookieHeader || ""
+      },
+      body: JSON.stringify({
+        name: "Test API Token",
+        expiresIn: 3600 // 1 hour
+      })
+    });
+    expect(bearerResponse.status).toBe(201);
+    const bearerBody = (await bearerResponse.json()) as TestResponse;
+    expect(bearerBody.data.token).toBeTruthy();
+    expect(bearerBody.data.expiresAt).toBeTruthy();
+    expect(bearerBody.data.tokenType).toBe("bearer");
+
+    // Use the bearer token to make an API request
+    const apiResponse = await apiFetch("/tenants", {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${bearerBody.data.token}`
+      }
+    });
+    expect(apiResponse.status).toBe(200);
+    const apiBody = (await apiResponse.json()) as TestResponse;
+    expect(Array.isArray(apiBody.data)).toBe(true);
+  });
+
+  it("prefers bearer tokens over cookies when both are present", async () => {
+    // Authenticate via cookies first
+    const loginResponse = await apiFetch("/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(adminCredentials)
+    });
+    expect(loginResponse.status).toBe(200);
+    const cookieHeader = loginResponse.headers.get("set-cookie");
+
+    // Generate a bearer token
+    const bearerResponse = await apiFetch("/auth/bearer-token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Cookie": cookieHeader || ""
+      },
+      body: JSON.stringify({ name: "Priority Test Token" })
+    });
+    expect(bearerResponse.status).toBe(201);
+    const bearerBody = (await bearerResponse.json()) as TestResponse;
+    const bearerToken = bearerBody.data.token;
+
+    // Make request with both cookie and bearer token - should prefer bearer
+    const response = await apiFetch("/tenants", {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${bearerToken}`,
+        "Cookie": cookieHeader || ""
+      }
+    });
+    expect(response.status).toBe(200);
+  });
+
+  it("rejects invalid bearer tokens", async () => {
+    const response = await apiFetch("/tenants", {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer invalid-token-here"
+      }
+    });
+    expect(response.status).toBe(401);
   });
 });

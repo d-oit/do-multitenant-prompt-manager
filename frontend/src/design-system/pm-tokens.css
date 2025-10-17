@@ -10,14 +10,14 @@
   --pm-font-family-mono: "Fira Code", "JetBrains Mono", "Consolas", "Monaco", monospace;
 
   /* Font Sizes - Fluid and responsive */
-  --pm-font-size-xs: 0.75rem;
-  --pm-font-size-sm: 0.875rem;
-  --pm-font-size-base: 1rem;
-  --pm-font-size-lg: 1.125rem;
-  --pm-font-size-xl: 1.25rem;
-  --pm-font-size-xxl: 1.5rem;
-  --pm-font-size-display-sm: clamp(1.75rem, 4vw, 2rem);
-  --pm-font-size-display-lg: clamp(2rem, 5vw, 2.5rem);
+  --pm-font-size-xs: clamp(0.7rem, 0.66rem + 0.3vw, 0.8rem);
+  --pm-font-size-sm: clamp(0.82rem, 0.78rem + 0.35vw, 0.95rem);
+  --pm-font-size-base: clamp(0.95rem, 0.88rem + 0.45vw, 1.0625rem);
+  --pm-font-size-lg: clamp(1.0625rem, 0.98rem + 0.55vw, 1.25rem);
+  --pm-font-size-xl: clamp(1.25rem, 1.1rem + 0.65vw, 1.5rem);
+  --pm-font-size-xxl: clamp(1.5rem, 1.34rem + 0.75vw, 1.875rem);
+  --pm-font-size-display-sm: clamp(1.75rem, 1.45rem + 1.4vw, 2.25rem);
+  --pm-font-size-display-lg: clamp(2.125rem, 1.8rem + 1.7vw, 2.75rem);
 
   /* Line Heights - Optimized for readability */
   --pm-line-height-tight: 1.25;
@@ -34,17 +34,23 @@
 
   /* Spacing System - 8px base with fluid scaling */
   --pm-spacing-0: 0;
-  --pm-spacing-1: 0.25rem;
-  --pm-spacing-2: 0.5rem;
-  --pm-spacing-3: 0.75rem;
-  --pm-spacing-4: 1rem;
-  --pm-spacing-5: 1.25rem;
-  --pm-spacing-6: 1.5rem;
-  --pm-spacing-8: 2rem;
-  --pm-spacing-10: 2.5rem;
-  --pm-spacing-12: 3rem;
-  --pm-spacing-16: 4rem;
-  --pm-spacing-20: 5rem;
+  --pm-spacing-fluid-unit: clamp(0.6rem, 0.5rem + 0.9vw, 0.95rem);
+  --pm-spacing-1: calc(var(--pm-spacing-fluid-unit) * 0.5);
+  --pm-spacing-2: var(--pm-spacing-fluid-unit);
+  --pm-spacing-3: calc(var(--pm-spacing-fluid-unit) * 1.5);
+  --pm-spacing-4: calc(var(--pm-spacing-fluid-unit) * 2);
+  --pm-spacing-5: calc(var(--pm-spacing-fluid-unit) * 2.5);
+  --pm-spacing-6: calc(var(--pm-spacing-fluid-unit) * 3);
+  --pm-spacing-8: calc(var(--pm-spacing-fluid-unit) * 4);
+  --pm-spacing-10: calc(var(--pm-spacing-fluid-unit) * 5);
+  --pm-spacing-12: calc(var(--pm-spacing-fluid-unit) * 6);
+  --pm-spacing-16: calc(var(--pm-spacing-fluid-unit) * 8);
+  --pm-spacing-20: calc(var(--pm-spacing-fluid-unit) * 10);
+  --pm-spacing-safe-top: max(env(safe-area-inset-top), var(--pm-spacing-3));
+  --pm-spacing-safe-bottom: max(env(safe-area-inset-bottom), var(--pm-spacing-3));
+  --pm-spacing-safe-inline: max(env(safe-area-inset-left), env(safe-area-inset-right), var(--pm-spacing-3));
+  --pm-gap-stack: clamp(0.75rem, 0.6rem + 0.8vw, 1.5rem);
+  --pm-gap-grid: clamp(1rem, 0.8rem + 1.2vw, 2rem);
 
   /* Border Radius - Modern and playful */
   --pm-radius-none: 0;
@@ -84,7 +90,8 @@
 
   --pm-content-max-width: 1200px;
   --pm-sidebar-width: 320px;
-  --pm-layout-gutter: var(--pm-spacing-6);
+  --pm-layout-gutter: clamp(1rem, 0.8rem + 1.5vw, 2.5rem);
+  --pm-layout-gutter-mobile: clamp(0.75rem, 0.6rem + 1vw, 1.5rem);
 
   /* Transitions - Smooth and modern easing curves */
   --pm-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);

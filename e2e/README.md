@@ -65,12 +65,49 @@ npm run test:e2e:debug
 - `setup/dbHelpers.ts` - Database utilities for test data management
 - `*.spec.ts` - Individual test suites
 
+### New Mobile-First Test Suites
+
+- `mobile-responsive.spec.ts` - Mobile-first responsive design tests
+- `touch-interactions.spec.ts` - Touch gestures and mobile interactions
+- `performance-mobile.spec.ts` - Core Web Vitals and mobile performance
+- `modern-components.spec.ts` - Command palette, data table, skeleton loaders
+- `accessibility-enhanced.spec.ts` - WCAG 2.1 AA compliance tests
+- `test-runner-mobile.spec.ts` - Cross-device integration tests
+
 ## Configuration
 
 - `playwright.config.ts` - Playwright configuration
   - Starts worker with `wrangler dev --local`
   - Starts frontend with `VITE_API_BASE_URL=http://localhost:8787`
+  - Multiple browser projects: Desktop Chrome, Mobile Chrome, Mobile Safari, Tablet
 - `.env.e2e` - Environment variables for e2e tests
+
+### Device Testing
+
+The test suite now includes multiple device configurations:
+- **Desktop**: Chrome on 1200x800 viewport
+- **Mobile Chrome**: Pixel 5 device simulation
+- **Mobile Safari**: iPhone 12 device simulation  
+- **Tablet**: iPad Pro device simulation
+
+### Mobile-Specific Test Commands
+
+```bash
+# Run only mobile tests
+npm run test:e2e -- --grep "Mobile"
+
+# Run only touch interaction tests
+npm run test:e2e -- touch-interactions.spec.ts
+
+# Run performance tests
+npm run test:e2e -- performance-mobile.spec.ts
+
+# Run accessibility tests
+npm run test:e2e -- accessibility-enhanced.spec.ts
+
+# Run cross-device integration tests
+npm run test:e2e -- test-runner-mobile.spec.ts
+```
 
 ## Notes
 

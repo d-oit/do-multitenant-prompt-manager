@@ -27,14 +27,21 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
+    "test:e2e:mobile": "playwright test --project mobile-chrome --project mobile-safari",
+    "test:e2e:desktop": "playwright test --project chromium",
+    "test:e2e:tablet": "playwright test --project tablet",
+    "test:e2e:performance": "playwright test performance-mobile.spec.ts",
+    "test:e2e:accessibility": "playwright test accessibility-enhanced.spec.ts",
+    "test:e2e:responsive": "playwright test mobile-responsive.spec.ts",
+    "test:e2e:touch": "playwright test touch-interactions.spec.ts",
+    "test:e2e:components": "playwright test modern-components.spec.ts",
     "deploy:worker": "npm run deploy --workspace do-multitenant-prompt-manager-worker",
     "deploy:pages": "node scripts/deploy-pages.mjs",
     "deploy:production": "node scripts/deploy-production.mjs",
     "deploy:full-production": "node scripts/deploy-full-production.mjs",
     "setup:production-secrets": "node scripts/setup-production-secrets.mjs",
     "migrate:production": "node scripts/migrate-production.mjs",
-    "health-check:production": "node scripts/health-check-production.mjs",
-    "prepare": "husky install .husky"
+    "health-check:production": "node scripts/health-check-production.mjs"
   },
   "overrides": {
     "dompurify": "^3.2.4"
@@ -54,7 +61,9 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.4",
     "prettier": "^3.6.2",
-    "typescript-eslint": "^8.46.1"
+    "typescript-eslint": "^8.46.1",
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0"
   },
   "dependencies": {
     "dompurify": "^3.2.4",

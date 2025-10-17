@@ -56,11 +56,23 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set("Content-Type", "application/json");
   }
 
-  // Attach CSRF token for mutating requests when a readable cookie is present
+  // Check if we have a bearer token available (preferred for API clients)
+  let hasBearerToken = false;
+  try {
+    const bearerToken = localStorage?.getItem("pm_bearer_token");
+    if (bearerToken && !headers.has("Authorization")) {
+      headers.set("Authorization", `Bearer ${bearerToken}`);
+      hasBearerToken = true;
+    }
+  } catch {
+    // localStorage may not be available in some environments
+  }
+
+  // Attach CSRF token for mutating requests when using cookies (not bearer tokens)
   try {
     const method = (init.method || "GET").toUpperCase();
-    if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
-      // Read pm_csrf cookie (double-submit cookie)
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && !hasBearerToken) {
+      // Read pm_csrf cookie (double-submit cookie) - only needed for cookie-based auth
       const cookieStr = typeof document !== "undefined" ? document.cookie : "";
       const match = cookieStr
         .split(";")
@@ -79,13 +91,13 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   let response: Response;
   try {
-    // Ensure cookies (HttpOnly session cookie) are sent with requests. If a caller
-    // still provides an explicit token it will be attached in the individual helper
-    // functions; new code should omit tokens and rely on cookies.
+    // Use credentials: "include" only for cookie-based auth, omit for bearer tokens
+    const credentials = hasBearerToken ? "omit" : "include";
+    
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
       headers,
-      credentials: "include"
+      credentials
     });
   } catch (error) {
     throw new Error(`Network error: ${error instanceof Error ? error.message : String(error)}`);
@@ -560,6 +572,58 @@ function resolveBaseUrl(): string {
   }
 
   return "";
+}
+
+/**
+ * Bearer token management utilities
+ */
+
+export function storeBearerToken(token: string): void {
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("pm_bearer_token", token);
+    }
+  } catch (error) {
+    console.warn("Failed to store bearer token:", error);
+  }
+}
+
+export function getBearerToken(): string | null {
+  try {
+    if (typeof localStorage !== "undefined") {
+      return localStorage.getItem("pm_bearer_token");
+    }
+  } catch (error) {
+    console.warn("Failed to retrieve bearer token:", error);
+  }
+  return null;
+}
+
+export function removeBearerToken(): void {
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.removeItem("pm_bearer_token");
+    }
+  } catch (error) {
+    console.warn("Failed to remove bearer token:", error);
+  }
+}
+
+/**
+ * Generate a bearer token from the current session
+ * This requires the user to be authenticated via cookies first
+ */
+export async function generateBearerToken(name?: string, expiresIn?: number): Promise<{ token: string; expiresAt: string }> {
+  const response = await request<{ data: { token: string; expiresAt: string; name: string } }>("/auth/bearer-token", {
+    method: "POST",
+    body: JSON.stringify({ name, expiresIn })
+  });
+  
+  if (response.data.token) {
+    storeBearerToken(response.data.token);
+  }
+  
+  return response.data;
 }
 
 export function serializeMetadata(metadata: Record<string, unknown> | null | undefined): string {

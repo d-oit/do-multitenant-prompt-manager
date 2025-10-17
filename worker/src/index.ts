@@ -27,7 +27,8 @@ import {
   buildAuthContext,
   fetchUser,
   fetchRoleAssignments,
-  hasPermission
+  hasPermission,
+  generateBearerToken
 } from "./auth";
 import {
   DEFAULT_PAGE_SIZE,
@@ -179,6 +180,11 @@ const refreshSchema = z.object({
   refreshToken: z.string().min(10)
 });
 
+const bearerTokenSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  expiresIn: z.number().min(300).max(86400).optional() // 5 minutes to 24 hours
+});
+
 const apiKeyCreateSchema = z.object({
   name: z.string().min(1).max(200),
   roleId: z.string().min(1),
@@ -321,6 +327,8 @@ export default {
         response = await handleRefresh(request, env);
       } else if (isLogoutRoute) {
         response = await handleLogout(request, env);
+      } else if (path === "/auth/bearer-token" && request.method === "POST") {
+        response = await handleBearerTokenCreate(request, env, auth);
       } else if (path === "/openapi.json" && request.method === "GET") {
         response = jsonResponse(getOpenAPIDocument());
       } else if (path === "/api-docs" && request.method === "GET") {
@@ -2260,6 +2268,29 @@ async function warmTopPrompts(env: Env, logger: Logger): Promise<void> {
   if (tenantIds.length) {
     logger.info("cache.warm.success", { tenants: tenantIds.length });
   }
+}
+
+async function handleBearerTokenCreate(request: Request, env: Env, auth: AuthContext): Promise<Response> {
+  // Allow both API key management permission and general prompt write permission
+  // This enables users with prompt management access to generate bearer tokens for API usage
+  if (!hasPermission(auth, "api-key:manage") && !hasPermission(auth, "prompt:write")) {
+    throw jsonResponse({ error: "Forbidden" }, 403);
+  }
+  
+  const payload = await readJson(request);
+  const parsed = bearerTokenSchema.parse(payload);
+  
+  // Use the parsed expiresIn value for the token generation
+  const { token, expiresAt } = await generateBearerToken(env, auth.user.id, parsed.expiresIn);
+  
+  return jsonResponse({
+    data: {
+      token,
+      expiresAt,
+      tokenType: "bearer",
+      name: parsed.name ?? "API Bearer Token"
+    }
+  }, 201);
 }
 
 addEventListener("unhandledrejection", (event) => {

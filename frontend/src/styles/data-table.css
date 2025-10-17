@@ -1,0 +1,354 @@
+/**
+ * Enhanced Data Table Styles
+ * Responsive table with mobile card layout and sticky columns
+ */
+
+/* ============================================
+   DATA TABLE CONTAINER
+   ============================================ */
+
+.data-table {
+  width: 100%;
+  border-radius: var(--pm-radius-lg);
+  border: 1px solid var(--pm-color-border-subtle);
+  background: var(--pm-color-bg-primary);
+  overflow: hidden;
+}
+
+.data-table__container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================
+   DESKTOP TABLE
+   ============================================ */
+
+.data-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.data-table__header {
+  background: var(--pm-color-bg-elevated);
+  border-bottom: 2px solid var(--pm-color-border-subtle);
+}
+
+.data-table__header--sticky {
+  position: sticky;
+  top: 0;
+  z-index: var(--pm-z-sticky);
+}
+
+.data-table__header-row {
+  border: none;
+}
+
+.data-table__header-cell {
+  padding: var(--pm-spacing-3) var(--pm-spacing-4);
+  text-align: left;
+  font-weight: var(--pm-font-weight-semibold);
+  font-size: var(--pm-font-size-sm);
+  color: var(--pm-color-text-secondary);
+  border-bottom: 1px solid var(--pm-color-border-subtle);
+  white-space: nowrap;
+}
+
+.data-table__header-cell--sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--pm-transition-fast);
+}
+
+.data-table__header-cell--sortable:hover {
+  background-color: var(--pm-color-bg-hover);
+}
+
+.data-table__header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--pm-spacing-2);
+}
+
+.data-table__sort-icon {
+  opacity: 0.5;
+  transition: opacity var(--pm-transition-fast);
+}
+
+.data-table__header-cell--sortable .data-table__sort-icon {
+  opacity: 1;
+}
+
+.data-table__sort-icon--asc,
+.data-table__sort-icon--desc {
+  opacity: 1;
+  color: var(--pm-color-primary);
+}
+
+/* ============================================
+   TABLE BODY
+   ============================================ */
+
+.data-table__body {
+  background: var(--pm-color-bg-primary);
+}
+
+.data-table__row {
+  border-bottom: 1px solid var(--pm-color-border-subtle);
+  transition: background-color var(--pm-transition-fast);
+}
+
+.data-table__row:hover {
+  background-color: var(--pm-color-bg-hover);
+}
+
+.data-table__row--clickable {
+  cursor: pointer;
+}
+
+.data-table__row--selected {
+  background-color: var(--pm-color-primary-light);
+}
+
+.data-table__cell {
+  padding: var(--pm-spacing-3) var(--pm-spacing-4);
+  font-size: var(--pm-font-size-sm);
+  color: var(--pm-color-text-primary);
+  vertical-align: middle;
+}
+
+.data-table__cell--selection {
+  width: 40px;
+  padding: var(--pm-spacing-2);
+}
+
+/* ============================================
+   STICKY COLUMNS
+   ============================================ */
+
+.data-table__header-cell--sticky-left,
+.data-table__cell--sticky-left {
+  position: sticky;
+  left: 0;
+  z-index: var(--pm-z-sticky);
+  background: var(--pm-color-bg-primary);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.data-table__header-cell--sticky-right,
+.data-table__cell--sticky-right {
+  position: sticky;
+  right: 0;
+  z-index: var(--pm-z-sticky);
+  background: var(--pm-color-bg-primary);
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.data-table__header-cell--sticky-left,
+.data-table__header-cell--sticky-right {
+  background: var(--pm-color-bg-elevated);
+}
+
+/* ============================================
+   MOBILE CARD LAYOUT
+   ============================================ */
+
+.data-table__mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-3);
+  padding: var(--pm-spacing-3);
+}
+
+.data-table__mobile-card {
+  background: var(--pm-color-bg-elevated);
+  border: 1px solid var(--pm-color-border-subtle);
+  border-radius: var(--pm-radius-lg);
+  padding: var(--pm-spacing-4);
+  transition: all var(--pm-transition-fast);
+}
+
+.data-table__mobile-card--clickable {
+  cursor: pointer;
+}
+
+.data-table__mobile-card--clickable:hover {
+  background: var(--pm-color-bg-hover);
+  border-color: var(--pm-color-border-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--pm-shadow-soft);
+}
+
+.data-table__mobile-card--selected {
+  border-color: var(--pm-color-primary);
+  background: var(--pm-color-primary-light);
+}
+
+.data-table__mobile-card-selection {
+  margin-bottom: var(--pm-spacing-3);
+  padding-bottom: var(--pm-spacing-3);
+  border-bottom: 1px solid var(--pm-color-border-subtle);
+}
+
+.data-table__mobile-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-2);
+}
+
+.data-table__mobile-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--pm-spacing-3);
+  min-height: 24px;
+}
+
+.data-table__mobile-field-label {
+  font-size: var(--pm-font-size-xs);
+  font-weight: var(--pm-font-weight-medium);
+  color: var(--pm-color-text-secondary);
+  flex-shrink: 0;
+  min-width: 80px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.data-table__mobile-field-value {
+  font-size: var(--pm-font-size-sm);
+  color: var(--pm-color-text-primary);
+  text-align: right;
+  word-break: break-word;
+}
+
+/* ============================================
+   LOADING AND EMPTY STATES
+   ============================================ */
+
+.data-table__loading {
+  padding: var(--pm-spacing-4);
+}
+
+.data-table__loading-row {
+  display: flex;
+  gap: var(--pm-spacing-4);
+  margin-bottom: var(--pm-spacing-3);
+}
+
+.data-table__loading-cell {
+  flex: 1;
+}
+
+.data-table__skeleton {
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    var(--pm-color-bg-secondary) 25%,
+    var(--pm-color-bg-elevated) 50%,
+    var(--pm-color-bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--pm-radius-sm);
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.data-table__empty {
+  padding: var(--pm-spacing-8) var(--pm-spacing-4);
+  text-align: center;
+  color: var(--pm-color-text-secondary);
+  font-size: var(--pm-font-size-sm);
+}
+
+/* ============================================
+   VIRTUAL SCROLLING
+   ============================================ */
+
+.data-table__virtual-container {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+@media (max-width: 640px) {
+  .data-table__mobile-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--pm-spacing-1);
+  }
+  
+  .data-table__mobile-field-value {
+    text-align: left;
+  }
+  
+  .data-table__mobile-field-label {
+    min-width: unset;
+  }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.data-table__header-cell:focus-visible,
+.data-table__cell:focus-visible,
+.data-table__mobile-card:focus-visible {
+  outline: 2px solid var(--pm-color-focus);
+  outline-offset: -2px;
+}
+
+/* ============================================
+   DARK THEME
+   ============================================ */
+
+[data-theme="dark"] .data-table__header-cell--sticky-left,
+[data-theme="dark"] .data-table__cell--sticky-left,
+[data-theme="dark"] .data-table__header-cell--sticky-right,
+[data-theme="dark"] .data-table__cell--sticky-right {
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .data-table__header-cell--sticky-right,
+[data-theme="dark"] .data-table__cell--sticky-right {
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   HIGH CONTRAST MODE
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  .data-table {
+    border-width: 2px;
+  }
+  
+  .data-table__header {
+    border-bottom-width: 3px;
+  }
+  
+  .data-table__row {
+    border-bottom-width: 2px;
+  }
+  
+  .data-table__mobile-card {
+    border-width: 2px;
+  }
+}

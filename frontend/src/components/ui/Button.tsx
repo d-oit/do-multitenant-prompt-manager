@@ -89,6 +89,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           loading && "pm-button--loading",
           className
         )}
+        style={{
+          minHeight: size === "xs" ? "32px" : size === "sm" ? "36px" : "44px", // Touch-friendly minimum
+          ...props.style
+        }}
         {...props}
       >
         {loading && <LoadingSpinner size={size} />}

@@ -1,0 +1,306 @@
+/**
+ * Floating Action Button Styles
+ * Material Design 3 inspired FAB with touch optimizations
+ */
+
+/* ============================================
+   FAB BASE STYLES
+   ============================================ */
+
+.fab {
+  position: fixed;
+  z-index: var(--pm-z-fab, 1000);
+  border: none;
+  border-radius: var(--pm-radius-2xl);
+  background: var(--pm-color-primary);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--pm-font-family-base);
+  font-weight: var(--pm-font-weight-semibold);
+  transition: all var(--pm-transition-base) cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--pm-shadow-strong);
+  overflow: hidden;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  
+  /* Minimum touch target size */
+  min-width: 56px;
+  min-height: 56px;
+}
+
+.fab:hover {
+  background: var(--pm-color-primary-hover);
+  box-shadow: var(--pm-shadow-stronger);
+  transform: scale(1.05) translateY(-2px);
+}
+
+.fab:active {
+  transform: scale(0.95) translateY(0);
+  box-shadow: var(--pm-shadow-soft);
+}
+
+.fab:focus-visible {
+  outline: 2px solid var(--pm-color-focus);
+  outline-offset: 2px;
+}
+
+.fab:disabled {
+  background: var(--pm-color-bg-disabled);
+  color: var(--pm-color-text-disabled);
+  cursor: not-allowed;
+  box-shadow: var(--pm-shadow-soft);
+  transform: none;
+}
+
+/* ============================================
+   FAB CONTENT
+   ============================================ */
+
+.fab__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pm-spacing-2);
+  position: relative;
+  z-index: 1;
+  transition: all var(--pm-transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fab__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.fab__label {
+  font-size: var(--pm-font-size-sm);
+  font-weight: var(--pm-font-weight-medium);
+  white-space: nowrap;
+}
+
+.fab__spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* ============================================
+   FAB SIZES
+   ============================================ */
+
+.fab--md {
+  width: 56px;
+  height: 56px;
+  padding: var(--pm-spacing-3);
+}
+
+.fab--lg {
+  width: 64px;
+  height: 64px;
+  padding: var(--pm-spacing-4);
+}
+
+.fab--lg .fab__icon {
+  font-size: 1.75rem;
+}
+
+/* ============================================
+   FAB POSITIONS
+   ============================================ */
+
+.fab--bottom-right {
+  bottom: max(var(--pm-spacing-safe-bottom, 0px), var(--pm-spacing-6));
+  right: var(--pm-spacing-6);
+}
+
+.fab--bottom-left {
+  bottom: max(var(--pm-spacing-safe-bottom, 0px), var(--pm-spacing-6));
+  left: var(--pm-spacing-6);
+}
+
+.fab--bottom-center {
+  bottom: max(var(--pm-spacing-safe-bottom, 0px), var(--pm-spacing-6));
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.fab--bottom-center:hover {
+  transform: translateX(-50%) scale(1.05) translateY(-2px);
+}
+
+.fab--bottom-center:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+/* ============================================
+   FAB RIPPLE EFFECT
+   ============================================ */
+
+.fab__ripple {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  transition: all var(--pm-transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.fab:active .fab__ripple {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.fab--loading {
+  pointer-events: none;
+}
+
+.fab--loading .fab__content {
+  opacity: 0.7;
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+
+@media (max-width: 640px) {
+  .fab--bottom-right {
+    bottom: max(var(--pm-spacing-safe-bottom, 0px), var(--mobile-nav-height, 80px), var(--pm-spacing-4));
+    right: var(--pm-spacing-4);
+  }
+  
+  .fab--bottom-left {
+    bottom: max(var(--pm-spacing-safe-bottom, 0px), var(--mobile-nav-height, 80px), var(--pm-spacing-4));
+    left: var(--pm-spacing-4);
+  }
+  
+  .fab--bottom-center {
+    bottom: max(var(--pm-spacing-safe-bottom, 0px), var(--mobile-nav-height, 80px), var(--pm-spacing-4));
+  }
+}
+
+/* ============================================
+   TOUCH DEVICE OPTIMIZATIONS
+   ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .fab:hover {
+    transform: none;
+    box-shadow: var(--pm-shadow-strong);
+    background: var(--pm-color-primary);
+  }
+  
+  .fab:active {
+    background: var(--pm-color-primary-active);
+    transform: scale(0.95);
+  }
+  
+  .fab--bottom-center:hover {
+    transform: translateX(-50%);
+  }
+  
+  .fab--bottom-center:active {
+    transform: translateX(-50%) scale(0.95);
+  }
+}
+
+/* ============================================
+   SAFE AREA SUPPORT
+   ============================================ */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .fab--bottom-right,
+  .fab--bottom-left,
+  .fab--bottom-center {
+    bottom: max(env(safe-area-inset-bottom), var(--pm-spacing-6));
+  }
+  
+  @media (max-width: 640px) {
+    .fab--bottom-right,
+    .fab--bottom-left,
+    .fab--bottom-center {
+      bottom: max(env(safe-area-inset-bottom), var(--mobile-nav-height, 80px), var(--pm-spacing-4));
+    }
+  }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fab-enter {
+  from {
+    opacity: 0;
+    transform: scale(0) translateY(100px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.fab {
+  animation: fab-enter var(--pm-transition-base) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .fab {
+    animation: none;
+    transition: none;
+  }
+  
+  .fab:hover,
+  .fab:active {
+    transform: none;
+  }
+  
+  .fab--bottom-center:hover,
+  .fab--bottom-center:active {
+    transform: translateX(-50%);
+  }
+  
+  .fab__ripple,
+  .fab__spinner {
+    animation: none;
+  }
+}
+
+/* ============================================
+   HIGH CONTRAST MODE
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  .fab {
+    border: 2px solid var(--pm-color-border-strong);
+  }
+  
+  .fab:focus-visible {
+    outline-width: 3px;
+  }
+}

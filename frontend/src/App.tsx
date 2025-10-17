@@ -21,6 +21,7 @@ import { cn } from "./design-system/utils";
 import { createTenant, listTenants } from "./lib/api";
 import type { Tenant, TenantCreateInput } from "./types";
 import NotificationMenu from "./components/NotificationMenu";
+import MobileNavigation from "./components/MobileNavigation";
 
 type ViewId = "dashboard" | "prompts" | "analytics" | "tenants";
 
@@ -246,6 +247,12 @@ export default function App(): JSX.Element {
       <header className="app-shell__header glass">
         <div className="app-header flex items-center justify-between gap-lg">
           <div className="flex items-center gap-md">
+            <MobileNavigation
+              navItems={navItems}
+              activeView={activeView}
+              onViewChange={setActiveView}
+              className="mobile-nav--header"
+            />
             <h1 className="app-header__title text-gradient">d.o. Prompt Manager</h1>
             <Badge tone="info">Production</Badge>
           </div>

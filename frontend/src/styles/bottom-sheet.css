@@ -1,0 +1,263 @@
+/**
+ * Bottom Sheet Styles
+ * Mobile-native modal pattern with smooth animations
+ */
+
+/* ============================================
+   BOTTOM SHEET OVERLAY
+   ============================================ */
+
+.bottom-sheet__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: var(--pm-z-overlay);
+  animation: fade-in var(--pm-transition-base) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   BOTTOM SHEET CONTAINER
+   ============================================ */
+
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--pm-color-bg-primary);
+  border-top-left-radius: var(--pm-radius-2xl);
+  border-top-right-radius: var(--pm-radius-2xl);
+  box-shadow: var(--pm-shadow-strong);
+  z-index: var(--pm-z-modal);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slide-up var(--pm-transition-base) cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform var(--pm-transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* ============================================
+   DRAG HANDLE
+   ============================================ */
+
+.bottom-sheet__drag-handle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--pm-spacing-3) 0 var(--pm-spacing-2);
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.bottom-sheet__drag-handle:active {
+  cursor: grabbing;
+}
+
+.bottom-sheet__drag-indicator {
+  width: 40px;
+  height: 4px;
+  background: var(--pm-color-border-strong);
+  border-radius: var(--pm-radius-full);
+  transition: all var(--pm-transition-fast);
+}
+
+.bottom-sheet__drag-handle:hover .bottom-sheet__drag-indicator,
+.bottom-sheet__drag-handle:active .bottom-sheet__drag-indicator {
+  background: var(--pm-color-text-secondary);
+  width: 48px;
+}
+
+/* ============================================
+   BOTTOM SHEET HEADER
+   ============================================ */
+
+.bottom-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--pm-spacing-4) var(--pm-spacing-5);
+  border-bottom: 1px solid var(--pm-color-border-subtle);
+  background: var(--pm-color-bg-elevated);
+  flex-shrink: 0;
+}
+
+.bottom-sheet__title {
+  font-size: var(--pm-font-size-lg);
+  font-weight: var(--pm-font-weight-semibold);
+  color: var(--pm-color-text-primary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.bottom-sheet__close-button {
+  min-width: 40px;
+  min-height: 40px;
+  padding: var(--pm-spacing-2);
+  color: var(--pm-color-text-secondary);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   BOTTOM SHEET CONTENT
+   ============================================ */
+
+.bottom-sheet__content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: var(--pm-spacing-5);
+}
+
+.bottom-sheet__content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.bottom-sheet__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.bottom-sheet__content::-webkit-scrollbar-thumb {
+  background: var(--pm-color-border-subtle);
+  border-radius: var(--pm-radius-full);
+}
+
+.bottom-sheet__content::-webkit-scrollbar-thumb:hover {
+  background: var(--pm-color-border-strong);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   SNAP POINTS BEHAVIOR
+   ============================================ */
+
+.bottom-sheet--snapping {
+  transition: height var(--pm-transition-base) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-sheet--dragging {
+  transition: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.bottom-sheet--dragging .bottom-sheet__drag-indicator {
+  background: var(--pm-color-primary);
+  width: 56px;
+}
+
+/* ============================================
+   SAFE AREA SUPPORT
+   ============================================ */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .bottom-sheet__content {
+    padding-bottom: max(var(--pm-spacing-5), env(safe-area-inset-bottom));
+  }
+}
+
+/* ============================================
+   LANDSCAPE ORIENTATION
+   ============================================ */
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .bottom-sheet {
+    max-height: 80vh;
+  }
+  
+  .bottom-sheet__content {
+    padding: var(--pm-spacing-4);
+  }
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-sheet__overlay,
+  .bottom-sheet {
+    animation: none;
+  }
+  
+  .bottom-sheet {
+    transition: none;
+  }
+  
+  .bottom-sheet__drag-indicator {
+    transition: none;
+  }
+}
+
+/* ============================================
+   HIGH CONTRAST MODE
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  .bottom-sheet {
+    border-top: 2px solid var(--pm-color-border-strong);
+  }
+  
+  .bottom-sheet__header {
+    border-bottom-width: 2px;
+  }
+  
+  .bottom-sheet__drag-indicator {
+    background: var(--pm-color-text-primary);
+    height: 6px;
+  }
+}
+
+/* ============================================
+   TABLET ADAPTATIONS
+   ============================================ */
+
+@media (min-width: 768px) {
+  .bottom-sheet {
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(90vw, 600px);
+    border-radius: var(--pm-radius-2xl);
+    bottom: var(--pm-spacing-6);
+  }
+  
+  .bottom-sheet__content {
+    max-height: 70vh;
+  }
+}
+
+@media (min-width: 768px) and (orientation: landscape) {
+  .bottom-sheet {
+    max-height: 80vh;
+  }
+}

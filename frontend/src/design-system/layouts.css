@@ -1,0 +1,275 @@
+/**
+ * Advanced Grid System and Layout Components
+ * Container queries and responsive grid implementations
+ */
+
+/* ============================================
+   CONTAINER QUERY SUPPORT
+   ============================================ */
+
+.container-query {
+  container-type: inline-size;
+  container-name: component;
+}
+
+.container-query--block {
+  container-type: block-size;
+}
+
+.container-query--size {
+  container-type: size;
+}
+
+/* ============================================
+   RESPONSIVE GRID CONTAINER
+   ============================================ */
+
+.grid-container {
+  display: grid;
+  gap: var(--pm-spacing-4);
+  width: 100%;
+  container-type: inline-size;
+}
+
+/* Auto-fit grid with minimum column width */
+.grid-container--auto {
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+}
+
+.grid-container--auto-sm {
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+
+.grid-container--auto-lg {
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+}
+
+/* Fixed column grids */
+.grid-container--1 { grid-template-columns: 1fr; }
+.grid-container--2 { grid-template-columns: repeat(2, 1fr); }
+.grid-container--3 { grid-template-columns: repeat(3, 1fr); }
+.grid-container--4 { grid-template-columns: repeat(4, 1fr); }
+.grid-container--5 { grid-template-columns: repeat(5, 1fr); }
+.grid-container--6 { grid-template-columns: repeat(6, 1fr); }
+
+/* ============================================
+   CONTAINER QUERY RESPONSIVE GRIDS
+   ============================================ */
+
+@container (max-width: 320px) {
+  .grid-container--responsive {
+    grid-template-columns: 1fr;
+    gap: var(--pm-spacing-3);
+  }
+}
+
+@container (min-width: 321px) and (max-width: 640px) {
+  .grid-container--responsive {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--pm-spacing-4);
+  }
+}
+
+@container (min-width: 641px) and (max-width: 1024px) {
+  .grid-container--responsive {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--pm-spacing-5);
+  }
+}
+
+@container (min-width: 1025px) {
+  .grid-container--responsive {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--pm-spacing-6);
+  }
+}
+
+/* ============================================
+   MASONRY LAYOUT
+   ============================================ */
+
+.masonry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--pm-spacing-4);
+  align-items: start;
+}
+
+.masonry-grid--dense {
+  grid-auto-flow: dense;
+}
+
+/* CSS-only masonry approximation */
+.masonry-grid--css {
+  columns: auto;
+  column-width: 280px;
+  column-gap: var(--pm-spacing-4);
+  column-fill: balance;
+}
+
+.masonry-grid--css > * {
+  break-inside: avoid;
+  margin-bottom: var(--pm-spacing-4);
+  display: inline-block;
+  width: 100%;
+}
+
+/* ============================================
+   FLEX LAYOUTS
+   ============================================ */
+
+.flex-container {
+  display: flex;
+  gap: var(--pm-spacing-4);
+}
+
+.flex-container--wrap {
+  flex-wrap: wrap;
+}
+
+.flex-container--column {
+  flex-direction: column;
+}
+
+.flex-container--center {
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-container--between {
+  justify-content: space-between;
+}
+
+.flex-container--around {
+  justify-content: space-around;
+}
+
+.flex-container--evenly {
+  justify-content: space-evenly;
+}
+
+/* ============================================
+   ASPECT RATIO CONTAINERS
+   ============================================ */
+
+.aspect-ratio {
+  position: relative;
+  width: 100%;
+}
+
+.aspect-ratio::before {
+  content: '';
+  display: block;
+  padding-top: var(--aspect-ratio, 100%);
+}
+
+.aspect-ratio > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.aspect-ratio--16-9 { --aspect-ratio: 56.25%; } /* 9/16 * 100% */
+.aspect-ratio--4-3 { --aspect-ratio: 75%; }     /* 3/4 * 100% */
+.aspect-ratio--3-2 { --aspect-ratio: 66.67%; }  /* 2/3 * 100% */
+.aspect-ratio--1-1 { --aspect-ratio: 100%; }    /* 1/1 * 100% */
+.aspect-ratio--3-4 { --aspect-ratio: 133.33%; } /* 4/3 * 100% */
+
+/* ============================================
+   RESPONSIVE SPACING
+   ============================================ */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.stack--xs { gap: var(--pm-spacing-1); }
+.stack--sm { gap: var(--pm-spacing-2); }
+.stack--md { gap: var(--pm-spacing-4); }
+.stack--lg { gap: var(--pm-spacing-6); }
+.stack--xl { gap: var(--pm-spacing-8); }
+
+.inline {
+  display: flex;
+  align-items: center;
+}
+
+.inline--xs { gap: var(--pm-spacing-1); }
+.inline--sm { gap: var(--pm-spacing-2); }
+.inline--md { gap: var(--pm-spacing-4); }
+.inline--lg { gap: var(--pm-spacing-6); }
+.inline--xl { gap: var(--pm-spacing-8); }
+
+/* ============================================
+   CONTAINER SIZES
+   ============================================ */
+
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--pm-spacing-4);
+  padding-right: var(--pm-spacing-4);
+}
+
+.container--sm { max-width: 640px; }
+.container--md { max-width: 768px; }
+.container--lg { max-width: 1024px; }
+.container--xl { max-width: 1280px; }
+.container--2xl { max-width: 1536px; }
+
+.container--full { max-width: none; }
+.container--prose { max-width: 65ch; }
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+
+@media (max-width: 640px) {
+  .grid-container {
+    gap: var(--pm-spacing-3);
+  }
+  
+  .masonry-grid {
+    grid-template-columns: 1fr;
+    gap: var(--pm-spacing-3);
+  }
+  
+  .masonry-grid--css {
+    columns: 1;
+    column-width: auto;
+  }
+  
+  .container {
+    padding-left: var(--pm-spacing-3);
+    padding-right: var(--pm-spacing-3);
+  }
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .grid-container,
+  .flex-container,
+  .masonry-grid {
+    transition: none;
+  }
+}
+
+/* ============================================
+   HIGH CONTRAST MODE
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  .grid-container,
+  .flex-container,
+  .masonry-grid {
+    border: 1px solid var(--pm-color-border-strong);
+  }
+}

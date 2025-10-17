@@ -130,6 +130,41 @@ export async function waitForApi(maxRetries = 60, delayMs = 500): Promise<void> 
 }
 
 /**
+ * Create a test prompt
+ */
+export async function createTestPrompt(
+  tenantId: string, 
+  title: string, 
+  content: string,
+  token?: string
+): Promise<any> {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    "X-Tenant-Id": tenantId
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/prompts`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      title,
+      content,
+      tags: ['test', 'e2e'],
+    }),
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to create test prompt: ${response.statusText}`);
+  }
+  
+  const result = await response.json();
+  return result.data;
+}
+
+/**
  * Generate a unique test identifier
  */
 export function generateTestId(): string {
