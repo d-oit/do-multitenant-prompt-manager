@@ -412,8 +412,7 @@ window.addEventListener("beforeunload", () => {
 });
 
 // Export utilities
-export { PerformanceMonitor };
-export type { PerformanceMetrics, DeviceCapabilities };
+export { PerformanceMonitor, type PerformanceMetrics, type DeviceCapabilities };
 
 // Memory monitoring
 const memoryManager = MemoryManager.getInstance();

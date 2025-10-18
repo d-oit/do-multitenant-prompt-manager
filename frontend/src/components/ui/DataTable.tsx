@@ -403,7 +403,7 @@ export const DataTable = forwardRef(
       </div>
     );
   }
-);
+) as <T>(props: DataTableProps<T> & { ref?: React.Ref<HTMLDivElement> }) => JSX.Element;
 
 DataTable.displayName = "DataTable";
 

@@ -50,7 +50,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
 
     // Handle manual dragging for more precise control
     const handleTouchStart = useCallback(
-      (e: React.TouchEvent) => {
+      (e: TouchEvent) => {
         if (!allowSwipeDown) return;
 
         setIsDragging(true);
@@ -61,7 +61,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
     );
 
     const handleTouchMove = useCallback(
-      (e: React.TouchEvent) => {
+      (e: TouchEvent) => {
         if (!isDragging) return;
 
         const deltaY = e.touches[0].clientY - initialTouchY.current;
