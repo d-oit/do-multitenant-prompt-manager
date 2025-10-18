@@ -149,7 +149,10 @@ class PerformanceMonitor {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         entries.forEach((entry) => {
-          const layoutShift = entry as LayoutShift;
+          const layoutShift = entry as PerformanceEntry & {
+            value: number;
+            hadRecentInput: boolean;
+          };
           if (!layoutShift.hadRecentInput) {
             clsValue += layoutShift.value;
           }
@@ -198,8 +201,8 @@ class PerformanceMonitor {
           const navigationEntry = entry as PerformanceNavigationTiming;
           this.metrics.ttfb = navigationEntry.responseStart - navigationEntry.requestStart;
           this.metrics.domContentLoaded =
-            navigationEntry.domContentLoadedEventEnd - navigationEntry.navigationStart;
-          this.metrics.loadTime = navigationEntry.loadEventEnd - navigationEntry.navigationStart;
+            navigationEntry.domContentLoadedEventEnd - navigationEntry.startTime;
+          this.metrics.loadTime = navigationEntry.loadEventEnd - navigationEntry.startTime;
 
           this.reportMetric("TTFB", this.metrics.ttfb);
           this.reportMetric("DOM_CONTENT_LOADED", this.metrics.domContentLoaded);
@@ -409,7 +412,8 @@ window.addEventListener("beforeunload", () => {
 });
 
 // Export utilities
-export { PerformanceMonitor, type PerformanceMetrics, type DeviceCapabilities };
+export { PerformanceMonitor };
+export type { PerformanceMetrics, DeviceCapabilities };
 
 // Memory monitoring
 const memoryManager = MemoryManager.getInstance();

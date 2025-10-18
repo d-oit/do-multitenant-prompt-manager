@@ -207,6 +207,7 @@ export function useMemoryMonitoring() {
             memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number; totalJSHeapSize: number };
           }
         ).memory;
+        if (!memory) return;
         const used = memory.usedJSHeapSize;
         const total = memory.jsHeapSizeLimit;
         const percentage = (used / total) * 100;

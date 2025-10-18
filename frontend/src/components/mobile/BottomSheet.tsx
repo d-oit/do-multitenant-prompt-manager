@@ -50,7 +50,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
 
     // Handle manual dragging for more precise control
     const handleTouchStart = useCallback(
-      (e: TouchEvent) => {
+      (e: React.TouchEvent) => {
         if (!allowSwipeDown) return;
 
         setIsDragging(true);

@@ -136,7 +136,7 @@ const MobileCard = <T,>({
   );
 };
 
-export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
+export const DataTable = forwardRef(
   <T,>(
     {
       data,
