@@ -17,25 +17,37 @@ interface PullToRefreshProps {
   refreshIndicator?: ReactNode;
 }
 
-const DefaultRefreshIndicator = ({ isRefreshing, canRefresh }: { isRefreshing: boolean; canRefresh: boolean }) => (
-  <div className={cn(
-    "pull-to-refresh__indicator",
-    isRefreshing && "pull-to-refresh__indicator--refreshing",
-    canRefresh && "pull-to-refresh__indicator--can-refresh"
-  )}>
-    <svg 
-      className="pull-to-refresh__icon" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
+const DefaultRefreshIndicator = ({
+  isRefreshing,
+  canRefresh
+}: {
+  isRefreshing: boolean;
+  canRefresh: boolean;
+}) => (
+  <div
+    className={cn(
+      "pull-to-refresh__indicator",
+      isRefreshing && "pull-to-refresh__indicator--refreshing",
+      canRefresh && "pull-to-refresh__indicator--can-refresh"
+    )}
+  >
+    <svg
+      className="pull-to-refresh__icon"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
       strokeWidth="2"
     >
       {isRefreshing ? (
         <>
           <circle cx="12" cy="12" r="10" opacity="0.25" />
-          <path d="M12 2 A10 10 0 0 1 22 12" strokeLinecap="round" className="pull-to-refresh__spinner" />
+          <path
+            d="M12 2 A10 10 0 0 1 22 12"
+            strokeLinecap="round"
+            className="pull-to-refresh__spinner"
+          />
         </>
       ) : (
         <path d="M1 4v6h6M23 20v-6h-6M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" />
@@ -56,38 +68,24 @@ export const PullToRefresh = forwardRef<HTMLDivElement, PullToRefreshProps>(
       threshold = 80,
       maxDistance = 120,
       enabled = true,
-      refreshIndicator,
+      refreshIndicator
     },
     ref
   ) => {
-    const {
-      containerRef,
-      isRefreshing,
-      canRefresh,
-      getRefreshIndicatorStyle,
-      getContainerStyle,
-    } = usePullToRefresh({
-      onRefresh,
-      threshold,
-      maxDistance,
-      enabled,
-    });
+    const { containerRef, isRefreshing, canRefresh, getRefreshIndicatorStyle, getContainerStyle } =
+      usePullToRefresh({
+        onRefresh,
+        threshold,
+        maxDistance,
+        enabled
+      });
 
     return (
-      <div
-        ref={ref}
-        className={cn("pull-to-refresh", className)}
-      >
+      <div ref={ref} className={cn("pull-to-refresh", className)}>
         {/* Refresh Indicator */}
-        <div
-          className="pull-to-refresh__indicator-container"
-          style={getRefreshIndicatorStyle()}
-        >
+        <div className="pull-to-refresh__indicator-container" style={getRefreshIndicatorStyle()}>
           {refreshIndicator || (
-            <DefaultRefreshIndicator 
-              isRefreshing={isRefreshing} 
-              canRefresh={canRefresh} 
-            />
+            <DefaultRefreshIndicator isRefreshing={isRefreshing} canRefresh={canRefresh} />
           )}
         </div>
 

@@ -318,9 +318,9 @@ export default function App(): JSX.Element {
                 <span>Help</span>
               </li>
             </ul>
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setShowShortcuts(true)}
               aria-label="View all keyboard shortcuts"
             >

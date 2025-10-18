@@ -85,9 +85,10 @@ npm run test:e2e:debug
 ### Device Testing
 
 The test suite now includes multiple device configurations:
+
 - **Desktop**: Chrome on 1200x800 viewport
 - **Mobile Chrome**: Pixel 5 device simulation
-- **Mobile Safari**: iPhone 12 device simulation  
+- **Mobile Safari**: iPhone 12 device simulation
 - **Tablet**: iPad Pro device simulation
 
 ### Mobile-Specific Test Commands

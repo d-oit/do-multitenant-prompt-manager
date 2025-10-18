@@ -194,7 +194,7 @@
   .bottom-sheet {
     max-height: 80vh;
   }
-  
+
   .bottom-sheet__content {
     padding: var(--pm-spacing-4);
   }
@@ -209,11 +209,11 @@
   .bottom-sheet {
     animation: none;
   }
-  
+
   .bottom-sheet {
     transition: none;
   }
-  
+
   .bottom-sheet__drag-indicator {
     transition: none;
   }
@@ -227,11 +227,11 @@
   .bottom-sheet {
     border-top: 2px solid var(--pm-color-border-strong);
   }
-  
+
   .bottom-sheet__header {
     border-bottom-width: 2px;
   }
-  
+
   .bottom-sheet__drag-indicator {
     background: var(--pm-color-text-primary);
     height: 6px;
@@ -250,7 +250,7 @@
     border-radius: var(--pm-radius-2xl);
     bottom: var(--pm-spacing-6);
   }
-  
+
   .bottom-sheet__content {
     max-height: 70vh;
   }

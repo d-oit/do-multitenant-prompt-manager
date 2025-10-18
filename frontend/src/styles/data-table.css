@@ -281,11 +281,11 @@
     align-items: flex-start;
     gap: var(--pm-spacing-1);
   }
-  
+
   .data-table__mobile-field-value {
     text-align: left;
   }
-  
+
   .data-table__mobile-field-label {
     min-width: unset;
   }
@@ -339,15 +339,15 @@
   .data-table {
     border-width: 2px;
   }
-  
+
   .data-table__header {
     border-bottom-width: 3px;
   }
-  
+
   .data-table__row {
     border-bottom-width: 2px;
   }
-  
+
   .data-table__mobile-card {
     border-width: 2px;
   }

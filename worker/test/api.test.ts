@@ -206,16 +206,16 @@ beforeEach(async () => {
   });
 
   expect(response.status).toBe(200);
-  
+
   // Extract access token from the Set-Cookie header
   const setCookieHeader = response.headers.get("set-cookie");
   expect(setCookieHeader).toBeTruthy();
-  
+
   // Parse the pm_access cookie from the Set-Cookie header
   const cookies = setCookieHeader?.split(", ") || [];
-  const accessCookie = cookies.find(cookie => cookie.startsWith("pm_access="));
+  const accessCookie = cookies.find((cookie) => cookie.startsWith("pm_access="));
   expect(accessCookie).toBeTruthy();
-  
+
   // Extract the token value from the cookie
   const tokenMatch = accessCookie?.match(/pm_access=([^;]+)/);
   expect(tokenMatch).toBeTruthy();
@@ -705,7 +705,7 @@ describe("bearer token authentication", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Cookie": cookieHeader || ""
+        Cookie: cookieHeader || ""
       },
       body: JSON.stringify({
         name: "Test API Token",
@@ -722,7 +722,7 @@ describe("bearer token authentication", () => {
     const apiResponse = await apiFetch("/tenants", {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${bearerBody.data.token}`
+        Authorization: `Bearer ${bearerBody.data.token}`
       }
     });
     expect(apiResponse.status).toBe(200);
@@ -745,7 +745,7 @@ describe("bearer token authentication", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Cookie": cookieHeader || ""
+        Cookie: cookieHeader || ""
       },
       body: JSON.stringify({ name: "Priority Test Token" })
     });
@@ -757,8 +757,8 @@ describe("bearer token authentication", () => {
     const response = await apiFetch("/tenants", {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${bearerToken}`,
-        "Cookie": cookieHeader || ""
+        Authorization: `Bearer ${bearerToken}`,
+        Cookie: cookieHeader || ""
       }
     });
     expect(response.status).toBe(200);
@@ -768,7 +768,7 @@ describe("bearer token authentication", () => {
     const response = await apiFetch("/tenants", {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer invalid-token-here"
+        Authorization: "Bearer invalid-token-here"
       }
     });
     expect(response.status).toBe(401);

@@ -30,7 +30,7 @@ textarea:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid var(--pm-color-focus);
   outline-offset: 2px;
-  box-shadow: 
+  box-shadow:
     0 0 0 4px var(--pm-color-focus-ring),
     var(--pm-shadow-soft);
   transition: box-shadow var(--pm-transition-fast);
@@ -48,7 +48,7 @@ textarea:focus-visible,
   [tabindex]:focus-visible {
     outline-width: 3px;
     outline-color: var(--pm-color-text-primary);
-    box-shadow: 
+    box-shadow:
       0 0 0 6px var(--pm-color-bg-primary),
       0 0 0 9px var(--pm-color-text-primary);
   }
@@ -120,7 +120,7 @@ textarea:focus-visible,
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  
+
   /* Keep focus transitions for accessibility */
   :focus-visible,
   button:focus-visible,
@@ -203,7 +203,7 @@ nav {
 }
 
 nav::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -1px;
   left: 0;
@@ -229,7 +229,7 @@ nav:focus-within::before {
 [aria-invalid="true"]:focus-visible,
 .has-error:focus-visible {
   outline-color: var(--pm-color-error);
-  box-shadow: 
+  box-shadow:
     0 0 0 1px var(--pm-color-error),
     0 0 0 4px var(--pm-color-error-light);
 }
@@ -285,7 +285,7 @@ nav:focus-within::before {
     min-height: var(--touch-target-comfortable);
     min-width: var(--touch-target-comfortable);
   }
-  
+
   /* Larger focus indicators on mobile */
   :focus-visible {
     outline-width: 3px;
@@ -309,7 +309,7 @@ nav:focus-within::before {
     clip: auto;
     white-space: normal;
   }
-  
+
   :focus-visible {
     outline: none;
     box-shadow: none;

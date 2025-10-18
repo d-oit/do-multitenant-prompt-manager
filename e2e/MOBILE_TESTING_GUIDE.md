@@ -51,14 +51,14 @@ This guide covers the comprehensive E2E testing suite for the mobile-first respo
 
 ### 📱 **Test Devices**
 
-| Device Type | Viewport | Browser Engine | Use Case |
-|-------------|----------|----------------|----------|
-| iPhone SE   | 375x667  | WebKit         | Small mobile screens |
-| iPhone 12   | 390x844  | WebKit         | Modern mobile screens |
-| Pixel 5     | 393x851  | Chromium       | Android devices |
-| iPad        | 768x1024 | WebKit         | Tablet portrait |
-| iPad Pro    | 1024x1366| WebKit         | Tablet landscape |
-| Desktop     | 1200x800 | Chromium       | Desktop experience |
+| Device Type | Viewport  | Browser Engine | Use Case              |
+| ----------- | --------- | -------------- | --------------------- |
+| iPhone SE   | 375x667   | WebKit         | Small mobile screens  |
+| iPhone 12   | 390x844   | WebKit         | Modern mobile screens |
+| Pixel 5     | 393x851   | Chromium       | Android devices       |
+| iPad        | 768x1024  | WebKit         | Tablet portrait       |
+| iPad Pro    | 1024x1366 | WebKit         | Tablet landscape      |
+| Desktop     | 1200x800  | Chromium       | Desktop experience    |
 
 ### 🎨 **Responsive Breakpoints Tested**
 
@@ -168,11 +168,11 @@ npm run test:e2e -- --grep "Memory"
 
 ### 🎯 **Core Web Vitals Targets**
 
-| Metric | Good | Needs Improvement | Poor |
-|--------|------|-------------------|------|
-| LCP    | ≤ 2.5s | ≤ 4.0s | > 4.0s |
-| FID    | ≤ 100ms | ≤ 300ms | > 300ms |
-| CLS    | ≤ 0.1 | ≤ 0.25 | > 0.25 |
+| Metric | Good    | Needs Improvement | Poor    |
+| ------ | ------- | ----------------- | ------- |
+| LCP    | ≤ 2.5s  | ≤ 4.0s            | > 4.0s  |
+| FID    | ≤ 100ms | ≤ 300ms           | > 300ms |
+| CLS    | ≤ 0.1   | ≤ 0.25            | > 0.25  |
 
 ### 📱 **Mobile-Specific Thresholds**
 
@@ -187,21 +187,25 @@ npm run test:e2e -- --grep "Memory"
 ### 🐛 **Troubleshooting**
 
 #### Mobile Navigation Not Appearing
+
 - Check viewport size is < 900px
 - Verify CSS media queries are working
 - Ensure mobile navigation component is rendered
 
 #### Touch Targets Too Small
+
 - Elements should be minimum 44x44px
 - Check CSS for proper sizing
 - Verify touch-action properties
 
 #### Performance Issues
+
 - Check bundle size and code splitting
 - Verify image optimization
 - Test with network throttling
 
 #### Accessibility Failures
+
 - Ensure proper ARIA labels
 - Check keyboard navigation flow
 - Verify focus indicators are visible
@@ -282,6 +286,7 @@ The test suite is designed for CI/CD pipelines:
 ### 📈 **Metrics Tracking**
 
 Track these metrics over time:
+
 - Test execution duration
 - Performance benchmark trends
 - Accessibility compliance scores

@@ -31,9 +31,7 @@ interface CommandPaletteProps {
 }
 
 const CommandIcon = ({ children }: { children: ReactNode }) => (
-  <div className="command-palette__command-icon">
-    {children}
-  </div>
+  <div className="command-palette__command-icon">{children}</div>
 );
 
 const CommandShortcut = ({ keys }: { keys: string[] }) => (
@@ -56,7 +54,7 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
       maxResults = 10,
       className,
       recentCommands = [],
-      onRecentCommand,
+      onRecentCommand
     },
     ref
   ) => {
@@ -71,7 +69,7 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
       if (!query.trim()) {
         // Show recent commands when no query
         const recent = recentCommands
-          .map(id => commands.find(cmd => cmd.id === id))
+          .map((id) => commands.find((cmd) => cmd.id === id))
           .filter(Boolean) as Command[];
         setFilteredCommands(recent.slice(0, maxResults));
         setSelectedIndex(0);
@@ -80,28 +78,30 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
 
       const queryLower = query.toLowerCase();
       const filtered = commands
-        .filter(command => {
+        .filter((command) => {
           const searchText = [
             command.label,
             command.description,
             command.category,
             ...(command.keywords || [])
-          ].join(' ').toLowerCase();
-          
+          ]
+            .join(" ")
+            .toLowerCase();
+
           return searchText.includes(queryLower);
         })
         .sort((a, b) => {
           // Prioritize exact matches
           const aExact = a.label.toLowerCase().startsWith(queryLower);
           const bExact = b.label.toLowerCase().startsWith(queryLower);
-          
+
           if (aExact && !bExact) return -1;
           if (!aExact && bExact) return 1;
-          
+
           // Then prioritize by category
           if (a.category && !b.category) return -1;
           if (!a.category && b.category) return 1;
-          
+
           return a.label.localeCompare(b.label);
         })
         .slice(0, maxResults);
@@ -111,43 +111,49 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
     }, [query, commands, maxResults, recentCommands]);
 
     // Execute selected command
-    const executeCommand = useCallback((command: Command) => {
-      command.action();
-      onRecentCommand?.(command.id);
-      onClose();
-      setQuery("");
-    }, [onClose, onRecentCommand]);
+    const executeCommand = useCallback(
+      (command: Command) => {
+        command.action();
+        onRecentCommand?.(command.id);
+        onClose();
+        setQuery("");
+      },
+      [onClose, onRecentCommand]
+    );
 
     // Handle keyboard navigation
-    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-      switch (e.key) {
-        case 'Escape':
-          onClose();
-          break;
-        case 'ArrowDown':
-          e.preventDefault();
-          setSelectedIndex(prev => Math.min(prev + 1, filteredCommands.length - 1));
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setSelectedIndex(prev => Math.max(prev - 1, 0));
-          break;
-        case 'Enter':
-          e.preventDefault();
-          if (filteredCommands[selectedIndex]) {
-            executeCommand(filteredCommands[selectedIndex]);
-          }
-          break;
-        case 'Tab':
-          e.preventDefault();
-          if (e.shiftKey) {
-            setSelectedIndex(prev => Math.max(prev - 1, 0));
-          } else {
-            setSelectedIndex(prev => Math.min(prev + 1, filteredCommands.length - 1));
-          }
-          break;
-      }
-    }, [filteredCommands, selectedIndex, executeCommand, onClose]);
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent) => {
+        switch (e.key) {
+          case "Escape":
+            onClose();
+            break;
+          case "ArrowDown":
+            e.preventDefault();
+            setSelectedIndex((prev) => Math.min(prev + 1, filteredCommands.length - 1));
+            break;
+          case "ArrowUp":
+            e.preventDefault();
+            setSelectedIndex((prev) => Math.max(prev - 1, 0));
+            break;
+          case "Enter":
+            e.preventDefault();
+            if (filteredCommands[selectedIndex]) {
+              executeCommand(filteredCommands[selectedIndex]);
+            }
+            break;
+          case "Tab":
+            e.preventDefault();
+            if (e.shiftKey) {
+              setSelectedIndex((prev) => Math.max(prev - 1, 0));
+            } else {
+              setSelectedIndex((prev) => Math.min(prev + 1, filteredCommands.length - 1));
+            }
+            break;
+        }
+      },
+      [filteredCommands, selectedIndex, executeCommand, onClose]
+    );
 
     // Scroll selected item into view
     useEffect(() => {
@@ -155,8 +161,8 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
         const selectedElement = listRef.current.children[selectedIndex] as HTMLElement;
         if (selectedElement) {
           selectedElement.scrollIntoView({
-            block: 'nearest',
-            behavior: 'smooth'
+            block: "nearest",
+            behavior: "smooth"
           });
         }
       }
@@ -172,32 +178,38 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
     // Handle clicks outside
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
-        if (ref && 'current' in ref && ref.current && !ref.current.contains(event.target as Node)) {
+        if (ref && "current" in ref && ref.current && !ref.current.contains(event.target as Node)) {
           onClose();
         }
       };
 
       if (isOpen) {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
       }
     }, [isOpen, onClose, ref]);
 
     // Group commands by category
-    const groupedCommands = filteredCommands.reduce((groups, command, index) => {
-      const category = command.category || 'Other';
-      if (!groups[category]) {
-        groups[category] = [];
-      }
-      groups[category].push({ command, originalIndex: index });
-      return groups;
-    }, {} as Record<string, Array<{ command: Command; originalIndex: number }>>);
+    const groupedCommands = filteredCommands.reduce(
+      (groups, command, index) => {
+        const category = command.category || "Other";
+        if (!groups[category]) {
+          groups[category] = [];
+        }
+        groups[category].push({ command, originalIndex: index });
+        return groups;
+      },
+      {} as Record<string, Array<{ command: Command; originalIndex: number }>>
+    );
 
-    const handleOverlayKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    }, [onClose]);
+    const handleOverlayKeyDown = useCallback(
+      (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === "Escape") {
+          onClose();
+        }
+      },
+      [onClose]
+    );
 
     if (!isOpen) return null;
 
@@ -224,7 +236,14 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
           {/* Search Input */}
           <div className="command-palette__search">
             <div className="command-palette__search-icon" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.35-4.35"></path>
               </svg>
@@ -252,7 +271,14 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
                 className="command-palette__clear"
                 aria-label="Clear search"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -286,7 +312,7 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
                       )}
                       onClick={() => executeCommand(command)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                        if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
                           executeCommand(command);
                         }
@@ -298,18 +324,14 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
                     >
                       {command.icon && <CommandIcon>{command.icon}</CommandIcon>}
                       <div className="command-palette__command-content">
-                        <div className="command-palette__command-label">
-                          {command.label}
-                        </div>
+                        <div className="command-palette__command-label">{command.label}</div>
                         {command.description && (
                           <div className="command-palette__command-description">
                             {command.description}
                           </div>
                         )}
                       </div>
-                      {command.shortcut && (
-                        <CommandShortcut keys={command.shortcut} />
-                      )}
+                      {command.shortcut && <CommandShortcut keys={command.shortcut} />}
                     </div>
                   ))}
                 </div>

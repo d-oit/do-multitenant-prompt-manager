@@ -27,7 +27,7 @@
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  
+
   /* Minimum touch target size */
   min-width: 56px;
   min-height: 56px;
@@ -178,17 +178,29 @@
 
 @media (max-width: 640px) {
   .fab--bottom-right {
-    bottom: max(var(--pm-spacing-safe-bottom, 0px), var(--mobile-nav-height, 80px), var(--pm-spacing-4));
+    bottom: max(
+      var(--pm-spacing-safe-bottom, 0px),
+      var(--mobile-nav-height, 80px),
+      var(--pm-spacing-4)
+    );
     right: var(--pm-spacing-4);
   }
-  
+
   .fab--bottom-left {
-    bottom: max(var(--pm-spacing-safe-bottom, 0px), var(--mobile-nav-height, 80px), var(--pm-spacing-4));
+    bottom: max(
+      var(--pm-spacing-safe-bottom, 0px),
+      var(--mobile-nav-height, 80px),
+      var(--pm-spacing-4)
+    );
     left: var(--pm-spacing-4);
   }
-  
+
   .fab--bottom-center {
-    bottom: max(var(--pm-spacing-safe-bottom, 0px), var(--mobile-nav-height, 80px), var(--pm-spacing-4));
+    bottom: max(
+      var(--pm-spacing-safe-bottom, 0px),
+      var(--mobile-nav-height, 80px),
+      var(--pm-spacing-4)
+    );
   }
 }
 
@@ -202,16 +214,16 @@
     box-shadow: var(--pm-shadow-strong);
     background: var(--pm-color-primary);
   }
-  
+
   .fab:active {
     background: var(--pm-color-primary-active);
     transform: scale(0.95);
   }
-  
+
   .fab--bottom-center:hover {
     transform: translateX(-50%);
   }
-  
+
   .fab--bottom-center:active {
     transform: translateX(-50%) scale(0.95);
   }
@@ -227,7 +239,7 @@
   .fab--bottom-center {
     bottom: max(env(safe-area-inset-bottom), var(--pm-spacing-6));
   }
-  
+
   @media (max-width: 640px) {
     .fab--bottom-right,
     .fab--bottom-left,
@@ -274,17 +286,17 @@
     animation: none;
     transition: none;
   }
-  
+
   .fab:hover,
   .fab:active {
     transform: none;
   }
-  
+
   .fab--bottom-center:hover,
   .fab--bottom-center:active {
     transform: translateX(-50%);
   }
-  
+
   .fab__ripple,
   .fab__spinner {
     animation: none;
@@ -299,7 +311,7 @@
   .fab {
     border: 2px solid var(--pm-color-border-strong);
   }
-  
+
   .fab:focus-visible {
     outline-width: 3px;
   }

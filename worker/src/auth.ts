@@ -598,7 +598,8 @@ export async function generateBearerToken(
   userId: string,
   expiresIn?: number
 ): Promise<{ token: string; expiresAt: string }> {
-  const accessTtl = expiresIn ?? parseInteger(env.ACCESS_TOKEN_TTL_SECONDS, DEFAULT_ACCESS_TOKEN_TTL_SECONDS);
+  const accessTtl =
+    expiresIn ?? parseInteger(env.ACCESS_TOKEN_TTL_SECONDS, DEFAULT_ACCESS_TOKEN_TTL_SECONDS);
   const expiresAt = new Date(Date.now() + accessTtl * 1000);
 
   const token = await signJwt(

@@ -31,17 +31,13 @@ export const SkeletonLoader = forwardRef<HTMLDivElement, SkeletonLoaderProps>(
     const skeletonStyle = {
       width,
       height,
-      ...style,
+      ...style
     };
 
     // For text variant with multiple lines
     if (variant === "text" && lines > 1) {
       return (
-        <div
-          ref={ref}
-          className={cn("skeleton-loader__container", className)}
-          {...props}
-        >
+        <div ref={ref} className={cn("skeleton-loader__container", className)} {...props}>
           {Array.from({ length: lines }, (_, index) => (
             <div
               key={index}
@@ -53,7 +49,7 @@ export const SkeletonLoader = forwardRef<HTMLDivElement, SkeletonLoaderProps>(
               )}
               style={{
                 ...skeletonStyle,
-                width: index === lines - 1 ? "75%" : width,
+                width: index === lines - 1 ? "75%" : width
               }}
             />
           ))}
@@ -107,12 +103,7 @@ interface SkeletonCardProps {
 export const SkeletonCard = forwardRef<HTMLDivElement, SkeletonCardProps>(
   ({ showAvatar = false, showImage = false, lines = 3, className }, ref) => (
     <div ref={ref} className={cn("skeleton-card", className)}>
-      {showImage && (
-        <SkeletonRectangle 
-          className="skeleton-card__image" 
-          height="200px" 
-        />
-      )}
+      {showImage && <SkeletonRectangle className="skeleton-card__image" height="200px" />}
       <div className="skeleton-card__content">
         {showAvatar && (
           <div className="skeleton-card__header">
@@ -145,11 +136,7 @@ export const SkeletonTable = forwardRef<HTMLDivElement, SkeletonTableProps>(
       {showHeader && (
         <div className="skeleton-table__header">
           {Array.from({ length: columns }, (_, index) => (
-            <SkeletonText 
-              key={`header-${index}`} 
-              height="16px" 
-              width="80px" 
-            />
+            <SkeletonText key={`header-${index}`} height="16px" width="80px" />
           ))}
         </div>
       )}
@@ -157,9 +144,9 @@ export const SkeletonTable = forwardRef<HTMLDivElement, SkeletonTableProps>(
         {Array.from({ length: rows }, (_, rowIndex) => (
           <div key={`row-${rowIndex}`} className="skeleton-table__row">
             {Array.from({ length: columns }, (_, colIndex) => (
-              <SkeletonText 
-                key={`cell-${rowIndex}-${colIndex}`} 
-                height="14px" 
+              <SkeletonText
+                key={`cell-${rowIndex}-${colIndex}`}
+                height="14px"
                 width={colIndex === 0 ? "120px" : "80px"}
               />
             ))}

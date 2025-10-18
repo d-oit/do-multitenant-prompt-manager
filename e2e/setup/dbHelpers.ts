@@ -133,8 +133,8 @@ export async function waitForApi(maxRetries = 60, delayMs = 500): Promise<void> 
  * Create a test prompt
  */
 export async function createTestPrompt(
-  tenantId: string, 
-  title: string, 
+  tenantId: string,
+  title: string,
   content: string,
   token?: string
 ): Promise<any> {
@@ -152,14 +152,14 @@ export async function createTestPrompt(
     body: JSON.stringify({
       title,
       body: content,
-      tags: ['test', 'e2e'],
-    }),
+      tags: ["test", "e2e"]
+    })
   });
-  
+
   if (!response.ok) {
     throw new Error(`Failed to create test prompt: ${response.statusText}`);
   }
-  
+
   const result = await response.json();
   return result.data;
 }

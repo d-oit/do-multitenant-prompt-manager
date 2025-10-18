@@ -14,7 +14,7 @@ interface Column<T = unknown> {
   cell: (item: T, index: number) => ReactNode;
   width?: string | number;
   minWidth?: string | number;
-  sticky?: 'left' | 'right';
+  sticky?: "left" | "right";
   sortable?: boolean;
   searchable?: boolean;
   mobileHidden?: boolean;
@@ -27,14 +27,14 @@ interface DataTableProps<T = unknown> {
   className?: string;
   loading?: boolean;
   emptyState?: ReactNode;
-  onSort?: (column: string, direction: 'asc' | 'desc') => void;
+  onSort?: (column: string, direction: "asc" | "desc") => void;
   sortColumn?: string;
-  sortDirection?: 'asc' | 'desc';
+  sortDirection?: "asc" | "desc";
   virtual?: boolean;
   rowHeight?: number;
   maxHeight?: string;
   stickyHeader?: boolean;
-  mobileLayout?: 'card' | 'stack' | 'horizontal-scroll';
+  mobileLayout?: "card" | "stack" | "horizontal-scroll";
   onRowClick?: (item: T, index: number) => void;
   rowSelection?: {
     selectedRows: Set<string | number>;
@@ -43,24 +43,16 @@ interface DataTableProps<T = unknown> {
   };
 }
 
-const SortIcon = ({ direction }: { direction?: 'asc' | 'desc' }) => (
-  <svg 
+const SortIcon = ({ direction }: { direction?: "asc" | "desc" }) => (
+  <svg
     className={cn("data-table__sort-icon", direction && `data-table__sort-icon--${direction}`)}
-    width="16" 
-    height="16" 
-    viewBox="0 0 16 16" 
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
     fill="none"
   >
-    <path 
-      d="M8 3L12 7H4L8 3Z" 
-      fill="currentColor" 
-      opacity={direction === 'asc' ? 1 : 0.3}
-    />
-    <path 
-      d="M8 13L4 9H12L8 13Z" 
-      fill="currentColor" 
-      opacity={direction === 'desc' ? 1 : 0.3}
-    />
+    <path d="M8 3L12 7H4L8 3Z" fill="currentColor" opacity={direction === "asc" ? 1 : 0.3} />
+    <path d="M8 13L4 9H12L8 13Z" fill="currentColor" opacity={direction === "desc" ? 1 : 0.3} />
   </svg>
 );
 
@@ -69,10 +61,10 @@ const LoadingSkeleton = ({ columns }: { columns: Array<Column<unknown>> }) => (
     {Array.from({ length: 5 }, (_, i) => (
       <div key={i} className="data-table__loading-row">
         {columns.map((column, _j) => (
-          <div 
-            key={`${i}-${_j}`} 
+          <div
+            key={`${i}-${_j}`}
             className="data-table__loading-cell"
-            style={{ width: column.width || 'auto' }}
+            style={{ width: column.width || "auto" }}
           >
             <div className="data-table__skeleton" />
           </div>
@@ -82,13 +74,13 @@ const LoadingSkeleton = ({ columns }: { columns: Array<Column<unknown>> }) => (
   </div>
 );
 
-const MobileCard = <T,>({ 
-  item, 
-  index, 
-  columns, 
+const MobileCard = <T,>({
+  item,
+  index,
+  columns,
   onRowClick,
   isSelected,
-  onSelectionChange 
+  onSelectionChange
 }: {
   item: T;
   index: number;
@@ -98,23 +90,27 @@ const MobileCard = <T,>({
   onSelectionChange?: (selected: boolean) => void;
 }) => {
   const visibleColumns = columns
-    .filter(col => !col.mobileHidden)
+    .filter((col) => !col.mobileHidden)
     .sort((a, b) => (a.mobileOrder || 0) - (b.mobileOrder || 0));
 
   return (
-    <div 
+    <div
       className={cn(
         "data-table__mobile-card",
         onRowClick && "data-table__mobile-card--clickable",
         isSelected && "data-table__mobile-card--selected"
       )}
       onClick={onRowClick ? () => onRowClick(item, index) : undefined}
-      onKeyDown={onRowClick ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onRowClick(item, index);
-        }
-      } : undefined}
+      onKeyDown={
+        onRowClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onRowClick(item, index);
+              }
+            }
+          : undefined
+      }
       role={onRowClick ? "button" : undefined}
       tabIndex={onRowClick ? 0 : undefined}
     >
@@ -131,12 +127,8 @@ const MobileCard = <T,>({
       <div className="data-table__mobile-card-content">
         {visibleColumns.map((column) => (
           <div key={column.key} className="data-table__mobile-field">
-            <div className="data-table__mobile-field-label">
-              {column.header}
-            </div>
-            <div className="data-table__mobile-field-value">
-              {column.cell(item, index)}
-            </div>
+            <div className="data-table__mobile-field-label">{column.header}</div>
+            <div className="data-table__mobile-field-value">{column.cell(item, index)}</div>
           </div>
         ))}
       </div>
@@ -159,9 +151,9 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
       rowHeight = 48,
       maxHeight = "400px",
       stickyHeader = true,
-      mobileLayout = 'card',
+      mobileLayout = "card",
       onRowClick,
-      rowSelection,
+      rowSelection
     }: DataTableProps<T>,
     ref: React.Ref<HTMLDivElement>
   ) => {
@@ -169,82 +161,89 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
       breakpoints: { sm: 320, md: 768, lg: 1024 }
     });
 
-
     const isMobile = !matches.md;
-    const shouldUseCardLayout = isMobile && mobileLayout === 'card';
+    const shouldUseCardLayout = isMobile && mobileLayout === "card";
 
-    const handleSort = useCallback((column: Column<T>) => {
-      if (!column.sortable || !onSort) return;
-      
-      const newDirection = 
-        sortColumn === column.key && sortDirection === 'asc' ? 'desc' : 'asc';
-      onSort(column.key, newDirection);
-    }, [onSort, sortColumn, sortDirection]);
+    const handleSort = useCallback(
+      (column: Column<T>) => {
+        if (!column.sortable || !onSort) return;
 
-    const handleRowSelection = useCallback((item: T, selected: boolean) => {
-      if (!rowSelection) return;
-      
-      const rowId = rowSelection.getRowId(item);
-      const newSelection = new Set(rowSelection.selectedRows);
-      
-      if (selected) {
-        newSelection.add(rowId);
-      } else {
-        newSelection.delete(rowId);
-      }
-      
-      rowSelection.onSelectionChange(newSelection);
-    }, [rowSelection]);
+        const newDirection = sortColumn === column.key && sortDirection === "asc" ? "desc" : "asc";
+        onSort(column.key, newDirection);
+      },
+      [onSort, sortColumn, sortDirection]
+    );
+
+    const handleRowSelection = useCallback(
+      (item: T, selected: boolean) => {
+        if (!rowSelection) return;
+
+        const rowId = rowSelection.getRowId(item);
+        const newSelection = new Set(rowSelection.selectedRows);
+
+        if (selected) {
+          newSelection.add(rowId);
+        } else {
+          newSelection.delete(rowId);
+        }
+
+        rowSelection.onSelectionChange(newSelection);
+      },
+      [rowSelection]
+    );
 
     const visibleColumns = useMemo(() => {
       if (isMobile) {
-        return columns.filter(col => !col.mobileHidden);
+        return columns.filter((col) => !col.mobileHidden);
       }
       return columns;
     }, [columns, isMobile]);
 
-    const renderTableRow = useCallback((item: T, index: number) => {
-      const rowId = rowSelection?.getRowId(item);
-      const isSelected = rowId !== undefined && rowSelection?.selectedRows.has(rowId);
+    const renderTableRow = useCallback(
+      (item: T, index: number) => {
+        const rowId = rowSelection?.getRowId(item);
+        const isSelected = rowId !== undefined && rowSelection?.selectedRows.has(rowId);
 
-      return (
-        <tr 
-          key={index}
-          className={cn(
-            "data-table__row",
-            onRowClick && "data-table__row--clickable",
-            isSelected && "data-table__row--selected"
-          )}
-          onClick={onRowClick ? () => onRowClick(item, index) : undefined}
-        >
-          {rowSelection && (
-            <td className="data-table__cell data-table__cell--selection">
-              <input
-                type="checkbox"
-                checked={isSelected || false}
-                onChange={(e) => handleRowSelection(item, e.target.checked)}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </td>
-          )}
+        return (
+          <tr
+            key={index}
+            className={cn(
+              "data-table__row",
+              onRowClick && "data-table__row--clickable",
+              isSelected && "data-table__row--selected"
+            )}
+            onClick={onRowClick ? () => onRowClick(item, index) : undefined}
+          >
+            {rowSelection && (
+              <td className="data-table__cell data-table__cell--selection">
+                <input
+                  type="checkbox"
+                  checked={isSelected || false}
+                  onChange={(e) => handleRowSelection(item, e.target.checked)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </td>
+            )}
             {visibleColumns.map((column) => (
-            <td
-              key={column.key}
-              className={cn(
-                "data-table__cell",
-                column.sticky && `data-table__cell--sticky-${column.sticky}`
-              )}
-              style={{
-                width: column.width,
-                minWidth: column.minWidth,
-              }}
-            >
-              {column.cell(item, index)}
-            </td>
-          ))}
-        </tr>
-      );
-    }, [visibleColumns, onRowClick, rowSelection, handleRowSelection]);
+              <td
+                key={column.key}
+                className={cn(
+                  "data-table__cell",
+                  column.sticky && `data-table__cell--sticky-${column.sticky}`
+                )}
+                style={{
+                  width: column.width,
+                  minWidth: column.minWidth
+                }}
+              >
+                {column.cell(item, index)}
+              </td>
+            ))}
+          </tr>
+        );
+      },
+      [visibleColumns, onRowClick, rowSelection, handleRowSelection]
+    );
 
     const renderMobileList = useCallback(() => {
       if (loading) {
@@ -252,10 +251,12 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
       }
 
       if (data.length === 0) {
-        return emptyState || (
-          <div className="data-table__empty">
-            <p>No data available</p>
-          </div>
+        return (
+          emptyState || (
+            <div className="data-table__empty">
+              <p>No data available</p>
+            </div>
+          )
         );
       }
 
@@ -264,7 +265,7 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
           {data.map((item, index) => {
             const rowId = rowSelection?.getRowId(item);
             const isSelected = rowId !== undefined && rowSelection?.selectedRows.has(rowId);
-            
+
             return (
               <MobileCard
                 key={index}
@@ -273,7 +274,9 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
                 columns={visibleColumns}
                 onRowClick={onRowClick}
                 isSelected={isSelected}
-                onSelectionChange={rowSelection ? (selected) => handleRowSelection(item, selected) : undefined}
+                onSelectionChange={
+                  rowSelection ? (selected) => handleRowSelection(item, selected) : undefined
+                }
               />
             );
           })}
@@ -290,13 +293,16 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
                 <th className="data-table__header-cell data-table__header-cell--selection">
                   <input
                     type="checkbox"
-                    checked={data.length > 0 && data.every(item => 
-                      rowSelection.selectedRows.has(rowSelection.getRowId(item))
-                    )}
+                    checked={
+                      data.length > 0 &&
+                      data.every((item) =>
+                        rowSelection.selectedRows.has(rowSelection.getRowId(item))
+                      )
+                    }
                     onChange={(e) => {
                       const newSelection = new Set<string | number>();
                       if (e.target.checked) {
-                        data.forEach(item => {
+                        data.forEach((item) => {
                           newSelection.add(rowSelection.getRowId(item));
                         });
                       }
@@ -315,16 +321,14 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
                   )}
                   style={{
                     width: column.width,
-                    minWidth: column.minWidth,
+                    minWidth: column.minWidth
                   }}
                   onClick={column.sortable ? () => handleSort(column) : undefined}
                 >
                   <div className="data-table__header-content">
                     {column.header}
                     {column.sortable && (
-                      <SortIcon 
-                        direction={sortColumn === column.key ? sortDirection : undefined}
-                      />
+                      <SortIcon direction={sortColumn === column.key ? sortDirection : undefined} />
                     )}
                   </div>
                 </th>
@@ -340,7 +344,10 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={visibleColumns.length + (rowSelection ? 1 : 0)} className="data-table__empty">
+                <td
+                  colSpan={visibleColumns.length + (rowSelection ? 1 : 0)}
+                  className="data-table__empty"
+                >
                   {emptyState || <p>No data available</p>}
                 </td>
               </tr>
@@ -386,11 +393,11 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
     ]);
 
     return (
-      <div
-        ref={ref}
-        className={cn("data-table", className)}
-      >
-        <div ref={containerRef as React.RefObject<HTMLDivElement>} className="data-table__container">
+      <div ref={ref} className={cn("data-table", className)}>
+        <div
+          ref={containerRef as React.RefObject<HTMLDivElement>}
+          className="data-table__container"
+        >
           {shouldUseCardLayout ? renderMobileList() : renderDesktopTable()}
         </div>
       </div>

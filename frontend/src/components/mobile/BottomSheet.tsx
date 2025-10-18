@@ -37,7 +37,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
       allowSwipeDown = true,
       showDragHandle = true,
       closeOnOverlayClick = true,
-      maxHeight = "90vh",
+      maxHeight = "90vh"
     },
     _ref
   ) => {
@@ -49,31 +49,37 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
     const currentTranslateY = useRef(0);
 
     // Handle manual dragging for more precise control
-    const handleTouchStart = useCallback((e: TouchEvent) => {
-      if (!allowSwipeDown) return;
-      
-      setIsDragging(true);
-      initialTouchY.current = e.touches[0].clientY;
-      currentTranslateY.current = dragOffset;
-    }, [allowSwipeDown, dragOffset]);
+    const handleTouchStart = useCallback(
+      (e: TouchEvent) => {
+        if (!allowSwipeDown) return;
 
-    const handleTouchMove = useCallback((e: React.TouchEvent) => {
-      if (!isDragging) return;
-      
-      const deltaY = e.touches[0].clientY - initialTouchY.current;
-      const newOffset = Math.max(0, currentTranslateY.current + deltaY);
-      setDragOffset(newOffset);
-    }, [isDragging]);
+        setIsDragging(true);
+        initialTouchY.current = e.touches[0].clientY;
+        currentTranslateY.current = dragOffset;
+      },
+      [allowSwipeDown, dragOffset]
+    );
+
+    const handleTouchMove = useCallback(
+      (e: React.TouchEvent) => {
+        if (!isDragging) return;
+
+        const deltaY = e.touches[0].clientY - initialTouchY.current;
+        const newOffset = Math.max(0, currentTranslateY.current + deltaY);
+        setDragOffset(newOffset);
+      },
+      [isDragging]
+    );
 
     const handleTouchEnd = useCallback(() => {
       if (!isDragging) return;
-      
+
       setIsDragging(false);
-      
+
       // Determine if we should close or snap to a point
-      const shouldClose = dragOffset > SNAP_THRESHOLD || 
-                         (dragOffset > 20 && currentSnapPoint === 0);
-      
+      const shouldClose =
+        dragOffset > SNAP_THRESHOLD || (dragOffset > 20 && currentSnapPoint === 0);
+
       if (shouldClose) {
         onClose();
       } else {
@@ -94,33 +100,33 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
     // Lock body scroll when open
     useEffect(() => {
       if (isOpen) {
-        document.body.style.overflow = 'hidden';
-        document.body.style.height = '100vh';
-        document.body.style.touchAction = 'none';
+        document.body.style.overflow = "hidden";
+        document.body.style.height = "100vh";
+        document.body.style.touchAction = "none";
       } else {
-        document.body.style.overflow = '';
-        document.body.style.height = '';
-        document.body.style.touchAction = '';
+        document.body.style.overflow = "";
+        document.body.style.height = "";
+        document.body.style.touchAction = "";
       }
 
       return () => {
-        document.body.style.overflow = '';
-        document.body.style.height = '';
-        document.body.style.touchAction = '';
+        document.body.style.overflow = "";
+        document.body.style.height = "";
+        document.body.style.touchAction = "";
       };
     }, [isOpen]);
 
     // Handle escape key
     useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'Escape' && isOpen) {
+        if (event.key === "Escape" && isOpen) {
           onClose();
         }
       };
 
       if (isOpen) {
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
       }
     }, [isOpen, onClose]);
 
@@ -158,7 +164,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
           style={{
             height: `${currentHeight}vh`,
             maxHeight,
-            transform: `translateY(${translateY}px)`,
+            transform: `translateY(${translateY}px)`
           }}
           onTouchStart={(e) => handleTouchStart(e.nativeEvent)}
           onTouchMove={(e) => {
@@ -185,7 +191,14 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
                 aria-label="Close bottom sheet"
                 className="bottom-sheet__close-button"
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -194,9 +207,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(
           )}
 
           {/* Content */}
-          <div className="bottom-sheet__content">
-            {children}
-          </div>
+          <div className="bottom-sheet__content">{children}</div>
         </div>
       </>
     );

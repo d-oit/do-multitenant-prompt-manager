@@ -321,11 +321,11 @@
   --layout-content-max-width: 1200px;
   --layout-gutter: clamp(1rem, 0.8rem + 1.5vw, 2.5rem);
   --layout-gutter-mobile: clamp(0.75rem, 0.6rem + 1vw, 1.5rem);
-  
+
   /* Touch target sizes */
   --touch-target-min: 44px;
   --touch-target-comfortable: 48px;
-  
+
   /* Safe areas for mobile devices */
   --spacing-safe-top: env(safe-area-inset-top, 0px);
   --spacing-safe-bottom: env(safe-area-inset-bottom, 0px);

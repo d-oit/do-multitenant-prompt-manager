@@ -24,10 +24,12 @@ body {
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr;
   gap: var(--pm-gap-stack);
-  padding:
-    max(var(--pm-spacing-safe-top), var(--pm-layout-gutter-mobile))
+  padding: max(var(--pm-spacing-safe-top), var(--pm-layout-gutter-mobile))
     max(var(--pm-spacing-safe-inline), var(--pm-layout-gutter-mobile))
-    calc(max(var(--pm-spacing-safe-bottom), var(--pm-layout-gutter-mobile)) + var(--mobile-nav-height, 0px));
+    calc(
+      max(var(--pm-spacing-safe-bottom), var(--pm-layout-gutter-mobile)) +
+        var(--mobile-nav-height, 0px)
+    );
   max-width: 1920px;
   position: relative;
   transition: padding var(--pm-transition-base);
@@ -40,7 +42,9 @@ body {
   border: 1px solid rgba(203, 213, 225, 0.4);
   border-radius: var(--pm-radius-2xl);
   padding: var(--pm-spacing-4);
-  box-shadow: var(--pm-shadow-soft), 0 0 0 1px rgba(99, 102, 241, 0.05);
+  box-shadow:
+    var(--pm-shadow-soft),
+    0 0 0 1px rgba(99, 102, 241, 0.05);
   animation: slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   position: sticky;
   top: max(var(--pm-spacing-safe-top), var(--pm-layout-gutter-mobile));
@@ -101,8 +105,7 @@ body {
   box-shadow: var(--pm-shadow-lg);
   transform: translateX(-100%);
   transition: transform var(--pm-transition-smooth);
-  padding:
-    max(var(--pm-spacing-safe-top), var(--pm-spacing-4))
+  padding: max(var(--pm-spacing-safe-top), var(--pm-spacing-4))
     clamp(var(--pm-spacing-4), 4vw, var(--pm-spacing-6))
     max(var(--pm-spacing-safe-bottom), var(--pm-spacing-6));
   display: flex;
@@ -163,7 +166,6 @@ body {
   flex-direction: column;
   gap: var(--pm-spacing-4);
 }
-
 
 .filters-grid {
   display: grid;

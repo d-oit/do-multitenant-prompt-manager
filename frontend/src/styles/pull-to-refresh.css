@@ -107,7 +107,11 @@
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
   40% {
@@ -131,17 +135,17 @@
     top: -60px;
     height: 60px;
   }
-  
+
   .pull-to-refresh__indicator {
     padding: var(--pm-spacing-2);
     gap: var(--pm-spacing-1);
   }
-  
+
   .pull-to-refresh__icon {
     width: 20px;
     height: 20px;
   }
-  
+
   .pull-to-refresh__text {
     font-size: var(--pm-font-size-xs);
   }
@@ -157,15 +161,15 @@
   .pull-to-refresh__text {
     transition: none;
   }
-  
+
   .pull-to-refresh__spinner {
     animation: none;
   }
-  
+
   .pull-to-refresh__indicator--refreshing {
     animation: none;
   }
-  
+
   .pull-to-refresh__indicator--can-refresh .pull-to-refresh__icon {
     transform: none;
   }
@@ -179,11 +183,11 @@
   .pull-to-refresh__indicator {
     border: 2px solid var(--pm-color-border-strong);
   }
-  
+
   .pull-to-refresh__indicator--can-refresh {
     border-color: var(--pm-color-primary);
   }
-  
+
   .pull-to-refresh__indicator--refreshing {
     border-color: white;
   }
@@ -223,12 +227,12 @@
     top: -40px;
     height: 40px;
   }
-  
+
   .pull-to-refresh__indicator {
     flex-direction: row;
     padding: var(--pm-spacing-2) var(--pm-spacing-3);
   }
-  
+
   .pull-to-refresh__text {
     font-size: var(--pm-font-size-xs);
   }

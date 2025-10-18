@@ -239,17 +239,17 @@
     transform: none;
     background-color: transparent;
   }
-  
+
   .mobile-nav__menu-button:hover {
     transform: none;
     background-color: transparent;
   }
-  
+
   .mobile-nav__menu-button:active {
     background-color: var(--pm-color-bg-active);
     transform: scale(0.98);
   }
-  
+
   .mobile-nav__menu-button--active:hover {
     background-color: var(--pm-color-primary);
   }
@@ -263,7 +263,7 @@
   .mobile-nav__menu {
     padding-top: env(safe-area-inset-top);
   }
-  
+
   .mobile-nav__menu-header {
     padding-top: var(--pm-spacing-4);
   }
@@ -282,11 +282,11 @@
     animation: none !important;
     transition: none !important;
   }
-  
+
   .mobile-nav__menu-button:hover {
     transform: none;
   }
-  
+
   .mobile-nav__hamburger-button:hover {
     transform: none;
   }
@@ -300,15 +300,15 @@
   .mobile-nav__menu {
     border-right-width: 2px;
   }
-  
+
   .mobile-nav__menu-header {
     border-bottom-width: 2px;
   }
-  
+
   .mobile-nav__menu-button {
     border: 1px solid transparent;
   }
-  
+
   .mobile-nav__menu-button:focus-visible {
     border-color: var(--pm-color-focus);
     outline: 2px solid var(--pm-color-focus);

@@ -41,28 +41,49 @@ const HamburgerIcon = ({ isOpen }: { isOpen: boolean }) => (
     strokeWidth="2"
     strokeLinecap="round"
   >
-    <line x1="3" y1="6" x2="21" y2="6" className="mobile-nav__hamburger-line mobile-nav__hamburger-line--top" />
-    <line x1="3" y1="12" x2="21" y2="12" className="mobile-nav__hamburger-line mobile-nav__hamburger-line--middle" />
-    <line x1="3" y1="18" x2="21" y2="18" className="mobile-nav__hamburger-line mobile-nav__hamburger-line--bottom" />
+    <line
+      x1="3"
+      y1="6"
+      x2="21"
+      y2="6"
+      className="mobile-nav__hamburger-line mobile-nav__hamburger-line--top"
+    />
+    <line
+      x1="3"
+      y1="12"
+      x2="21"
+      y2="12"
+      className="mobile-nav__hamburger-line mobile-nav__hamburger-line--middle"
+    />
+    <line
+      x1="3"
+      y1="18"
+      x2="21"
+      y2="18"
+      className="mobile-nav__hamburger-line mobile-nav__hamburger-line--bottom"
+    />
   </svg>
 );
 
 const MobileMenu = forwardRef<HTMLDivElement, MobileMenuProps>(
   ({ isOpen, onClose, navItems, activeView, onViewChange }, ref) => {
-    const handleItemClick = useCallback((viewId: ViewId) => {
-      onViewChange(viewId);
-      onClose();
-    }, [onViewChange, onClose]);
+    const handleItemClick = useCallback(
+      (viewId: ViewId) => {
+        onViewChange(viewId);
+        onClose();
+      },
+      [onViewChange, onClose]
+    );
 
     useEffect(() => {
       if (isOpen) {
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
       } else {
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
 
       return () => {
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       };
     }, [isOpen]);
 
@@ -74,10 +95,16 @@ const MobileMenu = forwardRef<HTMLDivElement, MobileMenuProps>(
           type="button"
           className="mobile-nav__overlay"
           onClick={onClose}
-          onKeyDown={(e) => e.key === 'Enter' && onClose()}
+          onKeyDown={(e) => e.key === "Enter" && onClose()}
           aria-label="Close navigation overlay"
         />
-        <div ref={ref} className="mobile-nav__menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
+        <div
+          ref={ref}
+          className="mobile-nav__menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+        >
           <div className="mobile-nav__menu-header">
             <h2 className="mobile-nav__menu-title">Navigation</h2>
             <Button
@@ -87,7 +114,14 @@ const MobileMenu = forwardRef<HTMLDivElement, MobileMenuProps>(
               aria-label="Close navigation menu"
               className="mobile-nav__close-button"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -129,7 +163,7 @@ export const MobileNavigation = forwardRef<HTMLDivElement, MobileNavigationProps
     const menuRef = useRef<HTMLDivElement>(null);
 
     const toggleMenu = useCallback(() => {
-      setIsMenuOpen(prev => !prev);
+      setIsMenuOpen((prev) => !prev);
     }, []);
 
     const closeMenu = useCallback(() => {
@@ -139,21 +173,21 @@ export const MobileNavigation = forwardRef<HTMLDivElement, MobileNavigationProps
     // Close menu on escape key
     useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'Escape' && isMenuOpen) {
+        if (event.key === "Escape" && isMenuOpen) {
           closeMenu();
         }
       };
 
       if (isMenuOpen) {
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
       }
     }, [isMenuOpen, closeMenu]);
 
     // Handle focus management
     useEffect(() => {
       if (isMenuOpen && menuRef.current) {
-        const firstFocusable = menuRef.current.querySelector('button');
+        const firstFocusable = menuRef.current.querySelector("button");
         firstFocusable?.focus();
       }
     }, [isMenuOpen]);

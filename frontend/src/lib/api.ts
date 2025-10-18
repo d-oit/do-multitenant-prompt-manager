@@ -93,7 +93,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   try {
     // Use credentials: "include" only for cookie-based auth, omit for bearer tokens
     const credentials = hasBearerToken ? "omit" : "include";
-    
+
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
       headers,
@@ -613,16 +613,22 @@ export function removeBearerToken(): void {
  * Generate a bearer token from the current session
  * This requires the user to be authenticated via cookies first
  */
-export async function generateBearerToken(name?: string, expiresIn?: number): Promise<{ token: string; expiresAt: string }> {
-  const response = await request<{ data: { token: string; expiresAt: string; name: string } }>("/auth/bearer-token", {
-    method: "POST",
-    body: JSON.stringify({ name, expiresIn })
-  });
-  
+export async function generateBearerToken(
+  name?: string,
+  expiresIn?: number
+): Promise<{ token: string; expiresAt: string }> {
+  const response = await request<{ data: { token: string; expiresAt: string; name: string } }>(
+    "/auth/bearer-token",
+    {
+      method: "POST",
+      body: JSON.stringify({ name, expiresIn })
+    }
+  );
+
   if (response.data.token) {
     storeBearerToken(response.data.token);
   }
-  
+
   return response.data;
 }
 

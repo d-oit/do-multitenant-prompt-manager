@@ -300,34 +300,34 @@
   .command-palette__overlay {
     padding: 5vh var(--pm-spacing-3) var(--pm-spacing-3);
   }
-  
+
   .command-palette {
     max-height: 80vh;
     border-radius: var(--pm-radius-xl);
   }
-  
+
   .command-palette__search {
     padding: var(--pm-spacing-3);
   }
-  
+
   .command-palette__input {
     font-size: var(--pm-font-size-base);
     padding: var(--pm-spacing-3) var(--pm-spacing-10) var(--pm-spacing-3) var(--pm-spacing-10);
   }
-  
+
   .command-palette__command {
     padding: var(--pm-spacing-4) var(--pm-spacing-4);
     min-height: 52px;
   }
-  
+
   .command-palette__command-content {
     gap: var(--pm-spacing-half);
   }
-  
+
   .command-palette__footer {
     padding: var(--pm-spacing-2) var(--pm-spacing-4);
   }
-  
+
   .command-palette__hint {
     gap: var(--pm-spacing-2);
     flex-wrap: wrap;
@@ -367,7 +367,7 @@
   .command-palette {
     animation: none;
   }
-  
+
   .command-palette__command {
     transition: none;
   }
@@ -381,17 +381,17 @@
   .command-palette {
     border-width: 2px;
   }
-  
+
   .command-palette__search,
   .command-palette__group-title,
   .command-palette__footer {
     border-bottom-width: 2px;
   }
-  
+
   .command-palette__footer {
     border-top-width: 2px;
   }
-  
+
   .command-palette__command--selected {
     outline: 2px solid var(--pm-color-primary);
   }

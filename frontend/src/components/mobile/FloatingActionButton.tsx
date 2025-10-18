@@ -73,9 +73,7 @@ export const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingAction
               {icon}
             </span>
           ) : null}
-          {children && !loading && (
-            <span className="fab__label">{children}</span>
-          )}
+          {children && !loading && <span className="fab__label">{children}</span>}
         </div>
         <div className="fab__ripple" aria-hidden="true" />
       </button>
