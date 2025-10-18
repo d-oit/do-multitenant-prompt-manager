@@ -33,6 +33,15 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    open: false,
+    cors: true,
+    hmr: {
+      overlay: true
+    },
+    watch: {
+      usePolling: false,
+      interval: 100
+    },
     fs: {
       allow: [path.resolve(__dirname, "..")]
     }

@@ -1,354 +1,336 @@
 /**
- * Advanced Filter Panel Component
- * Provides comprehensive filtering options for prompts
+ * Advanced Filters Component (2025 Best Practices)
+ * Comprehensive filtering with tags, date ranges, and custom options
  */
 
 import { useState } from "react";
+import { cn } from "../../design-system/utils";
+import Button from "./Button";
+import Input from "./Input";
 
-export interface FilterOptions {
-  search?: string;
-  searchIn?: Array<"title" | "body" | "tags" | "metadata">;
-  tags?: string[];
-  dateRange?: {
-    from?: string;
-    to?: string;
-  };
-  metadata?: Array<{
-    key: string;
-    operator: "equals" | "contains" | "not_equals";
-    value: string;
-  }>;
-  archived?: boolean;
-  owner?: string;
-  sortBy?: "created_at" | "updated_at" | "title";
-  sortOrder?: "asc" | "desc";
+interface FilterOption {
+  id: string;
+  label: string;
+  value: string | number | boolean;
 }
 
-export interface AdvancedFiltersProps {
-  initialFilters?: FilterOptions;
-  availableTags?: string[];
-  onApply: (filters: FilterOptions) => void;
-  onReset: () => void;
-  isOpen?: boolean;
-  onToggle?: () => void;
+interface FilterSection {
+  id: string;
+  label: string;
+  type: "tags" | "dateRange" | "select" | "multiSelect" | "search";
+  options?: FilterOption[];
+  placeholder?: string;
 }
+
+export interface FilterState {
+  [key: string]: string | string[] | { start?: string; end?: string } | undefined;
+}
+
+interface AdvancedFiltersProps {
+  sections: FilterSection[];
+  value: FilterState;
+  onChange: (filters: FilterState) => void;
+  onApply?: () => void;
+  onReset?: () => void;
+}
+
+const SearchIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.35-4.35" />
+  </svg>
+);
+
+const FilterIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
 
 export function AdvancedFilters({
-  initialFilters = {},
-  availableTags = [],
+  sections,
+  value,
+  onChange,
   onApply,
-  onReset,
-  isOpen = false,
-  onToggle
+  onReset
 }: AdvancedFiltersProps) {
-  const [filters, setFilters] = useState<FilterOptions>(initialFilters);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleSearchInChange = (field: "title" | "body" | "tags" | "metadata") => {
-    const current = filters.searchIn || ["title", "body", "tags"];
-    if (current.includes(field)) {
-      setFilters({
-        ...filters,
-        searchIn: current.filter((f) => f !== field)
-      });
-    } else {
-      setFilters({
-        ...filters,
-        searchIn: [...current, field]
-      });
-    }
-  };
-
-  const handleTagToggle = (tag: string) => {
-    const current = filters.tags || [];
-    if (current.includes(tag)) {
-      setFilters({
-        ...filters,
-        tags: current.filter((t) => t !== tag)
-      });
-    } else {
-      setFilters({
-        ...filters,
-        tags: [...current, tag]
-      });
-    }
-  };
-
-  const handleAddMetadataFilter = () => {
-    const current = filters.metadata || [];
-    setFilters({
-      ...filters,
-      metadata: [...current, { key: "", operator: "equals", value: "" }]
-    });
-  };
-
-  const handleMetadataFilterChange = (
-    index: number,
-    field: "key" | "operator" | "value",
-    value: string
+  const handleFilterChange = (
+    sectionId: string,
+    newValue: string | string[] | { start?: string; end?: string }
   ) => {
-    const current = filters.metadata || [];
-    const updated = [...current];
-    updated[index] = {
-      ...updated[index],
-      [field]: value
-    };
-    setFilters({ ...filters, metadata: updated });
-  };
-
-  const handleRemoveMetadataFilter = (index: number) => {
-    const current = filters.metadata || [];
-    setFilters({
-      ...filters,
-      metadata: current.filter((_, i) => i !== index)
+    onChange({
+      ...value,
+      [sectionId]: newValue
     });
-  };
-
-  const handleApply = () => {
-    onApply(filters);
   };
 
   const handleReset = () => {
-    setFilters({});
-    onReset();
+    const emptyFilters: FilterState = {};
+    sections.forEach((section) => {
+      if (section.type === "multiSelect") {
+        emptyFilters[section.id] = [];
+      } else if (section.type === "dateRange") {
+        emptyFilters[section.id] = {};
+      } else {
+        emptyFilters[section.id] = "";
+      }
+    });
+    onChange(emptyFilters);
+    onReset?.();
   };
 
-  const searchIn = filters.searchIn || ["title", "body", "tags"];
-
-  if (!isOpen) {
-    return (
-      <button onClick={onToggle} className="btn btn-secondary btn-sm" type="button">
-        Advanced Filters
-      </button>
-    );
-  }
+  const activeFilterCount = Object.values(value).filter((v) => {
+    if (Array.isArray(v)) return v.length > 0;
+    if (typeof v === "object") return Object.keys(v).length > 0;
+    return !!v;
+  }).length;
 
   return (
     <div className="advanced-filters">
       <div className="advanced-filters__header">
-        <h3 className="advanced-filters__title">Advanced Filters</h3>
-        <button
-          onClick={onToggle}
-          className="btn btn-ghost btn-sm"
-          aria-label="Close filters"
-          type="button"
+        <Button
+          variant="secondary"
+          size="sm"
+          leftIcon={<FilterIcon />}
+          onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
         >
-          ×
-        </button>
+          Filters
+          {activeFilterCount > 0 && (
+            <span className="advanced-filters__badge">{activeFilterCount}</span>
+          )}
+        </Button>
+
+        {activeFilterCount > 0 && (
+          <Button variant="ghost" size="sm" onClick={handleReset}>
+            Clear all
+          </Button>
+        )}
       </div>
 
-      <div className="advanced-filters__content">
-        {/* Search In */}
-        <fieldset className="pm-field">
-          <legend className="pm-field__label">Search in:</legend>
-          <div className="flex flex-wrap gap-sm">
-            {(["title", "body", "tags", "metadata"] as const).map((field) => (
-              <label key={field} className="pm-checkbox">
-                <input
-                  type="checkbox"
-                  checked={searchIn.includes(field)}
-                  onChange={() => handleSearchInChange(field)}
-                />
-                <span>{field.charAt(0).toUpperCase() + field.slice(1)}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+      {isOpen && (
+        <div className="advanced-filters__panel">
+          <div className="advanced-filters__sections">
+            {sections.map((section) => (
+              <div key={section.id} className="advanced-filters__section">
+                <label className="advanced-filters__section-label">{section.label}</label>
 
-        {/* Date Range */}
-        <fieldset className="pm-field">
-          <legend className="pm-field__label">Date Range:</legend>
-          <div className="flex gap-md">
-            <div className="flex-1">
-              <label className="sr-only" htmlFor="advanced-filters-date-from">
-                From date
-              </label>
-              <input
-                id="advanced-filters-date-from"
-                type="date"
-                className="pm-input input-sm"
-                value={filters.dateRange?.from || ""}
-                onChange={(e) =>
-                  setFilters({
-                    ...filters,
-                    dateRange: {
-                      ...filters.dateRange,
-                      from: e.target.value
-                    }
-                  })
-                }
-                placeholder="From"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="sr-only" htmlFor="advanced-filters-date-to">
-                To date
-              </label>
-              <input
-                id="advanced-filters-date-to"
-                type="date"
-                className="pm-input input-sm"
-                value={filters.dateRange?.to || ""}
-                onChange={(e) =>
-                  setFilters({
-                    ...filters,
-                    dateRange: {
-                      ...filters.dateRange,
-                      to: e.target.value
-                    }
-                  })
-                }
-                placeholder="To"
-              />
-            </div>
-          </div>
-        </fieldset>
+                {section.type === "search" && (
+                  <div className="advanced-filters__search">
+                    <SearchIcon />
+                    <Input
+                      type="text"
+                      placeholder={section.placeholder || "Search..."}
+                      value={(value[section.id] as string) || ""}
+                      onChange={(e) => handleFilterChange(section.id, e.target.value)}
+                    />
+                  </div>
+                )}
 
-        {/* Tags */}
-        {availableTags.length > 0 && (
-          <fieldset className="pm-field">
-            <legend className="pm-field__label">Tags (Multi-select):</legend>
-            <div className="flex flex-wrap gap-sm">
-              {availableTags.map((tag) => (
-                <label key={tag} className="pm-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={filters.tags?.includes(tag)}
-                    onChange={() => handleTagToggle(tag)}
-                  />
-                  <span>{tag}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-        )}
-
-        {/* Metadata Filters */}
-        <fieldset className="pm-field">
-          <legend className="pm-field__label">Metadata Filters:</legend>
-          <div className="stack-sm">
-            {(filters.metadata || []).map((filter, index) => (
-              <div key={index} className="flex gap-sm items-end">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    className="pm-input input-sm"
-                    value={filter.key}
-                    onChange={(e) => handleMetadataFilterChange(index, "key", e.target.value)}
-                    placeholder="Key"
-                  />
-                </div>
-                <div style={{ width: "120px" }}>
+                {section.type === "select" && (
                   <select
-                    className="pm-select input-sm"
-                    value={filter.operator}
-                    onChange={(e) => handleMetadataFilterChange(index, "operator", e.target.value)}
+                    className="advanced-filters__select"
+                    value={(value[section.id] as string) || ""}
+                    onChange={(e) => handleFilterChange(section.id, e.target.value)}
                   >
-                    <option value="equals">Equals</option>
-                    <option value="contains">Contains</option>
-                    <option value="not_equals">Not Equals</option>
+                    <option value="">All</option>
+                    {section.options?.map((option) => (
+                      <option key={option.id} value={option.value as string}>
+                        {option.label}
+                      </option>
+                    ))}
                   </select>
-                </div>
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    className="pm-input input-sm"
-                    value={filter.value}
-                    onChange={(e) => handleMetadataFilterChange(index, "value", e.target.value)}
-                    placeholder="Value"
-                  />
-                </div>
-                <button
-                  onClick={() => handleRemoveMetadataFilter(index)}
-                  className="btn btn-ghost btn-sm"
-                  aria-label="Remove filter"
-                  type="button"
-                >
-                  ×
-                </button>
+                )}
+
+                {section.type === "multiSelect" && (
+                  <div className="advanced-filters__multi-select">
+                    {section.options?.map((option) => (
+                      <label key={option.id} className="advanced-filters__checkbox">
+                        <input
+                          type="checkbox"
+                          checked={((value[section.id] as string[]) || []).includes(
+                            option.value as string
+                          )}
+                          onChange={(e) => {
+                            const currentValues = (value[section.id] as string[]) || [];
+                            const newValues = e.target.checked
+                              ? [...currentValues, option.value as string]
+                              : currentValues.filter((v) => v !== option.value);
+                            handleFilterChange(section.id, newValues);
+                          }}
+                        />
+                        <span>{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {section.type === "tags" && (
+                  <div className="advanced-filters__tags">
+                    {section.options?.map((option) => {
+                      const isActive = ((value[section.id] as string[]) || []).includes(
+                        option.value as string
+                      );
+                      return (
+                        <button
+                          key={option.id}
+                          className={cn(
+                            "advanced-filters__tag",
+                            isActive && "advanced-filters__tag--active"
+                          )}
+                          onClick={() => {
+                            const currentValues = (value[section.id] as string[]) || [];
+                            const newValues = isActive
+                              ? currentValues.filter((v) => v !== option.value)
+                              : [...currentValues, option.value as string];
+                            handleFilterChange(section.id, newValues);
+                          }}
+                          type="button"
+                        >
+                          {option.label}
+                          {isActive && (
+                            <span className="advanced-filters__tag-close">
+                              <CloseIcon />
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {section.type === "dateRange" && (
+                  <div className="advanced-filters__date-range">
+                    <div className="advanced-filters__date-field">
+                      <CalendarIcon />
+                      <Input
+                        type="date"
+                        placeholder="Start date"
+                        value={((value[section.id] as { start?: string }) || {}).start || ""}
+                        onChange={(e) =>
+                          handleFilterChange(section.id, {
+                            ...((value[section.id] as { start?: string; end?: string }) || {}),
+                            start: e.target.value
+                          })
+                        }
+                      />
+                    </div>
+                    <span className="advanced-filters__date-separator">to</span>
+                    <div className="advanced-filters__date-field">
+                      <CalendarIcon />
+                      <Input
+                        type="date"
+                        placeholder="End date"
+                        value={((value[section.id] as { end?: string }) || {}).end || ""}
+                        onChange={(e) =>
+                          handleFilterChange(section.id, {
+                            ...((value[section.id] as { start?: string; end?: string }) || {}),
+                            end: e.target.value
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
-            <button
-              onClick={handleAddMetadataFilter}
-              className="btn btn-secondary btn-sm"
-              type="button"
-            >
-              + Add Filter
-            </button>
           </div>
-        </fieldset>
 
-        {/* Status */}
-        <fieldset className="pm-field">
-          <legend className="pm-field__label">Status:</legend>
-          <div className="flex gap-md">
-            <label className="pm-checkbox">
-              <input
-                type="radio"
-                name="archived"
-                checked={filters.archived === false || filters.archived === undefined}
-                onChange={() => setFilters({ ...filters, archived: false })}
-              />
-              <span>Active</span>
-            </label>
-            <label className="pm-checkbox">
-              <input
-                type="radio"
-                name="archived"
-                checked={filters.archived === true}
-                onChange={() => setFilters({ ...filters, archived: true })}
-              />
-              <span>Archived</span>
-            </label>
-          </div>
-        </fieldset>
-
-        {/* Sort */}
-        <div className="pm-field">
-          <label className="pm-field__label" htmlFor="advanced-filters-sort-by">
-            Sort by:
-          </label>
-          <div className="flex gap-md">
-            <select
-              className="pm-select input-sm flex-1"
-              id="advanced-filters-sort-by"
-              value={filters.sortBy || "created_at"}
-              onChange={(e) =>
-                setFilters({
-                  ...filters,
-                  sortBy: e.target.value as FilterOptions["sortBy"]
-                })
-              }
-            >
-              <option value="created_at">Created Date</option>
-              <option value="updated_at">Updated Date</option>
-              <option value="title">Title</option>
-            </select>
-            <select
-              className="pm-select input-sm"
-              aria-label="Sort order"
-              value={filters.sortOrder || "desc"}
-              onChange={(e) =>
-                setFilters({
-                  ...filters,
-                  sortOrder: e.target.value as FilterOptions["sortOrder"]
-                })
-              }
-            >
-              <option value="desc">Descending</option>
-              <option value="asc">Ascending</option>
-            </select>
+          <div className="advanced-filters__actions">
+            <Button variant="secondary" size="sm" fullWidth onClick={() => setIsOpen(false)}>
+              Close
+            </Button>
+            {onApply && (
+              <Button variant="primary" size="sm" fullWidth onClick={onApply}>
+                Apply Filters
+              </Button>
+            )}
           </div>
         </div>
-      </div>
+      )}
 
-      <div className="advanced-filters__footer">
-        <button onClick={handleReset} className="btn btn-ghost" type="button">
-          Reset
-        </button>
-        <button onClick={handleApply} className="btn btn-primary" type="button">
-          Apply Filters
-        </button>
-      </div>
+      {/* Active Filters Display */}
+      {activeFilterCount > 0 && (
+        <div className="advanced-filters__active">
+          {Object.entries(value).map(([key, val]) => {
+            const section = sections.find((s) => s.id === key);
+            if (!section || !val) return null;
+
+            if (Array.isArray(val) && val.length > 0) {
+              return val.map((v) => {
+                const option = section.options?.find((o) => o.value === v);
+                return (
+                  <button
+                    key={`${key}-${v}`}
+                    className="advanced-filters__active-tag"
+                    onClick={() => {
+                      const newValues = (value[key] as string[]).filter((item) => item !== v);
+                      handleFilterChange(key, newValues);
+                    }}
+                    type="button"
+                  >
+                    {section.label}: {option?.label || v}
+                    <CloseIcon />
+                  </button>
+                );
+              });
+            }
+
+            if (typeof val === "object" && !Array.isArray(val)) {
+              const dateRange = val as { start?: string; end?: string };
+              if (dateRange.start || dateRange.end) {
+                return (
+                  <button
+                    key={key}
+                    className="advanced-filters__active-tag"
+                    onClick={() => handleFilterChange(key, {})}
+                    type="button"
+                  >
+                    {section.label}: {dateRange.start || "..."} - {dateRange.end || "..."}
+                    <CloseIcon />
+                  </button>
+                );
+              }
+            }
+
+            if (typeof val === "string" && val) {
+              return (
+                <button
+                  key={key}
+                  className="advanced-filters__active-tag"
+                  onClick={() => handleFilterChange(key, "")}
+                  type="button"
+                >
+                  {section.label}: {val}
+                  <CloseIcon />
+                </button>
+              );
+            }
+
+            return null;
+          })}
+        </div>
+      )}
     </div>
   );
 }
+
+export default AdvancedFilters;

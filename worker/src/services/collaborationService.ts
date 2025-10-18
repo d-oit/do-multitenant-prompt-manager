@@ -28,7 +28,7 @@ import {
   markNotificationRead,
   type NotificationRecord
 } from "../repositories/notificationRepository";
-import type { Prompt } from "../../shared/types.js";
+import type { Prompt } from "../../../shared/types";
 
 interface CommentInput {
   promptId: string;

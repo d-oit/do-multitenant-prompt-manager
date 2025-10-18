@@ -1,4 +1,3 @@
-
 /*
 Simple script to apply recommended branch protection rules to a repository branch
 Requires: GITHUB_TOKEN (with repo/admin or repo scope depending on org settings)
@@ -10,22 +9,24 @@ This script is intentionally minimal; run it locally or from a CI job with a tok
 */
 
 // Use global fetch when available (Node 18+). If not available, instruct user to install node-fetch.
-const hasGlobalFetch = typeof fetch === 'function';
+const hasGlobalFetch = typeof fetch === "function";
 if (!hasGlobalFetch) {
-  console.error('This script requires Node 18+ (global fetch) or install node-fetch and restore the import.');
+  console.error(
+    "This script requires Node 18+ (global fetch) or install node-fetch and restore the import."
+  );
   process.exit(2);
 }
 
-const [,, owner, repo, branch] = process.argv;
+const [, , owner, repo, branch] = process.argv;
 
 if (!owner || !repo || !branch) {
-  console.error('Usage: node scripts/apply-branch-protection.mjs <owner> <repo> <branch>');
+  console.error("Usage: node scripts/apply-branch-protection.mjs <owner> <repo> <branch>");
   process.exit(2);
 }
 
 const token = process.env.GITHUB_TOKEN;
 if (!token) {
-  console.error('Environment variable GITHUB_TOKEN is required (with appropriate permissions).');
+  console.error("Environment variable GITHUB_TOKEN is required (with appropriate permissions).");
   process.exit(2);
 }
 
@@ -56,27 +57,27 @@ const body = {
 
 async function apply() {
   const res = await fetch(url, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
       Authorization: `token ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/vnd.github+json'
+      "Content-Type": "application/json",
+      Accept: "application/vnd.github+json"
     },
     body: JSON.stringify(body)
   });
 
   if (!res.ok) {
     const text = await res.text();
-    console.error('Failed to apply branch protection:', res.status, text);
+    console.error("Failed to apply branch protection:", res.status, text);
     process.exit(1);
   }
 
   const data = await res.json();
-  console.log('Branch protection applied to', `${owner}/${repo}@${branch}`);
+  console.log("Branch protection applied to", `${owner}/${repo}@${branch}`);
   console.log(JSON.stringify(data, null, 2));
 }
 
-apply().catch(err => {
+apply().catch((err) => {
   console.error(err);
   process.exit(1);
 });

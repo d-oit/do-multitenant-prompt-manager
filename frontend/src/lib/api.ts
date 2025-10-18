@@ -21,6 +21,18 @@ import type {
   NotificationItem
 } from "../types";
 
+/**
+ * Migration note:
+ *
+ * This client previously accepted an explicit access token (passed from UI/localStorage)
+ * and attached it as an Authorization: Bearer header for API requests. The application
+ * is migrating to HttpOnly cookie-based sessions. The helper functions still accept an
+ * optional `token?: string` parameter for backwards compatibility during rollout, but
+ * apps should remove usage of the token parameter and rely on cookies instead.
+ *
+ * To finalize migration: remove token parameters and the conditional Authorization header
+ * logic from this file and ensure all requests are sent with `credentials: "include"`.
+ */
 const resolvedBaseUrl = resolveBaseUrl();
 export const API_BASE_URL = resolvedBaseUrl;
 
@@ -44,11 +56,48 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set("Content-Type", "application/json");
   }
 
+  // Check if we have a bearer token available (preferred for API clients)
+  let hasBearerToken = false;
+  try {
+    const bearerToken = localStorage?.getItem("pm_bearer_token");
+    if (bearerToken && !headers.has("Authorization")) {
+      headers.set("Authorization", `Bearer ${bearerToken}`);
+      hasBearerToken = true;
+    }
+  } catch {
+    // localStorage may not be available in some environments
+  }
+
+  // Attach CSRF token for mutating requests when using cookies (not bearer tokens)
+  try {
+    const method = (init.method || "GET").toUpperCase();
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && !hasBearerToken) {
+      // Read pm_csrf cookie (double-submit cookie) - only needed for cookie-based auth
+      const cookieStr = typeof document !== "undefined" ? document.cookie : "";
+      const match = cookieStr
+        .split(";")
+        .map((s) => s.trim())
+        .find((c) => c.startsWith("pm_csrf="));
+      if (match) {
+        const csrfVal = decodeURIComponent(match.split("=")[1] || "");
+        if (csrfVal && !headers.has("x-csrf-token")) {
+          headers.set("x-csrf-token", csrfVal);
+        }
+      }
+    }
+  } catch {
+    // document may be undefined in some environments (SSR); ignore in that case
+  }
+
   let response: Response;
   try {
+    // Use credentials: "include" only for cookie-based auth, omit for bearer tokens
+    const credentials = hasBearerToken ? "omit" : "include";
+
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
-      headers
+      headers,
+      credentials
     });
   } catch (error) {
     throw new Error(`Network error: ${error instanceof Error ? error.message : String(error)}`);
@@ -67,6 +116,15 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return body as T;
 }
 
+function attachDeprecatedTokenHeader(token: string | undefined, headers: HeadersInit) {
+  if (token) {
+    (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
+  }
+}
+
+/**
+ * @deprecated Token parameter is deprecated. Use cookie-based sessions instead.
+ */
 export async function listPrompts(
   params: PromptQuery,
   token?: string
@@ -82,6 +140,9 @@ export async function listPrompts(
   return request<PromptListResponse>(`/prompts?${query}`, { headers });
 }
 
+/**
+ * @deprecated Token parameter is deprecated. Use cookie-based sessions instead.
+ */
 export async function createPrompt(input: PromptInput, token?: string): Promise<Prompt> {
   const headers: HeadersInit = {
     "X-Tenant-Id": input.tenantId
@@ -98,6 +159,9 @@ export async function createPrompt(input: PromptInput, token?: string): Promise<
   return response.data;
 }
 
+/**
+ * @deprecated Token parameter is deprecated. Use cookie-based sessions instead.
+ */
 export async function updatePrompt(
   id: string,
   input: PromptUpdateInput,
@@ -119,6 +183,9 @@ export async function updatePrompt(
   return response.data;
 }
 
+/**
+ * @deprecated Token parameter is deprecated. Use cookie-based sessions instead.
+ */
 export async function deletePrompt(id: string, tenantId: string, token?: string): Promise<void> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
@@ -133,6 +200,9 @@ export async function deletePrompt(id: string, tenantId: string, token?: string)
   });
 }
 
+/**
+ * @deprecated Token parameter is deprecated. Use cookie-based sessions instead.
+ */
 export async function listTenants(token?: string): Promise<Tenant[]> {
   const headers: HeadersInit = {};
   if (token) {
@@ -143,6 +213,9 @@ export async function listTenants(token?: string): Promise<Tenant[]> {
   return response.data;
 }
 
+/**
+ * @deprecated Token parameter is deprecated. Use cookie-based sessions instead.
+ */
 export async function createTenant(input: TenantCreateInput, token?: string): Promise<Tenant> {
   const headers: HeadersInit = {};
   if (token) {
@@ -161,14 +234,13 @@ export async function fetchPromptVersions(
   promptId: string,
   tenantId: string,
   limit = 20,
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptVersion[]> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
 
   const response = await request<{ data: PromptVersion[] }>(
     `/prompts/${promptId}/versions?limit=${limit}`,
@@ -183,15 +255,14 @@ export async function recordPromptUsage(
   promptId: string,
   tenantId: string,
   payload: UsageEventPayload = {},
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<void> {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
 
   await request(`/prompts/${promptId}/usage`, {
     method: "POST",
@@ -203,15 +274,14 @@ export async function recordPromptUsage(
 export async function fetchPromptAnalytics(
   tenantId: string,
   rangeDays: number,
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptAnalyticsResponse> {
   const query = new URLSearchParams({ range: String(rangeDays) });
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   return request<PromptAnalyticsResponse>(`/analytics/prompts?${query.toString()}`, {
     headers
   });
@@ -220,6 +290,7 @@ export async function fetchPromptAnalytics(
 export async function fetchPromptSuggestions(
   tenantId: string,
   search: string,
+  /** @deprecated Token param is deprecated. */
   token?: string,
   limit = 5
 ): Promise<PromptSuggestion[]> {
@@ -227,9 +298,7 @@ export async function fetchPromptSuggestions(
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptSuggestion[] }>(
     `/prompts/search/suggestions?${params.toString()}`,
     { headers }
@@ -240,15 +309,14 @@ export async function fetchPromptSuggestions(
 export async function fetchDashboardOverview(
   tenantId: string,
   rangeDays: number,
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<DashboardOverviewResponse> {
   const params = new URLSearchParams({ range: String(rangeDays) });
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
 
   const response = await request<{ data: DashboardOverviewResponse }>(
     `/analytics/overview?${params.toString()}`,
@@ -260,14 +328,13 @@ export async function fetchDashboardOverview(
 export async function fetchPromptComments(
   promptId: string,
   tenantId: string,
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptComment[]> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptComment[] }>(`/prompts/${promptId}/comments`, {
     headers
   });
@@ -278,14 +345,13 @@ export async function createPromptComment(
   promptId: string,
   tenantId: string,
   payload: { body: string; parentId?: string | null },
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptComment> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptComment }>(`/prompts/${promptId}/comments`, {
     method: "POST",
     headers,
@@ -298,14 +364,13 @@ export async function updatePromptComment(
   commentId: string,
   tenantId: string,
   payload: Partial<{ body: string; resolved: boolean }>,
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptComment> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptComment }>(`/comments/${commentId}`, {
     method: "PATCH",
     headers,
@@ -317,14 +382,13 @@ export async function updatePromptComment(
 export async function deletePromptComment(
   commentId: string,
   tenantId: string,
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<void> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   await request(`/comments/${commentId}`, {
     method: "DELETE",
     headers
@@ -334,14 +398,13 @@ export async function deletePromptComment(
 export async function fetchPromptShares(
   promptId: string,
   tenantId: string,
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptShare[]> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptShare[] }>(`/prompts/${promptId}/shares`, {
     headers
   });
@@ -357,14 +420,13 @@ export async function createPromptShare(
     role: ShareRole;
     expiresAt?: string | null;
   },
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptShare[]> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptShare[] }>(`/prompts/${promptId}/shares`, {
     method: "POST",
     headers,
@@ -377,14 +439,13 @@ export async function removePromptShare(
   promptId: string,
   shareId: string,
   tenantId: string,
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptShare[]> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptShare[] }>(
     `/prompts/${promptId}/shares/${shareId}`,
     {
@@ -398,14 +459,13 @@ export async function removePromptShare(
 export async function fetchPromptApprovals(
   promptId: string,
   tenantId: string,
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptApproval[]> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptApproval[] }>(`/prompts/${promptId}/approvals`, {
     headers
   });
@@ -416,14 +476,13 @@ export async function requestPromptApproval(
   promptId: string,
   tenantId: string,
   payload: { approver: string; message?: string | null },
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptApproval[]> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptApproval[] }>(`/prompts/${promptId}/approvals`, {
     method: "POST",
     headers,
@@ -436,14 +495,13 @@ export async function updatePromptApproval(
   approvalId: string,
   tenantId: string,
   payload: { status: ApprovalStatus; message?: string | null },
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptApproval> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptApproval }>(`/approvals/${approvalId}`, {
     method: "PATCH",
     headers,
@@ -455,36 +513,37 @@ export async function updatePromptApproval(
 export async function fetchPromptActivity(
   promptId: string,
   tenantId: string,
+  /** @deprecated Token param is deprecated. */
   token?: string
 ): Promise<PromptActivityEntry[]> {
   const headers: HeadersInit = {
     "X-Tenant-Id": tenantId
   };
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: PromptActivityEntry[] }>(`/prompts/${promptId}/activity`, {
     headers
   });
   return response.data;
 }
 
+/**
+ * @deprecated Token parameter is deprecated. Use cookie-based sessions instead.
+ */
 export async function fetchNotifications(token?: string): Promise<NotificationItem[]> {
   const headers: HeadersInit = {};
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: NotificationItem[] }>(`/notifications`, {
     headers
   });
   return response.data;
 }
 
+/**
+ * @deprecated Token parameter is deprecated. Use cookie-based sessions instead.
+ */
 export async function markNotificationRead(id: string, token?: string): Promise<NotificationItem> {
   const headers: HeadersInit = {};
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  attachDeprecatedTokenHeader(token, headers);
   const response = await request<{ data: NotificationItem }>(`/notifications/${id}`, {
     method: "PATCH",
     headers
@@ -513,6 +572,64 @@ function resolveBaseUrl(): string {
   }
 
   return "";
+}
+
+/**
+ * Bearer token management utilities
+ */
+
+export function storeBearerToken(token: string): void {
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("pm_bearer_token", token);
+    }
+  } catch (error) {
+    console.warn("Failed to store bearer token:", error);
+  }
+}
+
+export function getBearerToken(): string | null {
+  try {
+    if (typeof localStorage !== "undefined") {
+      return localStorage.getItem("pm_bearer_token");
+    }
+  } catch (error) {
+    console.warn("Failed to retrieve bearer token:", error);
+  }
+  return null;
+}
+
+export function removeBearerToken(): void {
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.removeItem("pm_bearer_token");
+    }
+  } catch (error) {
+    console.warn("Failed to remove bearer token:", error);
+  }
+}
+
+/**
+ * Generate a bearer token from the current session
+ * This requires the user to be authenticated via cookies first
+ */
+export async function generateBearerToken(
+  name?: string,
+  expiresIn?: number
+): Promise<{ token: string; expiresAt: string }> {
+  const response = await request<{ data: { token: string; expiresAt: string; name: string } }>(
+    "/auth/bearer-token",
+    {
+      method: "POST",
+      body: JSON.stringify({ name, expiresIn })
+    }
+  );
+
+  if (response.data.token) {
+    storeBearerToken(response.data.token);
+  }
+
+  return response.data;
 }
 
 export function serializeMetadata(metadata: Record<string, unknown> | null | undefined): string {

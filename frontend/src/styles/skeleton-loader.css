@@ -1,0 +1,345 @@
+/**
+ * Skeleton Loader Styles
+ * Smooth loading placeholders with modern animations
+ */
+
+/* ============================================
+   BASE SKELETON STYLES
+   ============================================ */
+
+.skeleton-loader {
+  background: linear-gradient(
+    90deg,
+    var(--pm-color-bg-secondary) 25%,
+    var(--pm-color-bg-elevated) 50%,
+    var(--pm-color-bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--pm-radius-sm);
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-loader::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  border-radius: inherit;
+}
+
+/* ============================================
+   SKELETON VARIANTS
+   ============================================ */
+
+.skeleton-loader--text {
+  height: 1em;
+  border-radius: var(--pm-radius-xs);
+}
+
+.skeleton-loader--circular {
+  border-radius: 50%;
+  aspect-ratio: 1;
+}
+
+.skeleton-loader--rectangular {
+  border-radius: var(--pm-radius-sm);
+}
+
+.skeleton-loader--rounded {
+  border-radius: var(--pm-radius-lg);
+}
+
+/* ============================================
+   SKELETON ANIMATIONS
+   ============================================ */
+
+.skeleton-loader--pulse {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-loader--wave {
+  animation: skeleton-wave 1.5s ease-in-out infinite;
+}
+
+.skeleton-loader--none {
+  animation: none;
+}
+
+/* ============================================
+   MULTI-LINE TEXT SKELETONS
+   ============================================ */
+
+.skeleton-loader__container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-2);
+}
+
+.skeleton-loader--last-line {
+  width: 75% !important;
+}
+
+/* ============================================
+   SKELETON CARD LAYOUTS
+   ============================================ */
+
+.skeleton-card {
+  background: var(--pm-color-bg-primary);
+  border: 1px solid var(--pm-color-border-subtle);
+  border-radius: var(--pm-radius-lg);
+  overflow: hidden;
+  padding: 0;
+}
+
+.skeleton-card__image {
+  width: 100%;
+  border-radius: 0;
+}
+
+.skeleton-card__content {
+  padding: var(--pm-spacing-4);
+}
+
+.skeleton-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--pm-spacing-3);
+  margin-bottom: var(--pm-spacing-4);
+}
+
+.skeleton-card__header-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-1);
+}
+
+.skeleton-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-3);
+}
+
+/* ============================================
+   SKELETON TABLE LAYOUTS
+   ============================================ */
+
+.skeleton-table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-3);
+}
+
+.skeleton-table__header {
+  display: flex;
+  gap: var(--pm-spacing-4);
+  padding: var(--pm-spacing-3) 0;
+  border-bottom: 1px solid var(--pm-color-border-subtle);
+}
+
+.skeleton-table__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pm-spacing-3);
+}
+
+.skeleton-table__row {
+  display: flex;
+  gap: var(--pm-spacing-4);
+  align-items: center;
+  padding: var(--pm-spacing-2) 0;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes skeleton-wave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ============================================
+   ENHANCED WAVE ANIMATION
+   ============================================ */
+
+.skeleton-loader--wave::after {
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+[data-theme="dark"] .skeleton-loader--wave::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 640px) {
+  .skeleton-card__content {
+    padding: var(--pm-spacing-3);
+  }
+
+  .skeleton-card__header {
+    margin-bottom: var(--pm-spacing-3);
+    gap: var(--pm-spacing-2);
+  }
+
+  .skeleton-table__header,
+  .skeleton-table__row {
+    gap: var(--pm-spacing-2);
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.skeleton-loader {
+  role: "presentation";
+  aria-hidden: "true";
+}
+
+/* Screen reader text for better accessibility */
+.skeleton-loader[aria-label]::before {
+  content: attr(aria-label);
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-loader--pulse,
+  .skeleton-loader--wave {
+    animation: none;
+  }
+
+  .skeleton-loader--wave::after {
+    animation: none;
+  }
+
+  .skeleton-loader {
+    background: var(--pm-color-bg-secondary);
+  }
+}
+
+/* ============================================
+   HIGH CONTRAST MODE
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  .skeleton-loader {
+    background: var(--pm-color-border-strong);
+    border: 1px solid var(--pm-color-text-primary);
+  }
+
+  .skeleton-card {
+    border-width: 2px;
+  }
+
+  .skeleton-table__header {
+    border-bottom-width: 2px;
+  }
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+.skeleton-loader {
+  will-change: opacity, background-position;
+  contain: layout style paint;
+}
+
+.skeleton-loader--wave {
+  contain: layout style paint;
+  transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/* ============================================
+   CONTEXT-SPECIFIC SKELETONS
+   ============================================ */
+
+/* Form field skeleton */
+.skeleton-loader--field {
+  height: 40px;
+  border-radius: var(--pm-radius-md);
+}
+
+/* Button skeleton */
+.skeleton-loader--button {
+  height: 36px;
+  width: 120px;
+  border-radius: var(--pm-radius-md);
+}
+
+/* Avatar skeleton */
+.skeleton-loader--avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Badge skeleton */
+.skeleton-loader--badge {
+  height: 20px;
+  width: 60px;
+  border-radius: var(--pm-radius-full);
+}
+
+/* Navigation item skeleton */
+.skeleton-loader--nav-item {
+  height: 32px;
+  border-radius: var(--pm-radius-md);
+  margin-bottom: var(--pm-spacing-1);
+}
+
+/* ============================================
+   DARK THEME ADJUSTMENTS
+   ============================================ */
+
+[data-theme="dark"] .skeleton-loader {
+  background: linear-gradient(
+    90deg,
+    var(--pm-color-bg-tertiary) 25%,
+    var(--pm-color-bg-secondary) 50%,
+    var(--pm-color-bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+}

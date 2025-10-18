@@ -2,7 +2,6 @@
  * Service Worker registration and management
  */
 
-
 export interface ServiceWorkerConfig {
   onSuccess?: (registration: ServiceWorkerRegistration) => void;
   onUpdate?: (registration: ServiceWorkerRegistration) => void;

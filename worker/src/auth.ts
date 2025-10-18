@@ -24,7 +24,7 @@ export interface AuthContext {
   roles: RoleAssignment[];
   globalPermissions: Set<string>;
   tenantPermissions: Map<string, Set<string>>;
-  source: "jwt" | "api-key";
+  source: "jwt" | "api-key" | "jwt-cookie";
 }
 
 interface UserRow {
@@ -138,38 +138,99 @@ export async function authenticateRequest(
   env: Env,
   options: AuthOptions = {}
 ): Promise<AuthContext | null> {
+  // E2E test mode bypass - allows unauthenticated access with full permissions
+  if (env.E2E_TEST_MODE === "true") {
+    console.log("🧪 E2E_TEST_MODE enabled - bypassing authentication");
+    const testUser: AuthenticatedUser = {
+      id: "e2e-test-user",
+      email: "e2e@test.local",
+      name: "E2E Test User"
+    };
+    const testRole: RoleAssignment = {
+      roleId: "e2e-test-role",
+      roleName: "E2E Test Admin",
+      permissions: ["*"],
+      tenantId: null
+    };
+    return buildAuthContext(testUser, [testRole], "jwt");
+  }
+
+  console.log("🔐 Authentication request:", {
+    path: request.url,
+    method: request.method,
+    authHeader: request.headers.get("authorization"),
+    cookieHeader: request.headers.get("cookie"),
+    apiKeyHeader: request.headers.get("x-api-key"),
+    e2eMode: env.E2E_TEST_MODE
+  });
+
   const authHeader = request.headers.get("authorization");
   const apiKeyHeader = request.headers.get("x-api-key");
 
-  if (authHeader?.startsWith("Bearer ")) {
-    const token = authHeader.slice(7).trim();
-    if (!token) {
-      throw jsonResponse({ error: "Unauthorized" }, 401);
-    }
-    const payload = await verifyJwt(token, getAccessTokenSecret(env));
-    if (!payload?.sub || typeof payload.sub !== "string") {
-      throw jsonResponse({ error: "Unauthorized" }, 401);
-    }
-    const user = await fetchUser(env, payload.sub);
-    if (!user) {
-      throw jsonResponse({ error: "Unauthorized" }, 401);
-    }
-    const assignments = await fetchRoleAssignments(env, user.id);
-    return buildAuthContext(user, assignments, "jwt");
-  }
-
+  // Enhanced authentication priority: API Key > Bearer Token > Cookie
   if (apiKeyHeader) {
     const context = await authenticateApiKey(apiKeyHeader.trim(), env);
     if (context) {
+      console.log("🔐 API Key authentication successful for user:", context.user.email);
       return context;
     }
   }
 
+  // Check for Bearer token first (preferred for API clients)
+  let bearerToken: string | null = null;
+  if (authHeader?.startsWith("Bearer ")) {
+    bearerToken = authHeader.slice(7).trim();
+  }
+
+  // Fall back to cookies for web browser clients
+  let cookieAccessToken: string | null = null;
+  const cookieHeader = request.headers.get("cookie");
+  if (!bearerToken && cookieHeader) {
+    const cookies = parseCookies(cookieHeader);
+    if (cookies.pm_access) {
+      cookieAccessToken = cookies.pm_access;
+    }
+  }
+
+  const token = bearerToken || cookieAccessToken;
+  if (token) {
+    console.log("🔐 JWT token found:", token.substring(0, 20) + "...");
+    const payload = await verifyJwt(token, getAccessTokenSecret(env));
+    if (!payload?.sub || typeof payload.sub !== "string") {
+      console.log("🔐 JWT verification failed - invalid payload or missing sub");
+      throw jsonResponse({ error: "Unauthorized" }, 401);
+    }
+    console.log("🔐 JWT verified - user ID:", payload.sub);
+    const user = await fetchUser(env, payload.sub);
+    if (!user) {
+      console.log("🔐 User not found for ID:", payload.sub);
+      throw jsonResponse({ error: "Unauthorized" }, 401);
+    }
+    const assignments = await fetchRoleAssignments(env, user.id);
+    console.log("🔐 Authentication successful for user:", user.email);
+    return buildAuthContext(user, assignments, bearerToken ? "jwt" : "jwt-cookie");
+  }
+
   if (options.optional) {
+    console.log("🔐 Optional authentication - returning null");
     return null;
   }
 
+  console.log("🔐 No authentication method found - returning 401");
   throw jsonResponse({ error: "Unauthorized" }, 401);
+}
+
+function parseCookies(cookieHeader: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  const parts = cookieHeader.split(";");
+  for (const part of parts) {
+    const idx = part.indexOf("=");
+    if (idx === -1) continue;
+    const key = part.slice(0, idx).trim();
+    const value = part.slice(idx + 1).trim();
+    out[key] = decodeURIComponent(value);
+  }
+  return out;
 }
 
 export async function generateSessionTokens(env: Env, userId: string): Promise<SessionTokens> {
@@ -332,7 +393,7 @@ export async function fetchRoleAssignments(env: Env, userId: string): Promise<Ro
 export function buildAuthContext(
   user: AuthenticatedUser,
   assignments: RoleAssignment[],
-  source: "jwt" | "api-key"
+  source: "jwt" | "api-key" | "jwt-cookie"
 ): AuthContext {
   const globalPermissions = new Set<string>();
   const tenantPermissions = new Map<string, Set<string>>();
@@ -526,6 +587,35 @@ export async function rotateApiKey(env: Env, apiKeyId: string): Promise<string> 
     .bind(hash, apiKeyId)
     .run();
   return key;
+}
+
+/**
+ * Generate a bearer token specifically for API clients
+ * This creates a JWT token without cookies, suitable for bearer token authentication
+ */
+export async function generateBearerToken(
+  env: Env,
+  userId: string,
+  expiresIn?: number
+): Promise<{ token: string; expiresAt: string }> {
+  const accessTtl =
+    expiresIn ?? parseInteger(env.ACCESS_TOKEN_TTL_SECONDS, DEFAULT_ACCESS_TOKEN_TTL_SECONDS);
+  const expiresAt = new Date(Date.now() + accessTtl * 1000);
+
+  const token = await signJwt(
+    {
+      sub: userId,
+      type: "access",
+      tokenType: "bearer" // Distinguish from cookie-based tokens
+    },
+    getAccessTokenSecret(env),
+    accessTtl
+  );
+
+  return {
+    token,
+    expiresAt: expiresAt.toISOString()
+  };
 }
 
 export { getAccessTokenSecret };

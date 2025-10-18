@@ -10,7 +10,7 @@ import type {
   DashboardStats,
   UsageTrendPoint,
   TopPromptSummary
-} from "../../shared/types.js";
+} from "../../shared/types";
 import {
   authenticateRequest,
   generateSessionTokens,
@@ -27,7 +27,8 @@ import {
   buildAuthContext,
   fetchUser,
   fetchRoleAssignments,
-  hasPermission
+  hasPermission,
+  generateBearerToken
 } from "./auth";
 import {
   DEFAULT_PAGE_SIZE,
@@ -179,6 +180,11 @@ const refreshSchema = z.object({
   refreshToken: z.string().min(10)
 });
 
+const bearerTokenSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  expiresIn: z.number().min(300).max(86400).optional() // 5 minutes to 24 hours
+});
+
 const apiKeyCreateSchema = z.object({
   name: z.string().min(1).max(200),
   roleId: z.string().min(1),
@@ -186,7 +192,6 @@ const apiKeyCreateSchema = z.object({
 });
 
 const corsHeaders = new Headers({
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Max-Age": "86400"
@@ -239,12 +244,16 @@ export default {
 
     // Check if version is supported (only for versioned paths)
     if (pathVersion && !isVersionSupported(pathVersion)) {
-      return withCors(jsonResponse({ error: `API version ${pathVersion} is not supported` }, 400));
+      return withCors(
+        jsonResponse({ error: `API version ${pathVersion} is not supported` }, 400),
+        request,
+        env
+      );
     }
 
     if (request.method === "OPTIONS") {
       logger.debug("request.options", { requestId, method: request.method, path: originalPath });
-      return withCors(new Response(null, { status: 204, headers: corsHeaders }));
+      return withCors(new Response(null, { status: 204, headers: corsHeaders }), request, env);
     }
 
     logger.info("request.start", {
@@ -260,7 +269,7 @@ export default {
       if (request.method !== "OPTIONS") {
         const rateLimit = await enforceRateLimit(request, env, logger, requestId);
         if (rateLimit) {
-          const finalResponse = withCors(rateLimit.response);
+          const finalResponse = withCors(rateLimit.response, request, env);
           logger.warn("request.rate_limited", {
             requestId,
             method: request.method,
@@ -280,18 +289,46 @@ export default {
       const isLogoutRoute = path === "/auth/logout" && request.method === "POST";
       let auth: AuthContext | null = null;
 
+      // Enforce CSRF for state-changing requests when cookies (credentials) are used.
+      // Read allowed origins from env.ALLOWED_ORIGINS (comma-separated). If present,
+      // only those origins are permitted for requests with credentials.
+      const mutatingMethods = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+      const hasCredentials = request.headers.get("cookie") ? true : false;
+      if (
+        hasCredentials &&
+        mutatingMethods.has(request.method) &&
+        !isLoginRoute &&
+        !isRefreshRoute &&
+        !isLogoutRoute
+      ) {
+        const csrfHeader = request.headers.get("x-csrf-token") || "";
+        const cookieHeader = request.headers.get("cookie") || "";
+        const cookieMatch = cookieHeader
+          .split(";")
+          .map((s) => s.trim())
+          .find((c) => c.startsWith("pm_csrf="));
+        const cookieVal = cookieMatch ? decodeURIComponent(cookieMatch.split("=")[1] || "") : "";
+        if (!csrfHeader || !cookieVal || csrfHeader !== cookieVal) {
+          throw jsonResponse({ error: "CSRF validation failed" }, 403);
+        }
+      }
+
       if (!isLoginRoute && !isRefreshRoute && !isLogoutRoute) {
         auth = await authenticateRequest(request, env);
       }
 
       let response: Response | undefined;
 
-      if (isLoginRoute) {
+      if (path === "/healthz" && request.method === "GET") {
+        response = jsonResponse({ status: "ok" });
+      } else if (isLoginRoute) {
         response = await handleLogin(request, env);
       } else if (isRefreshRoute) {
         response = await handleRefresh(request, env);
       } else if (isLogoutRoute) {
         response = await handleLogout(request, env);
+      } else if (path === "/auth/bearer-token" && request.method === "POST") {
+        response = await handleBearerTokenCreate(request, env, auth);
       } else if (path === "/openapi.json" && request.method === "GET") {
         response = jsonResponse(getOpenAPIDocument());
       } else if (path === "/api-docs" && request.method === "GET") {
@@ -672,7 +709,7 @@ export default {
       }
 
       const responseWithVersion = addVersionHeaders(response, apiVersion);
-      const finalResponse = withCors(responseWithVersion);
+      const finalResponse = withCors(responseWithVersion, request, env);
       logger.info("request.complete", {
         requestId,
         method: request.method,
@@ -685,7 +722,7 @@ export default {
     } catch (error) {
       if (error instanceof Response) {
         const errorWithVersion = addVersionHeaders(error, apiVersion);
-        const finalResponse = withCors(errorWithVersion);
+        const finalResponse = withCors(errorWithVersion, request, env);
         logger.warn("request.handled_error", {
           requestId,
           method: request.method,
@@ -706,10 +743,40 @@ export default {
   }
 };
 
-function withCors(response: Response): Response {
+function withCors(response: Response, request?: Request, env?: Env): Response {
   // Add CORS headers
   const headers = new Headers(response.headers);
+  const requestOrigin = request?.headers.get("origin") || headers.get("origin") || "*";
+
+  // Check allowed origins if configured
+  let finalOrigin = "*";
+  const allowedOrigins = env?.ALLOWED_ORIGINS?.split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+
+  if (requestOrigin !== "*") {
+    if (!allowedOrigins?.length) {
+      // No origin whitelist - echo back the origin
+      finalOrigin = requestOrigin;
+    } else if (allowedOrigins.includes(requestOrigin)) {
+      // Origin is in whitelist
+      finalOrigin = requestOrigin;
+    } else {
+      // Origin not in whitelist - return * if not using credentials
+      const hasCredentials = request?.headers.get("cookie") ? true : false;
+      if (hasCredentials) {
+        // Block the request if credentials are used with non-whitelisted origin
+        throw jsonResponse({ error: "Origin not allowed" }, 403);
+      }
+      finalOrigin = "*";
+    }
+  }
+
   corsHeaders.forEach((value, key) => headers.set(key, value));
+  headers.set("Access-Control-Allow-Origin", finalOrigin);
+  if (finalOrigin !== "*") {
+    headers.set("Access-Control-Allow-Credentials", "true");
+  }
 
   const responseWithCors = new Response(response.body, {
     status: response.status,
@@ -1915,16 +1982,34 @@ async function handleLogin(request: Request, env: Env): Promise<Response> {
   const assignments = await fetchRoleAssignments(env, record.user.id);
   const context = buildAuthContext(record.user, assignments, "jwt");
 
-  return jsonResponse({
-    data: {
-      user: context.user,
-      roles: context.roles,
-      accessToken: tokens.accessToken,
-      accessTokenExpiresAt: tokens.accessTokenExpiresAt,
-      refreshToken: tokens.refreshToken,
-      refreshTokenExpiresAt: tokens.refreshTokenExpiresAt
-    }
-  });
+  const accessMaxAge = Math.max(
+    0,
+    Math.floor((new Date(tokens.accessTokenExpiresAt).getTime() - Date.now()) / 1000)
+  );
+  const refreshMaxAge = Math.max(
+    0,
+    Math.floor((new Date(tokens.refreshTokenExpiresAt).getTime() - Date.now()) / 1000)
+  );
+
+  const accessCookie = `pm_access=${encodeURIComponent(tokens.accessToken)}; HttpOnly; Path=/; SameSite=Lax; Secure; Max-Age=${accessMaxAge}`;
+  const refreshCookie = `pm_refresh=${encodeURIComponent(tokens.refreshToken)}; HttpOnly; Path=/auth; SameSite=Lax; Secure; Max-Age=${refreshMaxAge}`;
+
+  // CSRF token (double-submit cookie) - readable by JS
+  const csrfToken = crypto.randomUUID();
+  const csrfCookie = `pm_csrf=${encodeURIComponent(csrfToken)}; Path=/; SameSite=Lax; Secure; Max-Age=${accessMaxAge}`;
+
+  return jsonResponse(
+    {
+      data: {
+        user: context.user,
+        roles: context.roles,
+        accessTokenExpiresAt: tokens.accessTokenExpiresAt,
+        refreshTokenExpiresAt: tokens.refreshTokenExpiresAt
+      }
+    },
+    200,
+    { "Set-Cookie": [accessCookie, refreshCookie, csrfCookie] }
+  );
 }
 
 async function handleRefresh(request: Request, env: Env): Promise<Response> {
@@ -1947,23 +2032,45 @@ async function handleRefresh(request: Request, env: Env): Promise<Response> {
   const assignments = await fetchRoleAssignments(env, user.id);
   const context = buildAuthContext(user, assignments, "jwt");
 
-  return jsonResponse({
-    data: {
-      user: context.user,
-      roles: context.roles,
-      accessToken: tokens.accessToken,
-      accessTokenExpiresAt: tokens.accessTokenExpiresAt,
-      refreshToken: tokens.refreshToken,
-      refreshTokenExpiresAt: tokens.refreshTokenExpiresAt
-    }
-  });
+  const accessMaxAge = Math.max(
+    0,
+    Math.floor((new Date(tokens.accessTokenExpiresAt).getTime() - Date.now()) / 1000)
+  );
+  const refreshMaxAge = Math.max(
+    0,
+    Math.floor((new Date(tokens.refreshTokenExpiresAt).getTime() - Date.now()) / 1000)
+  );
+
+  const accessCookie = `pm_access=${encodeURIComponent(tokens.accessToken)}; HttpOnly; Path=/; SameSite=Lax; Secure; Max-Age=${accessMaxAge}`;
+  const refreshCookie = `pm_refresh=${encodeURIComponent(tokens.refreshToken)}; HttpOnly; Path=/auth; SameSite=Lax; Secure; Max-Age=${refreshMaxAge}`;
+  const csrfToken = crypto.randomUUID();
+  const csrfCookie = `pm_csrf=${encodeURIComponent(csrfToken)}; Path=/; SameSite=Lax; Secure; Max-Age=${accessMaxAge}`;
+
+  return jsonResponse(
+    {
+      data: {
+        user: context.user,
+        roles: context.roles,
+        accessTokenExpiresAt: tokens.accessTokenExpiresAt,
+        refreshTokenExpiresAt: tokens.refreshTokenExpiresAt
+      }
+    },
+    200,
+    { "Set-Cookie": [accessCookie, refreshCookie, csrfCookie] }
+  );
 }
 
 async function handleLogout(request: Request, env: Env): Promise<Response> {
   const payload = await readJson(request);
   const parsed = refreshSchema.parse(payload);
   await invalidateRefreshToken(env, parsed.refreshToken);
-  return jsonResponse({ success: true });
+  // Clear cookies
+  const clearAccess = `pm_access=; HttpOnly; Path=/; SameSite=Lax; Secure; Max-Age=0`;
+  const clearRefresh = `pm_refresh=; HttpOnly; Path=/auth; SameSite=Lax; Secure; Max-Age=0`;
+  const clearCsrf = `pm_csrf=; Path=/; SameSite=Lax; Secure; Max-Age=0`;
+  return jsonResponse({ success: true }, 200, {
+    "Set-Cookie": [clearAccess, clearRefresh, clearCsrf]
+  });
 }
 
 async function handleApiKeyList(env: Env, auth: AuthContext): Promise<Response> {
@@ -2010,7 +2117,7 @@ async function handleApiKeyCreate(
   if (parsed.tenantId) {
     const tenant = await ensureTenant(env, parsed.tenantId);
     tenantId = tenant.id;
-    ensureTenantAccess(auth, tenantId);
+    ensureTenantAccess(auth, tenant.id);
   }
 
   const role = await env.DB.prepare("SELECT id FROM roles WHERE id = ?")
@@ -2161,6 +2268,36 @@ async function warmTopPrompts(env: Env, logger: Logger): Promise<void> {
   if (tenantIds.length) {
     logger.info("cache.warm.success", { tenants: tenantIds.length });
   }
+}
+
+async function handleBearerTokenCreate(
+  request: Request,
+  env: Env,
+  auth: AuthContext
+): Promise<Response> {
+  // Allow both API key management permission and general prompt write permission
+  // This enables users with prompt management access to generate bearer tokens for API usage
+  if (!hasPermission(auth, "api-key:manage") && !hasPermission(auth, "prompt:write")) {
+    throw jsonResponse({ error: "Forbidden" }, 403);
+  }
+
+  const payload = await readJson(request);
+  const parsed = bearerTokenSchema.parse(payload);
+
+  // Use the parsed expiresIn value for the token generation
+  const { token, expiresAt } = await generateBearerToken(env, auth.user.id, parsed.expiresIn);
+
+  return jsonResponse(
+    {
+      data: {
+        token,
+        expiresAt,
+        tokenType: "bearer",
+        name: parsed.name ?? "API Bearer Token"
+      }
+    },
+    201
+  );
 }
 
 addEventListener("unhandledrejection", (event) => {

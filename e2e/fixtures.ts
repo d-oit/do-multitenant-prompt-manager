@@ -1,12 +1,13 @@
 import { test as base } from "@playwright/test";
-import { setupApiMocks, type ApiState } from "./utils/mockApi";
+import { generateTestId, waitForApi } from "./setup/dbHelpers";
 
 type Fixtures = {
-  apiState: ApiState;
+  testId: string;
 };
 
 export const test = base.extend<Fixtures>({
-  apiState: async ({ page }, use) => {
+  testId: async ({ page }, use) => {
+    // Stub recharts to avoid loading issues
     await page.route("**/node_modules/.vite/deps/recharts.js*", async (route) => {
       const stub = `const passthrough = () => ({ children }) => children ?? null;
 export const ResponsiveContainer = passthrough();
@@ -28,8 +29,21 @@ export default {};
         body: stub
       });
     });
-    const state = await setupApiMocks(page);
-    await use(state);
+
+    // Wait for API to be ready before each test
+    try {
+      await waitForApi();
+    } catch (error) {
+      console.error("Failed to connect to API:", error);
+      throw error;
+    }
+
+    // Generate unique test ID for this test
+    const testId = generateTestId();
+
+    await use(testId);
+
+    // Cleanup can be added here if needed
   }
 });
 

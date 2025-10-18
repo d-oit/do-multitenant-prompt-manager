@@ -1,9 +1,21 @@
-export function jsonResponse(body: unknown, status = 200): Response {
+export function jsonResponse(
+  body: unknown,
+  status = 200,
+  extraHeaders?: Record<string, string | string[]>
+): Response {
+  const headers = new Headers({ "Content-Type": "application/json" });
+  if (extraHeaders) {
+    for (const [k, v] of Object.entries(extraHeaders)) {
+      if (Array.isArray(v)) {
+        for (const vv of v) headers.append(k, vv);
+      } else {
+        headers.set(k, v);
+      }
+    }
+  }
   return new Response(JSON.stringify(body), {
     status,
-    headers: {
-      "Content-Type": "application/json"
-    }
+    headers
   });
 }
 

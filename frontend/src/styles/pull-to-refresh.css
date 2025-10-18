@@ -1,0 +1,239 @@
+/**
+ * Pull to Refresh Styles
+ * Native-like pull-to-refresh visual feedback
+ */
+
+/* ============================================
+   PULL TO REFRESH CONTAINER
+   ============================================ */
+
+.pull-to-refresh {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pull-to-refresh__content {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+  will-change: transform;
+}
+
+/* ============================================
+   REFRESH INDICATOR
+   ============================================ */
+
+.pull-to-refresh__indicator-container {
+  position: absolute;
+  top: -80px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  will-change: transform, opacity;
+}
+
+.pull-to-refresh__indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pm-spacing-2);
+  padding: var(--pm-spacing-3);
+  background: var(--pm-color-bg-elevated);
+  border-radius: var(--pm-radius-lg);
+  box-shadow: var(--pm-shadow-soft);
+  transition: all var(--pm-transition-fast);
+}
+
+.pull-to-refresh__indicator--can-refresh {
+  background: var(--pm-color-primary-light);
+  color: var(--pm-color-primary);
+  transform: scale(1.05);
+}
+
+.pull-to-refresh__indicator--refreshing {
+  background: var(--pm-color-primary);
+  color: white;
+}
+
+/* ============================================
+   REFRESH ICON
+   ============================================ */
+
+.pull-to-refresh__icon {
+  transition: transform var(--pm-transition-fast);
+  flex-shrink: 0;
+}
+
+.pull-to-refresh__indicator--can-refresh .pull-to-refresh__icon {
+  transform: rotate(180deg);
+}
+
+.pull-to-refresh__spinner {
+  animation: spin 1s linear infinite;
+  transform-origin: center;
+}
+
+/* ============================================
+   REFRESH TEXT
+   ============================================ */
+
+.pull-to-refresh__text {
+  font-size: var(--pm-font-size-sm);
+  font-weight: var(--pm-font-weight-medium);
+  color: inherit;
+  text-align: center;
+  white-space: nowrap;
+  transition: all var(--pm-transition-fast);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.pull-to-refresh__indicator--refreshing {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+
+@media (max-width: 640px) {
+  .pull-to-refresh__indicator-container {
+    top: -60px;
+    height: 60px;
+  }
+
+  .pull-to-refresh__indicator {
+    padding: var(--pm-spacing-2);
+    gap: var(--pm-spacing-1);
+  }
+
+  .pull-to-refresh__icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .pull-to-refresh__text {
+    font-size: var(--pm-font-size-xs);
+  }
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .pull-to-refresh__icon,
+  .pull-to-refresh__indicator,
+  .pull-to-refresh__text {
+    transition: none;
+  }
+
+  .pull-to-refresh__spinner {
+    animation: none;
+  }
+
+  .pull-to-refresh__indicator--refreshing {
+    animation: none;
+  }
+
+  .pull-to-refresh__indicator--can-refresh .pull-to-refresh__icon {
+    transform: none;
+  }
+}
+
+/* ============================================
+   HIGH CONTRAST MODE
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  .pull-to-refresh__indicator {
+    border: 2px solid var(--pm-color-border-strong);
+  }
+
+  .pull-to-refresh__indicator--can-refresh {
+    border-color: var(--pm-color-primary);
+  }
+
+  .pull-to-refresh__indicator--refreshing {
+    border-color: white;
+  }
+}
+
+/* ============================================
+   TOUCH OPTIMIZATIONS
+   ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .pull-to-refresh__content {
+    /* Improve scroll performance on mobile */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+}
+
+/* ============================================
+   DARK THEME ADJUSTMENTS
+   ============================================ */
+
+[data-theme="dark"] .pull-to-refresh__indicator {
+  background: var(--pm-color-bg-secondary);
+  box-shadow: var(--pm-shadow-strong);
+}
+
+[data-theme="dark"] .pull-to-refresh__indicator--can-refresh {
+  background: var(--pm-color-primary-dark);
+}
+
+/* ============================================
+   LANDSCAPE ORIENTATION
+   ============================================ */
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .pull-to-refresh__indicator-container {
+    top: -40px;
+    height: 40px;
+  }
+
+  .pull-to-refresh__indicator {
+    flex-direction: row;
+    padding: var(--pm-spacing-2) var(--pm-spacing-3);
+  }
+
+  .pull-to-refresh__text {
+    font-size: var(--pm-font-size-xs);
+  }
+}

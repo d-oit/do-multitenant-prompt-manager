@@ -20,12 +20,11 @@ import Badge from "../components/ui/Badge";
 
 interface AnalyticsPageProps {
   tenantId: string;
-  token?: string;
 }
 
 const ranges = [7, 14, 30];
 
-export default function AnalyticsPage({ tenantId, token }: AnalyticsPageProps): JSX.Element {
+export default function AnalyticsPage({ tenantId }: AnalyticsPageProps): JSX.Element {
   const [analytics, setAnalytics] = useState<PromptAnalyticsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +36,7 @@ export default function AnalyticsPage({ tenantId, token }: AnalyticsPageProps): 
     setLoading(true);
     setError(null);
 
-    fetchPromptAnalytics(tenantId, range, token || undefined)
+    fetchPromptAnalytics(tenantId, range)
       .then((response) => {
         if (cancelled) return;
         setAnalytics(response);
@@ -54,7 +53,7 @@ export default function AnalyticsPage({ tenantId, token }: AnalyticsPageProps): 
     return () => {
       cancelled = true;
     };
-  }, [tenantId, range, token, reloadKey]);
+  }, [tenantId, range, reloadKey]);
 
   const maxUsage = useMemo(() => {
     if (!analytics) return 0;
