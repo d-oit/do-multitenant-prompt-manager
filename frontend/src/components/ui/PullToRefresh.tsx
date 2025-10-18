@@ -93,7 +93,7 @@ export const PullToRefresh = forwardRef<HTMLDivElement, PullToRefreshProps>(
 
         {/* Content Container */}
         <div
-          ref={containerRef as any}
+          ref={containerRef as React.RefObject<HTMLDivElement>}
           className="pull-to-refresh__content"
           style={getContainerStyle()}
         >

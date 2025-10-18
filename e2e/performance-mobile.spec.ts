@@ -6,11 +6,42 @@
 import { test, expect, devices } from '@playwright/test';
 import { createTestTenant, createTestPrompt } from './setup/dbHelpers';
 
+// Type definitions for browser-specific APIs
+interface LayoutShift extends PerformanceEntry {
+  hadRecentInput: boolean;
+  value: number;
+}
+
+interface MemoryInfo {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+interface PerformanceWithMemory extends Performance {
+  memory?: MemoryInfo;
+}
+
+interface WindowWithGC extends Window {
+  gc?: () => void;
+}
+
+interface WindowWithCLS extends Window {
+  clsValue?: number;
+}
+
+interface ResponseWithTiming extends Response {
+  timing(): {
+    responseEnd: number;
+    requestStart: number;
+  };
+}
+
 test.describe('Mobile Performance and Core Web Vitals', () => {
-  let testTenant: any;
+  let testTenant: { id: string };
 
   test.beforeAll(async () => {
-    testTenant = await createTestTenant('performance-test');
+    testTenant = await createTestTenant('performance-test', 'performance-test');
     // Create multiple test prompts for performance testing
     await Promise.all(
       Array.from({ length: 20 }, (_, i) =>
@@ -70,11 +101,11 @@ test.describe('Mobile Performance and Core Web Vitals', () => {
       
       // Monitor layout shifts
       let cls = 0;
-      await page.evaluateOnNewDocument(() => {
+      await page.addInitScript(() => {
         new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            if (!(entry as any).hadRecentInput) {
-              (window as any).clsValue = ((window as any).clsValue || 0) + (entry as any).value;
+            if (!(entry as LayoutShift).hadRecentInput) {
+              (window as WindowWithCLS).clsValue = ((window as WindowWithCLS).clsValue || 0) + (entry as LayoutShift).value;
             }
           }
         }).observe({ entryTypes: ['layout-shift'] });
@@ -86,7 +117,7 @@ test.describe('Mobile Performance and Core Web Vitals', () => {
       // Wait for potential layout shifts to occur
       await page.waitForTimeout(2000);
 
-      cls = await page.evaluate(() => (window as any).clsValue || 0);
+      cls = await page.evaluate(() => (window as WindowWithCLS).clsValue || 0);
       
       // CLS should be minimal (under 0.1 for good UX)
       expect(cls).toBeLessThan(0.25); // Relaxed threshold
@@ -178,10 +209,10 @@ test.describe('Mobile Performance and Core Web Vitals', () => {
 
       // Get initial memory usage
       const initialMemory = await page.evaluate(() => {
-        return (performance as any).memory ? {
-          used: (performance as any).memory.usedJSHeapSize,
-          total: (performance as any).memory.totalJSHeapSize,
-          limit: (performance as any).memory.jsHeapSizeLimit
+        return (performance as PerformanceWithMemory).memory ? {
+          used: (performance as PerformanceWithMemory).memory!.usedJSHeapSize,
+          total: (performance as PerformanceWithMemory).memory!.totalJSHeapSize,
+          limit: (performance as PerformanceWithMemory).memory!.jsHeapSizeLimit
         } : null;
       });
 
@@ -199,9 +230,9 @@ test.describe('Mobile Performance and Core Web Vitals', () => {
         // Check memory after navigation
         const finalMemory = await page.evaluate(() => {
           return {
-            used: (performance as any).memory.usedJSHeapSize,
-            total: (performance as any).memory.totalJSHeapSize,
-            limit: (performance as any).memory.jsHeapSizeLimit
+            used: (performance as PerformanceWithMemory).memory!.usedJSHeapSize,
+            total: (performance as PerformanceWithMemory).memory!.totalJSHeapSize,
+            limit: (performance as PerformanceWithMemory).memory!.jsHeapSizeLimit
           };
         });
 
@@ -220,13 +251,13 @@ test.describe('Mobile Performance and Core Web Vitals', () => {
 
       // Force garbage collection if available
       await page.evaluate(() => {
-        if ((window as any).gc) {
-          (window as any).gc();
+        if ((window as WindowWithGC).gc) {
+          (window as WindowWithGC).gc!();
         }
       });
 
       const beforeMemory = await page.evaluate(() => {
-        return (performance as any).memory ? (performance as any).memory.usedJSHeapSize : 0;
+        return (performance as PerformanceWithMemory).memory ? (performance as PerformanceWithMemory).memory!.usedJSHeapSize : 0;
       });
 
       // Create and destroy components by navigating
@@ -239,13 +270,13 @@ test.describe('Mobile Performance and Core Web Vitals', () => {
 
       // Force garbage collection again
       await page.evaluate(() => {
-        if ((window as any).gc) {
-          (window as any).gc();
+        if ((window as WindowWithGC).gc) {
+          (window as WindowWithGC).gc!();
         }
       });
 
       const afterMemory = await page.evaluate(() => {
-        return (performance as any).memory ? (performance as any).memory.usedJSHeapSize : 0;
+        return (performance as PerformanceWithMemory).memory ? (performance as PerformanceWithMemory).memory!.usedJSHeapSize : 0;
       });
 
       if (beforeMemory && afterMemory) {
@@ -327,7 +358,7 @@ test.describe('Mobile Performance and Core Web Vitals', () => {
       
       page.on('response', (response) => {
         if (response.url().includes('/api/')) {
-          const timing = response.timing();
+          const timing = (response as ResponseWithTiming).timing();
           apiTimes.push(timing.responseEnd - timing.requestStart);
         }
       });
@@ -351,7 +382,7 @@ test.describe('Mobile Performance and Core Web Vitals', () => {
       await page.waitForLoadState('networkidle');
 
       // Go offline
-      await page.setOffline(true);
+      await page.context().setOffline(true);
 
       // Try to navigate
       await page.click('button:has-text("Prompts")');
@@ -367,7 +398,7 @@ test.describe('Mobile Performance and Core Web Vitals', () => {
       expect(hasContent || hasOfflineMessage).toBe(true);
 
       // Go back online
-      await page.setOffline(false);
+      await page.context().setOffline(false);
     });
   });
 });

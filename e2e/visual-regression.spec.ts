@@ -11,7 +11,7 @@ test.describe('Visual Regression Testing', () => {
   let testPrompts: any[];
 
   test.beforeAll(async () => {
-    testTenant = await createTestTenant('visual-regression-test');
+    testTenant = await createTestTenant('visual-regression-test', 'visual-regression-test');
     testPrompts = await Promise.all([
       createTestPrompt(testTenant.id, 'Visual Test Prompt 1', 'Content for visual testing'),
       createTestPrompt(testTenant.id, 'Visual Test Prompt 2', 'Second visual test content'),

@@ -151,7 +151,7 @@ export async function createTestPrompt(
     headers,
     body: JSON.stringify({
       title,
-      content,
+      body: content,
       tags: ['test', 'e2e'],
     }),
   });
@@ -168,5 +168,5 @@ export async function createTestPrompt(
  * Generate a unique test identifier
  */
 export function generateTestId(): string {
-  return `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }

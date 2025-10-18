@@ -70,7 +70,13 @@ const MobileMenu = forwardRef<HTMLDivElement, MobileMenuProps>(
 
     return (
       <>
-        <div className="mobile-nav__overlay" onClick={onClose} />
+        <button
+          type="button"
+          className="mobile-nav__overlay"
+          onClick={onClose}
+          onKeyDown={(e) => e.key === 'Enter' && onClose()}
+          aria-label="Close navigation overlay"
+        />
         <div ref={ref} className="mobile-nav__menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
           <div className="mobile-nav__menu-header">
             <h2 className="mobile-nav__menu-title">Navigation</h2>
@@ -88,7 +94,7 @@ const MobileMenu = forwardRef<HTMLDivElement, MobileMenuProps>(
             </Button>
           </div>
           <nav className="mobile-nav__menu-nav">
-            <ul className="mobile-nav__menu-list" role="list">
+            <ul className="mobile-nav__menu-list">
               {navItems.map((item, index) => (
                 <li key={item.id} className="mobile-nav__menu-item">
                   <Button

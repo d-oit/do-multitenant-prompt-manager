@@ -30,7 +30,7 @@ test.describe('Mobile-First Responsive Design', () => {
 
   test.beforeAll(async () => {
     // Create test data
-    testTenant = await createTestTenant('mobile-responsive-test');
+    testTenant = await createTestTenant('mobile-responsive-test', 'mobile-responsive-test');
     testPrompts = await Promise.all([
       createTestPrompt(testTenant.id, 'Mobile Test Prompt 1', 'Test content for mobile'),
       createTestPrompt(testTenant.id, 'Mobile Test Prompt 2', 'Another test content'),

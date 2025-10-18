@@ -10,7 +10,7 @@ test.describe('Mobile Edge Cases and Error Scenarios', () => {
   let testTenant: any;
 
   test.beforeAll(async () => {
-    testTenant = await createTestTenant('edge-cases-test');
+    testTenant = await createTestTenant('edge-cases-test', 'edge-cases-test');
   });
 
   test.describe('Network Edge Cases', () => {

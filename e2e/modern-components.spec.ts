@@ -4,14 +4,15 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { createTestTenant, createTestPrompt } from './setup/dbHelpers';
+import { createTestTenant, createTestPrompt, generateTestId } from './setup/dbHelpers';
 
 test.describe('Modern UI Components', () => {
   let testTenant: any;
   let testPrompts: any[];
 
   test.beforeAll(async () => {
-    testTenant = await createTestTenant('modern-components-test');
+    const uniqueId = generateTestId();
+    testTenant = await createTestTenant(`modern-components-test-${uniqueId}`, `modern-components-test-${uniqueId}`);
     testPrompts = await Promise.all(
       Array.from({ length: 15 }, (_, i) =>
         createTestPrompt(testTenant.id, `Component Test Prompt ${i + 1}`, `Test content for component ${i + 1}`)

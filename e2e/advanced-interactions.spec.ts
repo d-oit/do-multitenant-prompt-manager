@@ -10,7 +10,7 @@ test.describe('Advanced Mobile Interaction Patterns', () => {
   let testTenant: any;
 
   test.beforeAll(async () => {
-    testTenant = await createTestTenant('advanced-interactions-test');
+    testTenant = await createTestTenant('advanced-interactions-test', 'advanced-interactions-test');
   });
 
   test.describe('Complex Gesture Combinations', () => {

@@ -11,7 +11,7 @@ test.describe('Touch Interactions and Gestures', () => {
   let testPrompts: any[];
 
   test.beforeAll(async () => {
-    testTenant = await createTestTenant('touch-interactions-test');
+    testTenant = await createTestTenant('touch-interactions-test', 'touch-interactions-test');
     testPrompts = await Promise.all([
       createTestPrompt(testTenant.id, 'Touch Test Prompt 1', 'Test content for touch'),
       createTestPrompt(testTenant.id, 'Touch Test Prompt 2', 'Another test content'),

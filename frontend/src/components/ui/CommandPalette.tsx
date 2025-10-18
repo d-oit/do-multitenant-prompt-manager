@@ -193,21 +193,37 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
       return groups;
     }, {} as Record<string, Array<{ command: Command; originalIndex: number }>>);
 
+    const handleOverlayKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }, [onClose]);
+
     if (!isOpen) return null;
 
     const commandPaletteContent = (
-      <div className="command-palette__overlay" onClick={onClose}>
+      <div
+        className="command-palette__overlay"
+        role="button"
+        onMouseDown={onClose}
+        onKeyDown={handleOverlayKeyDown}
+        tabIndex={0}
+        aria-label="Close command palette"
+        aria-hidden="true"
+      >
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
         <div
           ref={ref}
           className={cn("command-palette", className)}
-          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
           aria-label="Command palette"
+          onKeyDown={handleKeyDown as React.KeyboardEventHandler<HTMLDivElement>}
         >
           {/* Search Input */}
           <div className="command-palette__search">
-            <div className="command-palette__search-icon">
+            <div className="command-palette__search-icon" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.35-4.35"></path>
@@ -223,6 +239,10 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
               className="command-palette__input"
               autoComplete="off"
               spellCheck="false"
+              role="combobox"
+              aria-expanded={filteredCommands.length > 0}
+              aria-controls="command-palette-results"
+              aria-activedescendant={filteredCommands[selectedIndex]?.id ?? undefined}
             />
             {query && (
               <Button
@@ -241,7 +261,12 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
           </div>
 
           {/* Results */}
-          <div ref={listRef} className="command-palette__results" role="listbox">
+          <div
+            ref={listRef}
+            className="command-palette__results"
+            role="listbox"
+            id="command-palette-results"
+          >
             {filteredCommands.length === 0 ? (
               <div className="command-palette__empty">
                 {query ? `No commands found for "${query}"` : "Type to search for commands..."}
@@ -260,8 +285,16 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(
                         selectedIndex === originalIndex && "command-palette__command--selected"
                       )}
                       onClick={() => executeCommand(command)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          executeCommand(command);
+                        }
+                      }}
                       role="option"
                       aria-selected={selectedIndex === originalIndex}
+                      tabIndex={selectedIndex === originalIndex ? 0 : -1}
+                      id={command.id}
                     >
                       {command.icon && <CommandIcon>{command.icon}</CommandIcon>}
                       <div className="command-palette__command-content">

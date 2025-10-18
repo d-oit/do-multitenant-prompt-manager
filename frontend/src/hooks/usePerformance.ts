@@ -4,7 +4,8 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { performanceMonitor, type DeviceCapabilities, type PerformanceMetrics } from "../utils/performance";
+import { performanceMonitor } from "../utils/performance";
+import type { DeviceCapabilities, PerformanceMetrics } from "../utils/performance";
 
 // Hook for tracking component render performance
 export function useRenderPerformance(componentName: string) {
@@ -25,7 +26,7 @@ export function useRenderPerformance(componentName: string) {
     
     // Track in performance monitoring
     if (renderTime > 50) { // Only track unusually slow renders
-      performanceMonitor['reportMetric']?.('COMPONENT_RENDER', renderTime, {
+      performanceMonitor.reportComponentRender?.('COMPONENT_RENDER', renderTime, {
         component: componentName,
         renderCount: renderCount.current,
       });
@@ -194,7 +195,7 @@ export function useMemoryMonitoring() {
   useEffect(() => {
     const updateMemoryUsage = () => {
       if ('memory' in performance) {
-        const memory = (performance as any).memory;
+        const memory = (performance as Performance & { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number; totalJSHeapSize: number } }).memory;
         const used = memory.usedJSHeapSize;
         const total = memory.jsHeapSizeLimit;
         const percentage = (used / total) * 100;

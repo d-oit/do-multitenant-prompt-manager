@@ -153,9 +153,11 @@
   border: none;
   background: transparent;
   min-height: 48px;
+  text-align: left;
 }
 
-.command-palette__command:hover {
+.command-palette__command:hover,
+.command-palette__command:focus-visible {
   background: var(--pm-color-bg-hover);
 }
 
@@ -164,7 +166,8 @@
   color: var(--pm-color-primary);
 }
 
-.command-palette__command--selected:hover {
+.command-palette__command--selected:hover,
+.command-palette__command--selected:focus-visible {
   background: var(--pm-color-primary-light);
 }
 

@@ -3,7 +3,7 @@
  * Core Web Vitals tracking and performance optimization
  */
 
-interface PerformanceMetrics {
+export interface PerformanceMetrics {
   lcp?: number;
   fid?: number;
   cls?: number;
@@ -13,7 +13,7 @@ interface PerformanceMetrics {
   domContentLoaded?: number;
 }
 
-interface DeviceCapabilities {
+export interface DeviceCapabilities {
   memory?: number;
   connection?: {
     effectiveType: string;
@@ -24,10 +24,13 @@ interface DeviceCapabilities {
   isLowEndDevice: boolean;
 }
 
+type MetricListener = (name: string, value: number, metadata?: Record<string, unknown>) => void;
+
 class PerformanceMonitor {
   private metrics: PerformanceMetrics = {};
   private observers: PerformanceObserver[] = [];
   private deviceCapabilities: DeviceCapabilities;
+  private listeners: MetricListener[] = [];
 
   constructor() {
     this.deviceCapabilities = this.detectDeviceCapabilities();
@@ -35,7 +38,22 @@ class PerformanceMonitor {
   }
 
   private detectDeviceCapabilities(): DeviceCapabilities {
-    const nav = navigator as any;
+    if (typeof window === 'undefined') {
+      return {
+        hardwareConcurrency: 4,
+        isLowEndDevice: false,
+      };
+    }
+
+    const nav = window.navigator as Navigator & {
+      deviceMemory?: number;
+      connection?: {
+        effectiveType: string;
+        downlink: number;
+        rtt: number;
+      };
+      hardwareConcurrency?: number;
+    };
     
     return {
       memory: nav.deviceMemory,
@@ -44,12 +62,12 @@ class PerformanceMonitor {
         downlink: nav.connection.downlink,
         rtt: nav.connection.rtt,
       } : undefined,
-      hardwareConcurrency: nav.hardwareConcurrency || 4,
+      hardwareConcurrency: nav.hardwareConcurrency ?? 4,
       isLowEndDevice: this.isLowEndDevice(nav),
     };
   }
 
-  private isLowEndDevice(nav: any): boolean {
+  private isLowEndDevice(nav: Navigator & { deviceMemory?: number; hardwareConcurrency?: number; connection?: { effectiveType?: string } }): boolean {
     // Heuristics for detecting low-end devices
     const memory = nav.deviceMemory;
     const cores = nav.hardwareConcurrency;
@@ -63,16 +81,15 @@ class PerformanceMonitor {
   }
 
   private initializeMetrics(): void {
-    // Core Web Vitals
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     this.observeLCP();
     this.observeFID();
     this.observeCLS();
     this.observeFCP();
-    
-    // Navigation timing
     this.observeNavigation();
-    
-    // Resource timing for critical resources
     this.observeResources();
   }
 
@@ -82,7 +99,7 @@ class PerformanceMonitor {
     try {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1] as any;
+        const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number };
         this.metrics.lcp = lastEntry.startTime;
         this.reportMetric('LCP', lastEntry.startTime);
       });
@@ -100,8 +117,9 @@ class PerformanceMonitor {
     try {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        entries.forEach((entry: any) => {
-          this.metrics.fid = entry.processingStart - entry.startTime;
+        entries.forEach((entry) => {
+          const firstInput = entry as PerformanceEventTiming;
+          this.metrics.fid = firstInput.processingStart - firstInput.startTime;
           this.reportMetric('FID', this.metrics.fid);
         });
       });
@@ -121,9 +139,10 @@ class PerformanceMonitor {
       
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        entries.forEach((entry: any) => {
-          if (!entry.hadRecentInput) {
-            clsValue += entry.value;
+        entries.forEach((entry) => {
+          const layoutShift = entry as LayoutShift;
+          if (!layoutShift.hadRecentInput) {
+            clsValue += layoutShift.value;
           }
         });
         
@@ -144,10 +163,11 @@ class PerformanceMonitor {
     try {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        entries.forEach((entry: any) => {
+        entries.forEach((entry) => {
           if (entry.name === 'first-contentful-paint') {
-            this.metrics.fcp = entry.startTime;
-            this.reportMetric('FCP', entry.startTime);
+            const paintEntry = entry as PerformanceEntry & { startTime: number };
+            this.metrics.fcp = paintEntry.startTime;
+            this.reportMetric('FCP', paintEntry.startTime);
           }
         });
       });
@@ -165,10 +185,11 @@ class PerformanceMonitor {
     try {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        entries.forEach((entry: any) => {
-          this.metrics.ttfb = entry.responseStart - entry.requestStart;
-          this.metrics.domContentLoaded = entry.domContentLoadedEventEnd - entry.navigationStart;
-          this.metrics.loadTime = entry.loadEventEnd - entry.navigationStart;
+        entries.forEach((entry) => {
+          const navigationEntry = entry as PerformanceNavigationTiming;
+          this.metrics.ttfb = navigationEntry.responseStart - navigationEntry.requestStart;
+          this.metrics.domContentLoaded = navigationEntry.domContentLoadedEventEnd - navigationEntry.navigationStart;
+          this.metrics.loadTime = navigationEntry.loadEventEnd - navigationEntry.navigationStart;
           
           this.reportMetric('TTFB', this.metrics.ttfb);
           this.reportMetric('DOM_CONTENT_LOADED', this.metrics.domContentLoaded);
@@ -189,11 +210,11 @@ class PerformanceMonitor {
     try {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        entries.forEach((entry: any) => {
-          // Track critical resources
-          if (entry.name.includes('.css') || entry.name.includes('.js')) {
-            const duration = entry.responseEnd - entry.startTime;
-            this.reportMetric('RESOURCE_LOAD', duration, { resource: entry.name });
+        entries.forEach((entry) => {
+          const resourceEntry = entry as PerformanceResourceTiming;
+          if (resourceEntry.name.includes('.css') || resourceEntry.name.includes('.js')) {
+            const duration = resourceEntry.responseEnd - resourceEntry.startTime;
+            this.reportMetric('RESOURCE_LOAD', duration, { resource: resourceEntry.name });
           }
         });
       });
@@ -205,21 +226,37 @@ class PerformanceMonitor {
     }
   }
 
-  private reportMetric(name: string, value: number, metadata?: any): void {
-    // Send to analytics service
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'web_vitals', {
-        event_category: 'Performance',
-        event_label: name,
-        value: Math.round(value),
-        custom_map: metadata,
-      });
+  private reportMetric(name: string, value: number, metadata?: Record<string, unknown>): void {
+    this.listeners.forEach(listener => listener(name, value, metadata));
+
+    if (typeof window !== 'undefined') {
+      const gtag = (window as { gtag?: (...args: unknown[]) => void }).gtag;
+
+      if (typeof gtag === 'function') {
+        gtag('event', 'web_vitals', {
+          event_category: 'Performance',
+          event_label: name,
+          value: Math.round(value),
+          custom_map: metadata,
+        });
+      }
     }
-    
-    // Log for development
+
     if (import.meta.env.DEV) {
       console.log(`Performance metric - ${name}:`, value, metadata);
     }
+  }
+
+  public reportComponentRender(name: string, value: number, metadata?: Record<string, unknown>): void {
+    this.reportMetric(name, value, metadata);
+  }
+
+  public addMetricListener(listener: MetricListener): void {
+    this.listeners.push(listener);
+  }
+
+  public removeMetricListener(listener: MetricListener): void {
+    this.listeners = this.listeners.filter(existing => existing !== listener);
   }
 
   public getMetrics(): PerformanceMetrics {
@@ -250,17 +287,23 @@ class PerformanceMonitor {
     const canvas = document.createElement('canvas');
     canvas.width = 1;
     canvas.height = 1;
-    
-    // Check AVIF support
-    if (canvas.toDataURL('image/avif').indexOf('data:image/avif') === 0) {
-      return 'avif';
+
+    try {
+      if (canvas.toDataURL('image/avif').indexOf('data:image/avif') === 0) {
+        return 'avif';
+      }
+    } catch (error) {
+      console.warn('AVIF support check failed:', error);
     }
-    
-    // Check WebP support
-    if (canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0) {
-      return 'webp';
+
+    try {
+      if (canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0) {
+        return 'webp';
+      }
+    } catch (error) {
+      console.warn('WebP support check failed:', error);
     }
-    
+
     return 'jpeg';
   }
 
@@ -283,39 +326,45 @@ export class MemoryManager {
   }
 
   public monitorMemoryUsage(): void {
-    if ('memory' in performance) {
-      const memory = (performance as any).memory;
-      const usage = memory.usedJSHeapSize / memory.jsHeapSizeLimit;
-      
-      if (usage > this.memoryWarningThreshold) {
-        this.triggerMemoryCleanup();
-      }
+    const memory = (performance as Performance & { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+    if (!memory) {
+      return;
+    }
+
+    const usage = memory.usedJSHeapSize / memory.jsHeapSizeLimit;
+
+    if (usage > this.memoryWarningThreshold) {
+      this.triggerMemoryCleanup();
     }
   }
 
   private triggerMemoryCleanup(): void {
-    // Trigger garbage collection hint
-    if ((window as any).gc) {
-      (window as any).gc();
+    const gCollector = (window as { gc?: () => void }).gc;
+    if (typeof gCollector === 'function') {
+      gCollector();
     }
-    
-    // Emit memory warning event
-    window.dispatchEvent(new CustomEvent('memory-warning', {
-      detail: { timestamp: Date.now() }
-    }));
+
+    window.dispatchEvent(
+      new CustomEvent('memory-warning', {
+        detail: { timestamp: Date.now() }
+      })
+    );
   }
 
   public clearUnusedCaches(): void {
-    // Clear unused image caches, component caches, etc.
-    if ('caches' in window) {
-      caches.keys().then(cacheNames => {
-        cacheNames.forEach(cacheName => {
-          if (cacheName.includes('old-') || cacheName.includes('temp-')) {
-            caches.delete(cacheName);
-          }
-        });
-      });
+    if (!('caches' in window)) {
+      return;
     }
+
+    caches.keys().then(cacheNames => {
+      cacheNames.forEach(cacheName => {
+        if (cacheName.includes('old-') || cacheName.includes('temp-')) {
+          caches.delete(cacheName).catch(error => {
+            console.warn('Failed to delete cache', cacheName, error);
+          });
+        }
+      });
+    });
   }
 }
 
@@ -348,6 +397,8 @@ export { PerformanceMonitor, type PerformanceMetrics, type DeviceCapabilities };
 
 // Memory monitoring
 const memoryManager = MemoryManager.getInstance();
-setInterval(() => {
-  memoryManager.monitorMemoryUsage();
-}, 30000); // Check every 30 seconds
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    memoryManager.monitorMemoryUsage();
+  }, 30000);
+}

@@ -8,7 +8,7 @@ import { cn } from "../../design-system/utils";
 import { useContainerQuery } from "../../hooks/useContainerQuery";
 import { VirtualList } from "./VirtualList";
 
-interface Column<T = any> {
+interface Column<T = unknown> {
   key: string;
   header: ReactNode;
   cell: (item: T, index: number) => ReactNode;
@@ -21,7 +21,7 @@ interface Column<T = any> {
   mobileOrder?: number;
 }
 
-interface DataTableProps<T = any> {
+interface DataTableProps<T = unknown> {
   data: T[];
   columns: Column<T>[];
   className?: string;
@@ -64,7 +64,7 @@ const SortIcon = ({ direction }: { direction?: 'asc' | 'desc' }) => (
   </svg>
 );
 
-const LoadingSkeleton = ({ columns }: { columns: Column[] }) => (
+const LoadingSkeleton = ({ columns }: { columns: Array<Column<unknown>> }) => (
   <div className="data-table__loading">
     {Array.from({ length: 5 }, (_, i) => (
       <div key={i} className="data-table__loading-row">
@@ -109,6 +109,14 @@ const MobileCard = <T,>({
         isSelected && "data-table__mobile-card--selected"
       )}
       onClick={onRowClick ? () => onRowClick(item, index) : undefined}
+      onKeyDown={onRowClick ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onRowClick(item, index);
+        }
+      } : undefined}
+      role={onRowClick ? "button" : undefined}
+      tabIndex={onRowClick ? 0 : undefined}
     >
       {onSelectionChange && (
         <div className="data-table__mobile-card-selection">
@@ -121,7 +129,7 @@ const MobileCard = <T,>({
         </div>
       )}
       <div className="data-table__mobile-card-content">
-        {visibleColumns.map((column, colIndex) => (
+        {visibleColumns.map((column) => (
           <div key={column.key} className="data-table__mobile-field">
             <div className="data-table__mobile-field-label">
               {column.header}
@@ -219,7 +227,7 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
               />
             </td>
           )}
-          {visibleColumns.map((column) => (
+            {visibleColumns.map((column) => (
             <td
               key={column.key}
               className={cn(
@@ -343,7 +351,7 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
                     items={data}
                     itemHeight={rowHeight}
                     height={400}
-                    renderItem={renderTableRow as any}
+                    renderItem={renderTableRow}
                   />
                 </td>
               </tr>
@@ -382,7 +390,7 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
         ref={ref}
         className={cn("data-table", className)}
       >
-        <div ref={containerRef as any} className="data-table__container">
+        <div ref={containerRef as React.RefObject<HTMLDivElement>} className="data-table__container">
           {shouldUseCardLayout ? renderMobileList() : renderDesktopTable()}
         </div>
       </div>

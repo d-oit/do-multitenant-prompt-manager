@@ -11,7 +11,7 @@ test.describe('Complete Mobile User Workflows', () => {
   let testPrompts: any[];
 
   test.beforeAll(async () => {
-    testTenant = await createTestTenant('user-workflows-test');
+    testTenant = await createTestTenant('user-workflows-test', 'user-workflows-test');
     testPrompts = await Promise.all([
       createTestPrompt(testTenant.id, 'Workflow Test Prompt 1', 'Content for workflow testing'),
       createTestPrompt(testTenant.id, 'Workflow Test Prompt 2', 'Second workflow content'),

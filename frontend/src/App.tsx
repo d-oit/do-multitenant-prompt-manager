@@ -281,7 +281,7 @@ export default function App(): JSX.Element {
             onCreateTenant={handleCreateTenant}
             busy={creatingTenant}
           />
-          <nav className="stack-sm">
+          <nav className="stack-sm" role="navigation" aria-label="Sidebar navigation">
             {navItems.map((item, index) => (
               <Button
                 key={item.id}
@@ -292,6 +292,8 @@ export default function App(): JSX.Element {
                 )}
                 onClick={() => setActiveView(item.id)}
                 style={{ animationDelay: `${(index + 1) * 0.05}s` }}
+                aria-label={item.label}
+                aria-current={activeView === item.id ? "page" : undefined}
               >
                 <span className="app-nav__icon" aria-hidden="true">
                   {item.icon}
@@ -316,14 +318,19 @@ export default function App(): JSX.Element {
                 <span>Help</span>
               </li>
             </ul>
-            <Button variant="ghost" size="sm" onClick={() => setShowShortcuts(true)}>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowShortcuts(true)}
+              aria-label="View all keyboard shortcuts"
+            >
               View all shortcuts
             </Button>
           </div>
         </div>
       </aside>
       <main className="app-shell__main custom-scrollbar">{renderMainContent()}</main>
-      <nav className="app-bottom-nav">
+      <nav className="app-bottom-nav" role="navigation" aria-label="Main navigation">
         {navItems.map((item) => (
           <Button
             key={`mobile-${item.id}`}
@@ -333,6 +340,8 @@ export default function App(): JSX.Element {
               activeView === item.id && "app-bottom-nav__item--active"
             )}
             onClick={() => setActiveView(item.id)}
+            aria-label={item.label}
+            aria-current={activeView === item.id ? "page" : undefined}
           >
             <span aria-hidden="true">{item.icon}</span>
             <span>{item.label}</span>
