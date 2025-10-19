@@ -19,14 +19,12 @@ If a release is no longer listed above it means it is no longer supported and ma
 Preferred reporting channels (in order):
 
 1. **GitHub Security Advisories (recommended)**
-
-   * Open the repository on GitHub, click the **Security** tab, then **Advisories** and create a new private advisory.
-   * This allows private discussion and coordinated disclosure without sharing details publicly.
+   - Open the repository on GitHub, click the **Security** tab, then **Advisories** and create a new private advisory.
+   - This allows private discussion and coordinated disclosure without sharing details publicly.
 
 2. **GitHub Issue with encrypted details**
-
-   * If you cannot use Security Advisories, open a new **issue** and start the title with `[SECURITY]`. Do **not** include exploit code or sensitive PoC details in the public issue.
-   * Attach an encrypted file or encrypted text block containing sensitive details (see "Encrypting sensitive details" below).
+   - If you cannot use Security Advisories, open a new **issue** and start the title with `[SECURITY]`. Do **not** include exploit code or sensitive PoC details in the public issue.
+   - Attach an encrypted file or encrypted text block containing sensitive details (see "Encrypting sensitive details" below).
 
 3. **Create a private gist (encrypted)** and paste a short, high-level summary in a public GitHub issue linking to the private gist. Use the encryption method described below for the gist content.
 
@@ -38,13 +36,13 @@ Preferred reporting channels (in order):
 
 Please provide as much of the following as you can, while avoiding public disclosure of exploit code:
 
-* **Short summary** of the issue (1–2 sentences).
-* **Impact** (what an attacker could do).
-* **Affected versions** (branch/commit/tag).
-* **Reproduction steps** (high-level). If sensitive, provide an encrypted PoC instead of posting it publicly.
-* **Configuration / environment** (OS, runtime, third-party libs and versions).
-* **Suggested fix** (optional).
-* **Your PGP/GPG key fingerprint** (optional) for secure follow-up.
+- **Short summary** of the issue (1–2 sentences).
+- **Impact** (what an attacker could do).
+- **Affected versions** (branch/commit/tag).
+- **Reproduction steps** (high-level). If sensitive, provide an encrypted PoC instead of posting it publicly.
+- **Configuration / environment** (OS, runtime, third-party libs and versions).
+- **Suggested fix** (optional).
+- **Your PGP/GPG key fingerprint** (optional) for secure follow-up.
 
 ---
 
