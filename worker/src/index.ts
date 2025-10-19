@@ -2008,7 +2008,7 @@ async function handleApiKeyCreate(
 
   let tenantId: string | null = null;
   if (parsed.tenantId) {
-    const tenant = await ensureTenant(env, parsed.tenantId!);
+    const tenant = await ensureTenant(env, parsed.tenantId as string);
     tenantId = tenant.id;
     ensureTenantAccess(auth, tenantId);
   }

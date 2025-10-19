@@ -1,5 +1,5 @@
 import type { Env } from "../types";
-import type { Prompt } from "../../shared/types";
+import type { Prompt } from "../../shared/types.js";
 import { deserializePrompt } from "../lib/prompts";
 
 interface PromptRow {
