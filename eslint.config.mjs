@@ -85,19 +85,13 @@ export default tseslint.config(
     }
   },
   {
-    files: [
-      "worker/src/lib/logger.ts",
-      "frontend/src/lib/logger.ts"
-    ],
+    files: ["worker/src/lib/logger.ts", "frontend/src/lib/logger.ts"],
     rules: {
       "no-console": "off"
     }
   },
   {
-    files: [
-      "**/*.{test,spec}.{ts,tsx}",
-      "**/__tests__/**/*.{ts,tsx}"
-    ],
+    files: ["**/*.{test,spec}.{ts,tsx}", "**/__tests__/**/*.{ts,tsx}"],
     languageOptions: {
       globals: {
         ...globals.es2024,

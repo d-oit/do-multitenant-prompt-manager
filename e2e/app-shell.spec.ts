@@ -4,7 +4,9 @@ test.describe("App shell", () => {
   test("renders tenants and navigates between primary views", async ({ page, apiState }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { name: /DO Multi-Tenant Prompt Manager/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /DO Multi-Tenant Prompt Manager/i })
+    ).toBeVisible();
 
     const tenantSelect = page.getByLabel("Tenant");
     await expect(tenantSelect).toHaveValue(apiState.tenants[0].id);

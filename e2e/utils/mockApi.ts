@@ -247,7 +247,9 @@ export function createDefaultApiState(): ApiState {
           body: `${prompt.body}\nPrevious revision.`,
           tags: prompt.tags,
           metadata: prompt.metadata,
-          createdAt: new Date(new Date(prompt.updatedAt).getTime() - 1000 * 60 * 60 * 24).toISOString(),
+          createdAt: new Date(
+            new Date(prompt.updatedAt).getTime() - 1000 * 60 * 60 * 24
+          ).toISOString(),
           createdBy: "revision-bot"
         }
       ].filter((version) => version.version > 0);
@@ -565,7 +567,12 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
 
         if (search) {
           prompts = prompts.filter((prompt) => {
-            const haystack = [prompt.title, prompt.body, prompt.tags.join(" "), JSON.stringify(prompt.metadata ?? {})]
+            const haystack = [
+              prompt.title,
+              prompt.body,
+              prompt.tags.join(" "),
+              JSON.stringify(prompt.metadata ?? {})
+            ]
               .join(" ")
               .toLowerCase();
             return haystack.includes(search);
@@ -581,7 +588,9 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
             if (!prompt.metadata) return false;
             const value = prompt.metadata[metadataKey];
             if (metadataValue) {
-              return String(value ?? "").toLowerCase().includes(metadataValue);
+              return String(value ?? "")
+                .toLowerCase()
+                .includes(metadataValue);
             }
             return value !== undefined;
           });
@@ -865,7 +874,9 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
           target.updatedAt = new Date().toISOString();
         }
       });
-      const updated = Object.values(state.promptComments).flat().find((c) => c.id === commentId);
+      const updated = Object.values(state.promptComments)
+        .flat()
+        .find((c) => c.id === commentId);
       await fulfillJson(route, 200, { data: updated });
       return;
     }

@@ -89,7 +89,10 @@ test.describe("Prompts workflows", () => {
   test("edits and updates a prompt", async ({ page }) => {
     await openPrompts(page);
 
-    await page.getByRole("row", { name: /Acme Prompt 1/ }).getByRole("button", { name: "Edit" }).click();
+    await page
+      .getByRole("row", { name: /Acme Prompt 1/ })
+      .getByRole("button", { name: "Edit" })
+      .click();
     const dialog = page.getByRole("dialog", { name: "Edit Prompt" });
     await expect(dialog).toBeVisible();
 
