@@ -14,6 +14,9 @@ export default tseslint.config(
       "worker/dist",
       "coverage",
       ".wrangler",
+      ".husky",
+      "scripts/deploy-pages.mjs",
+      "worker/.wrangler",
       "e2e/playwright-report",
       "e2e/test-results"
     ]
@@ -85,19 +88,13 @@ export default tseslint.config(
     }
   },
   {
-    files: [
-      "worker/src/lib/logger.ts",
-      "frontend/src/lib/logger.ts"
-    ],
+    files: ["worker/src/lib/logger.ts", "frontend/src/lib/logger.ts"],
     rules: {
       "no-console": "off"
     }
   },
   {
-    files: [
-      "**/*.{test,spec}.{ts,tsx}",
-      "**/__tests__/**/*.{ts,tsx}"
-    ],
+    files: ["**/*.{test,spec}.{ts,tsx}", "**/__tests__/**/*.{ts,tsx}"],
     languageOptions: {
       globals: {
         ...globals.es2024,

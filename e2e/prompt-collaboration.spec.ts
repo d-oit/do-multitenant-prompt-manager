@@ -9,7 +9,10 @@ async function openPrompts(page: Page) {
 
 async function openPromptDetails(page: Page, title = "Acme Prompt 1") {
   await openPrompts(page);
-  await page.getByRole("row", { name: new RegExp(title) }).getByRole("button", { name: "View" }).click();
+  await page
+    .getByRole("row", { name: new RegExp(title) })
+    .getByRole("button", { name: "View" })
+    .click();
   const dialog = page.getByRole("dialog", { name: new RegExp(title) });
   await expect(dialog).toBeVisible();
   return dialog;

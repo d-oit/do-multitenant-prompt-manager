@@ -739,6 +739,25 @@ async function handleList(
   const metadataKey = url.searchParams.get("metadataKey") || undefined;
   const metadataValue = url.searchParams.get("metadataValue") || undefined;
 
+  // Parse new advanced filter parameters
+  const tagsParam = url.searchParams.get("tags");
+  const tags = tagsParam
+    ? tagsParam
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : undefined;
+
+  const metadataFiltersParam = url.searchParams.get("metadataFilters");
+  const metadataFilters = metadataFiltersParam ? JSON.parse(metadataFiltersParam) : undefined;
+
+  const archivedParam = url.searchParams.get("archived");
+  const archived = archivedParam ? archivedParam === "true" : undefined;
+
+  const createdBy = url.searchParams.get("createdBy") || undefined;
+  const dateFrom = url.searchParams.get("dateFrom") || undefined;
+  const dateTo = url.searchParams.get("dateTo") || undefined;
+
   const sortBy = (url.searchParams.get("sortBy") as SortField | null) || "created_at";
   const sortField = sortColumns[sortBy] ? sortBy : "created_at";
 
@@ -757,8 +776,14 @@ async function handleList(
     tenantId: tenant.id,
     search,
     tag,
+    tags,
     metadataKey,
     metadataValue,
+    metadataFilters,
+    archived,
+    createdBy,
+    dateFrom,
+    dateTo,
     sortField,
     sortOrder,
     page,
@@ -2008,7 +2033,7 @@ async function handleApiKeyCreate(
 
   let tenantId: string | null = null;
   if (parsed.tenantId) {
-    const tenant = await ensureTenant(env, parsed.tenantId);
+    const tenant = await ensureTenant(env, parsed.tenantId!);
     tenantId = tenant.id;
     ensureTenantAccess(auth, tenantId);
   }

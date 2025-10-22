@@ -24,6 +24,12 @@ interface Prompt {
 type SortField = "created_at" | "updated_at" | "title";
 type SortOrder = "asc" | "desc";
 
+interface MetadataFilter {
+  key: string;
+  operator: "equals" | "contains" | "not_equals";
+  value: string;
+}
+
 interface PromptListResponse {
   data: Prompt[];
   pagination: {
@@ -194,22 +200,113 @@ export function createDefaultApiState(): ApiState {
   ];
 
   const promptsByTenant: Record<string, Prompt[]> = {
-    tenant_acme: Array.from({ length: 8 }).map((_, index) => {
-      const createdAt = new Date(baseDate.getTime() - index * 1000 * 60 * 60 * 12);
-      return {
-        id: `prompt_acme_${index + 1}`,
+    tenant_acme: [
+      // Enhanced test data for comprehensive filter testing
+      {
+        id: "prompt_acme_1",
         tenantId: "tenant_acme",
-        title: `Acme Prompt ${index + 1}`,
-        body: `You are assisting Acme users with workflow ${index + 1}.`,
-        tags: index % 2 === 0 ? ["support", "beta"] : ["onboarding"],
-        metadata: index % 2 === 0 ? { channel: "chat", tier: "enterprise" } : null,
-        createdAt: createdAt.toISOString(),
-        updatedAt: new Date(createdAt.getTime() + 1000 * 60 * 20).toISOString(),
-        version: index % 3 === 0 ? 3 : 2,
-        archived: index === 7,
-        createdBy: index % 2 === 0 ? "morgan" : "casey"
-      } as Prompt;
-    }),
+        title: "Production API Alert System",
+        body: "Handle critical production alerts with priority escalation",
+        tags: ["urgent", "production", "api"],
+        metadata: { priority: "high", department: "engineering", channel: "slack" },
+        createdAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 2).toISOString(),
+        updatedAt: new Date(baseDate.getTime() - 1000 * 60 * 60).toISOString(),
+        version: 2,
+        archived: false,
+        createdBy: "john.doe@acme.com"
+      },
+      {
+        id: "prompt_acme_2",
+        tenantId: "tenant_acme",
+        title: "Development Debug Helper",
+        body: "Debug helper for development environment issues",
+        tags: ["urgent", "development"],
+        metadata: { priority: "medium", department: "engineering", channel: "email" },
+        createdAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 4).toISOString(),
+        updatedAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 3).toISOString(),
+        version: 1,
+        archived: false,
+        createdBy: "jane.smith@acme.com"
+      },
+      {
+        id: "prompt_acme_3",
+        tenantId: "tenant_acme",
+        title: "Marketing Campaign Template",
+        body: "Template for marketing campaign automation",
+        tags: ["marketing", "template"],
+        metadata: { priority: "low", department: "marketing", channel: "email" },
+        createdAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 6).toISOString(),
+        updatedAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 5).toISOString(),
+        version: 1,
+        archived: false,
+        createdBy: "alice.marketing@acme.com"
+      },
+      {
+        id: "prompt_acme_4",
+        tenantId: "tenant_acme",
+        title: "Production API Documentation",
+        body: "Comprehensive API documentation for production systems",
+        tags: ["production", "api", "documentation"],
+        metadata: { priority: "high", department: "engineering", channel: "web" },
+        createdAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 8).toISOString(),
+        updatedAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 7).toISOString(),
+        version: 3,
+        archived: false,
+        createdBy: "john.doe@acme.com"
+      },
+      {
+        id: "prompt_acme_5",
+        tenantId: "tenant_acme",
+        title: "Customer Support Template",
+        body: "Standard customer support response template",
+        tags: ["support", "template"],
+        metadata: { priority: "medium", department: "support", channel: "chat" },
+        createdAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 10).toISOString(),
+        updatedAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 9).toISOString(),
+        version: 2,
+        archived: false,
+        createdBy: "support.team@acme.com"
+      },
+      {
+        id: "prompt_acme_6",
+        tenantId: "tenant_acme",
+        title: "Legacy Script - Deprecated",
+        body: "Old automation script that is no longer used",
+        tags: ["legacy", "deprecated"],
+        metadata: { priority: "low", department: "engineering", channel: "none" },
+        createdAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 24 * 30).toISOString(),
+        updatedAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 24 * 29).toISOString(),
+        version: 1,
+        archived: true,
+        createdBy: "legacy.system@acme.com"
+      },
+      {
+        id: "prompt_acme_7",
+        tenantId: "tenant_acme",
+        title: "Analytics Dashboard Helper",
+        body: "Helper for analytics dashboard generation",
+        tags: ["analytics", "dashboard"],
+        metadata: { priority: "medium", department: "analytics", channel: "api" },
+        createdAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 12).toISOString(),
+        updatedAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 11).toISOString(),
+        version: 1,
+        archived: false,
+        createdBy: "john.analytics@acme.com"
+      },
+      {
+        id: "prompt_acme_8",
+        tenantId: "tenant_acme",
+        title: "Urgent Production Fix",
+        body: "Emergency fix for production deployment issues",
+        tags: ["urgent", "production", "fix"],
+        metadata: { priority: "critical", department: "engineering", channel: "slack" },
+        createdAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 14).toISOString(),
+        updatedAt: new Date(baseDate.getTime() - 1000 * 60 * 60 * 13).toISOString(),
+        version: 1,
+        archived: false,
+        createdBy: "john.doe@acme.com"
+      }
+    ] as Prompt[],
     tenant_globex: Array.from({ length: 5 }).map((_, index) => {
       const createdAt = new Date(baseDate.getTime() - index * 1000 * 60 * 60 * 6);
       return {
@@ -247,7 +344,9 @@ export function createDefaultApiState(): ApiState {
           body: `${prompt.body}\nPrevious revision.`,
           tags: prompt.tags,
           metadata: prompt.metadata,
-          createdAt: new Date(new Date(prompt.updatedAt).getTime() - 1000 * 60 * 60 * 24).toISOString(),
+          createdAt: new Date(
+            new Date(prompt.updatedAt).getTime() - 1000 * 60 * 60 * 24
+          ).toISOString(),
           createdBy: "revision-bot"
         }
       ].filter((version) => version.version > 0);
@@ -503,7 +602,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
       const payload = JSON.parse(request.postData() || "{}");
       const now = new Date().toISOString();
       const tenant: Tenant = {
-        id: _nextId("tenant"),
+        id: __nextId("tenant"),
         name: payload.name,
         slug: payload.slug,
         createdAt: now
@@ -556,6 +655,23 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const tag = url.searchParams.get("tag") ?? undefined;
         const metadataKey = url.searchParams.get("metadataKey") ?? undefined;
         const metadataValue = url.searchParams.get("metadataValue")?.toLowerCase() ?? undefined;
+
+        // Enhanced filter parameters
+        const tagsParam = url.searchParams.get("tags");
+        const tags = tagsParam
+          ? tagsParam
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : undefined;
+        const metadataFiltersParam = url.searchParams.get("metadataFilters");
+        const metadataFilters = metadataFiltersParam ? JSON.parse(metadataFiltersParam) : undefined;
+        const archivedParam = url.searchParams.get("archived");
+        const archived = archivedParam ? archivedParam === "true" : undefined;
+        const createdBy = url.searchParams.get("createdBy") ?? undefined;
+        const dateFrom = url.searchParams.get("dateFrom") ?? undefined;
+        const dateTo = url.searchParams.get("dateTo") ?? undefined;
+
         const sortBy = (url.searchParams.get("sortBy") as SortField) ?? "updated_at";
         const order = (url.searchParams.get("order") as SortOrder) ?? "desc";
         const page = Number.parseInt(url.searchParams.get("page") ?? "1", 10);
@@ -565,26 +681,88 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
 
         if (search) {
           prompts = prompts.filter((prompt) => {
-            const haystack = [prompt.title, prompt.body, prompt.tags.join(" "), JSON.stringify(prompt.metadata ?? {})]
+            const haystack = [
+              prompt.title,
+              prompt.body,
+              prompt.tags.join(" "),
+              JSON.stringify(prompt.metadata ?? {})
+            ]
               .join(" ")
               .toLowerCase();
             return haystack.includes(search);
           });
         }
 
-        if (tag) {
+        // Handle multiple tags (AND logic)
+        if (tags && tags.length > 0) {
+          prompts = prompts.filter((prompt) =>
+            tags.every((tagToMatch) => prompt.tags.includes(tagToMatch))
+          );
+        } else if (tag) {
           prompts = prompts.filter((prompt) => prompt.tags.includes(tag));
         }
 
+        // Handle legacy metadata filtering
         if (metadataKey) {
           prompts = prompts.filter((prompt) => {
             if (!prompt.metadata) return false;
             const value = prompt.metadata[metadataKey];
             if (metadataValue) {
-              return String(value ?? "").toLowerCase().includes(metadataValue);
+              return String(value ?? "")
+                .toLowerCase()
+                .includes(metadataValue);
             }
             return value !== undefined;
           });
+        }
+
+        // Handle advanced metadata filters
+        if (metadataFilters && metadataFilters.length > 0) {
+          prompts = prompts.filter((prompt) => {
+            return metadataFilters.every((filter: MetadataFilter) => {
+              if (!filter.key || !filter.value) return true;
+
+              if (!prompt.metadata) return filter.operator === "not_equals";
+
+              const value = String(prompt.metadata[filter.key] ?? "").toLowerCase();
+              const filterValue = filter.value.toLowerCase();
+
+              switch (filter.operator) {
+                case "equals":
+                  return value === filterValue;
+                case "contains":
+                  return value.includes(filterValue);
+                case "not_equals":
+                  return value !== filterValue;
+                default:
+                  return true;
+              }
+            });
+          });
+        }
+
+        // Handle archived status filter
+        if (archived !== undefined) {
+          prompts = prompts.filter((prompt) => prompt.archived === archived);
+        }
+
+        // Handle creator filter
+        if (createdBy) {
+          const createdByLower = createdBy.toLowerCase();
+          prompts = prompts.filter((prompt) =>
+            (prompt.createdBy ?? "").toLowerCase().includes(createdByLower)
+          );
+        }
+
+        // Handle date range filters
+        if (dateFrom) {
+          const fromDate = new Date(dateFrom);
+          prompts = prompts.filter((prompt) => new Date(prompt.createdAt) >= fromDate);
+        }
+
+        if (dateTo) {
+          const toDate = new Date(dateTo);
+          prompts = prompts.filter((prompt) => new Date(prompt.createdAt) <= toDate);
         }
 
         prompts.sort((a, b) => {
@@ -631,7 +809,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         }
         const now = new Date().toISOString();
         const prompt: Prompt = {
-          id: _nextId("prompt"),
+          id: __nextId("prompt"),
           tenantId,
           title: payload.title,
           body: payload.body,
@@ -735,7 +913,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
       const now = new Date().toISOString();
       state.promptActivity[promptId] = state.promptActivity[promptId] ?? [];
       state.promptActivity[promptId].unshift({
-        id: _nextId("activity"),
+        id: __nextId("activity"),
         promptId,
         tenantId,
         actor: request.headers()["authorization"] ? "authenticated" : "system",
@@ -757,7 +935,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const comment: PromptComment = {
-          id: _nextId("comment"),
+          id: __nextId("comment"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           parentId: payload.parentId ?? null,
@@ -784,7 +962,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const share: PromptShare = {
-          id: _nextId("share"),
+          id: __nextId("share"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           targetType: payload.targetType,
@@ -826,7 +1004,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const approval: PromptApproval = {
-          id: _nextId("approval"),
+          id: __nextId("approval"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           requestedBy: "e2e-user",
@@ -865,7 +1043,9 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
           target.updatedAt = new Date().toISOString();
         }
       });
-      const updated = Object.values(state.promptComments).flat().find((c) => c.id === commentId);
+      const updated = Object.values(state.promptComments)
+        .flat()
+        .find((c) => c.id === commentId);
       await fulfillJson(route, 200, { data: updated });
       return;
     }

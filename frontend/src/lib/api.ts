@@ -31,6 +31,27 @@ function buildQuery(params: PromptQuery): string {
   if (params.tag) search.set("tag", params.tag);
   if (params.metadataKey) search.set("metadataKey", params.metadataKey);
   if (params.metadataValue) search.set("metadataValue", params.metadataValue);
+
+  // Add support for advanced filters
+  if (params.tags && params.tags.length > 0) {
+    search.set("tags", params.tags.join(","));
+  }
+  if (params.metadataFilters && params.metadataFilters.length > 0) {
+    search.set("metadataFilters", JSON.stringify(params.metadataFilters));
+  }
+  if (params.archived !== undefined) {
+    search.set("archived", String(params.archived));
+  }
+  if (params.createdBy) {
+    search.set("createdBy", params.createdBy);
+  }
+  if (params.dateFrom) {
+    search.set("dateFrom", params.dateFrom);
+  }
+  if (params.dateTo) {
+    search.set("dateTo", params.dateTo);
+  }
+
   search.set("sortBy", params.sortBy);
   search.set("order", params.order);
   search.set("page", String(params.page));
