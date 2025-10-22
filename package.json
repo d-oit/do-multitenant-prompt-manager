@@ -28,7 +28,9 @@
     "test:e2e:debug": "playwright test --debug",
     "deploy:worker": "npm run deploy --workspace do-multitenant-prompt-manager-worker",
     "deploy:pages": "node scripts/deploy-pages.mjs",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "check-loc": "node scripts/check-loc.js",
+    "check-loc:ci": "CHECK_LOC_FAIL=1 node scripts/check-loc.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0",
@@ -48,6 +50,7 @@
     "typescript-eslint": "^8.46.1"
   },
   "dependencies": {
+    "minimist": "^1.2.8",
     "monaco-editor": "^0.53.0",
     "sharp": "^0.34.4"
   }

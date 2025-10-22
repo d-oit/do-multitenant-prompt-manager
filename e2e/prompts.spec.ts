@@ -127,26 +127,90 @@ test.describe("Prompts workflows", () => {
     await openPrompts(page);
 
     const searchInput = page.getByPlaceholder("Search prompts");
-    await searchInput.fill("workflow 1");
-    await expect(page.getByRole("row", { name: /Acme Prompt 1/ })).toBeVisible();
-    await expect(page.getByRole("row", { name: /Acme Prompt 3/ })).toHaveCount(0);
+    await searchInput.fill("production");
+    await expect(page.getByRole("row", { name: /Production API/ })).toBeVisible();
 
     await page.getByRole("button", { name: "Advanced Filters" }).click();
     const filtersPanel = page.locator(".advanced-filters");
     await expect(filtersPanel).toBeVisible();
 
-    await filtersPanel.getByLabel("support").check();
+    await filtersPanel.getByLabel("urgent").check();
     await filtersPanel.getByRole("button", { name: "Apply Filters" }).click();
-    await expect(page.getByRole("row", { name: /Acme Prompt 1/ })).toBeVisible();
+    await expect(page.getByRole("row", { name: /Production API Alert System/ })).toBeVisible();
 
     await page.getByRole("button", { name: "Advanced Filters" }).click();
     await filtersPanel.getByRole("button", { name: "+ Add Filter" }).click();
-    await filtersPanel.locator("input[placeholder='Key']").fill("channel");
-    await filtersPanel.locator("input[placeholder='Value']").fill("voice");
+    await filtersPanel.locator("input[placeholder='Key']").fill("priority");
+    await filtersPanel.locator("input[placeholder='Value']").fill("high");
     await filtersPanel.getByRole("button", { name: "Apply Filters" }).click();
 
-    await expect(page.getByText("No results found")).toBeVisible();
+    await expect(page.getByRole("row", { name: /Production API Alert System/ })).toBeVisible();
     await page.getByRole("button", { name: "Clear Filters" }).click();
-    await expect(page.getByRole("row", { name: /Acme Prompt 1/ })).toBeVisible();
+    await expect(page.locator("tbody tr")).toHaveCount(7); // All active prompts
+  });
+
+  test("tests enhanced multiple tags filtering", async ({ page }) => {
+    await openPrompts(page);
+
+    await page.getByRole("button", { name: "Advanced Filters" }).click();
+    const filtersPanel = page.locator(".advanced-filters");
+
+    // Select multiple tags - should use AND logic
+    await filtersPanel.getByLabel("urgent").check();
+    await filtersPanel.getByLabel("production").check();
+    await filtersPanel.getByRole("button", { name: "Apply Filters" }).click();
+
+    // Should show only prompts with BOTH urgent AND production tags
+    await expect(page.locator("tbody tr")).toHaveCount(2);
+    await expect(page.getByRole("row", { name: /Production API Alert System/ })).toBeVisible();
+    await expect(page.getByRole("row", { name: /Urgent Production Fix/ })).toBeVisible();
+  });
+
+  test("tests advanced metadata filtering with operators", async ({ page }) => {
+    await openPrompts(page);
+
+    await page.getByRole("button", { name: "Advanced Filters" }).click();
+    const filtersPanel = page.locator(".advanced-filters");
+
+    // Test equals operator
+    await filtersPanel.getByRole("button", { name: "+ Add Filter" }).click();
+    await filtersPanel.locator("input[placeholder='Key']").fill("department");
+    await filtersPanel.locator("select").selectOption("equals");
+    await filtersPanel.locator("input[placeholder='Value']").fill("engineering");
+    await filtersPanel.getByRole("button", { name: "Apply Filters" }).click();
+
+    // Should show engineering department prompts
+    const engineeringCount = await page.locator("tbody tr").count();
+    expect(engineeringCount).toBeGreaterThan(0);
+
+    // Reset and test contains operator
+    await page.getByRole("button", { name: "Advanced Filters" }).click();
+    await filtersPanel.getByRole("button", { name: "Reset" }).click();
+    await filtersPanel.getByRole("button", { name: "+ Add Filter" }).click();
+    await filtersPanel.locator("input[placeholder='Key']").fill("department");
+    await filtersPanel.locator("select").selectOption("contains");
+    await filtersPanel.locator("input[placeholder='Value']").fill("market");
+    await filtersPanel.getByRole("button", { name: "Apply Filters" }).click();
+
+    // Should show marketing department prompts
+    await expect(page.getByRole("row", { name: /Marketing Campaign Template/ })).toBeVisible();
+  });
+
+  test("tests archived status filtering", async ({ page }) => {
+    await openPrompts(page);
+
+    // Initially should show active prompts (default)
+    await expect(page.locator("tbody tr")).toHaveCount(7);
+
+    await page.getByRole("button", { name: "Advanced Filters" }).click();
+    const filtersPanel = page.locator(".advanced-filters");
+
+    // Filter for archived prompts
+    await filtersPanel.getByLabel("Archived").check();
+    await filtersPanel.getByRole("button", { name: "Apply Filters" }).click();
+
+    // Should show only archived prompts
+    await expect(page.locator("tbody tr")).toHaveCount(1);
+    await expect(page.getByRole("row", { name: /Legacy Script - Deprecated/ })).toBeVisible();
   });
 });

@@ -31,6 +31,16 @@ export type {
 
 export interface PromptQuery extends PromptFilters {
   tenantId?: string;
+  tags?: string[]; // Multiple tags support
+  metadataFilters?: Array<{
+    key: string;
+    operator: "equals" | "contains" | "not_equals";
+    value: string;
+  }>; // Advanced metadata filtering
+  archived?: boolean; // Include archived status filter
+  createdBy?: string; // Filter by creator
+  dateFrom?: string; // Date range filtering
+  dateTo?: string;
   sortBy: SortField;
   order: SortOrder;
   page: number;

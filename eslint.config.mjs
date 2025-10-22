@@ -14,6 +14,9 @@ export default tseslint.config(
       "worker/dist",
       "coverage",
       ".wrangler",
+      ".husky",
+      "scripts/deploy-pages.mjs",
+      "worker/.wrangler",
       "e2e/playwright-report",
       "e2e/test-results"
     ]

@@ -9,7 +9,14 @@ import { Modal, ConfirmDialog } from "../components/ui/Modal";
 import { ErrorState, NoPromptsFound, NoSearchResults } from "../components/ui/EmptyState";
 import { SkeletonTable } from "../components/ui/LoadingState";
 import { createPrompt, deletePrompt, listPrompts, updatePrompt } from "../lib/api";
-import type { Prompt, PromptInput, PromptListResponse, SortField, SortOrder } from "../types";
+import type {
+  Prompt,
+  PromptInput,
+  PromptListResponse,
+  PromptQuery,
+  SortField,
+  SortOrder
+} from "../types";
 import PromptCollaborationPanel from "../components/PromptCollaborationPanel";
 
 interface ToastApi {
@@ -85,44 +92,51 @@ export default function PromptsPage({
       setLoading(true);
       setError(null);
       try {
-        const response = await listPrompts(
-          {
-            tenantId,
-            search: debouncedSearch || undefined,
-            tag: filters.tags && filters.tags.length ? filters.tags[0] : undefined,
-            metadataKey:
-              filters.metadata && filters.metadata[0]?.key ? filters.metadata[0].key : undefined,
-            metadataValue:
-              filters.metadata && filters.metadata[0]?.value
-                ? filters.metadata[0].value
-                : undefined,
-            sortBy,
-            order,
-            page,
-            pageSize: PAGE_SIZE
-          },
-          token || undefined
-        );
+        // Convert FilterOptions to server-compatible format
+        const serverFilters: Partial<PromptQuery> = {
+          tenantId,
+          search: debouncedSearch || undefined,
+          sortBy,
+          order,
+          page,
+          pageSize: PAGE_SIZE
+        };
+
+        // Add advanced filters
+        if (filters.tags && filters.tags.length > 0) {
+          serverFilters.tags = filters.tags;
+        }
+
+        if (filters.metadata && filters.metadata.length > 0) {
+          serverFilters.metadataFilters = filters.metadata.filter((m) => m.key && m.value);
+        }
+
+        if (filters.archived !== undefined) {
+          serverFilters.archived = filters.archived;
+        }
+
+        if (filters.owner) {
+          serverFilters.createdBy = filters.owner;
+        }
+
+        if (filters.dateRange?.from) {
+          serverFilters.dateFrom = new Date(filters.dateRange.from).toISOString();
+        }
+
+        if (filters.dateRange?.to) {
+          // Add one day to include the entire "to" date
+          const toDate = new Date(filters.dateRange.to);
+          toDate.setDate(toDate.getDate() + 1);
+          serverFilters.dateTo = toDate.toISOString();
+        }
+
+        const response = await listPrompts(serverFilters as PromptQuery, token || undefined);
 
         if (cancelled) return;
 
         let data = response.data;
 
-        if (filters.tags && filters.tags.length > 1) {
-          data = data.filter((prompt) => filters.tags?.every((tag) => prompt.tags.includes(tag)));
-        }
-
-        if (filters.archived !== undefined) {
-          data = data.filter((prompt) => prompt.archived === filters.archived);
-        }
-
-        if (filters.owner) {
-          const normalizedOwner = filters.owner.toLowerCase();
-          data = data.filter((prompt) =>
-            (prompt.createdBy ?? "").toLowerCase().includes(normalizedOwner)
-          );
-        }
-
+        // Only apply client-side filtering for searchIn functionality (if search is used)
         if (filters.searchIn && filters.searchIn.length && debouncedSearch) {
           const lowered = debouncedSearch.toLowerCase();
           data = data.filter((prompt) => {

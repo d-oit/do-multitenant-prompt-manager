@@ -32,8 +32,18 @@ export interface PromptListQueryOptions {
   tenantId: string;
   search?: string;
   tag?: string;
+  tags?: string[]; // Multiple tags support
   metadataKey?: string;
   metadataValue?: string;
+  metadataFilters?: Array<{
+    key: string;
+    operator: "equals" | "contains" | "not_equals";
+    value: string;
+  }>; // Advanced metadata filtering
+  archived?: boolean; // Include archived status filter
+  createdBy?: string; // Filter by creator
+  dateFrom?: string; // Date range filtering
+  dateTo?: string;
   sortField: SortField;
   sortOrder: "ASC" | "DESC";
   page: number;
@@ -70,8 +80,14 @@ export async function listPrompts(
     tenantId: options.tenantId,
     search: options.search,
     tag: options.tag,
+    tags: options.tags,
     metadataKey: options.metadataKey,
     metadataValue: options.metadataValue,
+    metadataFilters: options.metadataFilters,
+    archived: options.archived,
+    createdBy: options.createdBy,
+    dateFrom: options.dateFrom,
+    dateTo: options.dateTo,
     sortField: options.sortField,
     order: options.sortOrder,
     page: options.page,
@@ -429,17 +445,71 @@ async function buildPromptListPayload(
     };
   }
 
-  const conditions: string[] = ["tenant_id = ?", "archived = 0"];
+  const conditions: string[] = ["tenant_id = ?"];
   const baseParams: unknown[] = [options.tenantId];
 
-  if (options.tag) {
+  // Handle archived filter
+  if (options.archived !== undefined) {
+    conditions.push("archived = ?");
+    baseParams.push(options.archived ? 1 : 0);
+  } else {
+    conditions.push("archived = 0"); // Default to non-archived
+  }
+
+  // Handle multiple tags
+  if (options.tags && options.tags.length > 0) {
+    const tagConditions = options.tags.map(() => "tags LIKE ?");
+    conditions.push(`(${tagConditions.join(" AND ")})`);
+    options.tags.forEach((tag) => {
+      baseParams.push(`%"${tag}"%`);
+    });
+  } else if (options.tag) {
     conditions.push("tags LIKE ?");
     baseParams.push(`%"${options.tag}"%`);
   }
 
+  // Handle legacy metadata filters
   if (options.metadataKey && options.metadataValue) {
     conditions.push("metadata LIKE ?");
     baseParams.push(`%"${options.metadataKey}":"${options.metadataValue}"%`);
+  }
+
+  // Handle advanced metadata filters
+  if (options.metadataFilters && options.metadataFilters.length > 0) {
+    options.metadataFilters.forEach((filter) => {
+      if (filter.key && filter.value) {
+        switch (filter.operator) {
+          case "equals":
+            conditions.push("metadata LIKE ?");
+            baseParams.push(`%"${filter.key}":"${filter.value}"%`);
+            break;
+          case "contains":
+            conditions.push("metadata LIKE ?");
+            baseParams.push(`%"${filter.key}"%${filter.value}%`);
+            break;
+          case "not_equals":
+            conditions.push("(metadata IS NULL OR metadata NOT LIKE ?)");
+            baseParams.push(`%"${filter.key}":"${filter.value}"%`);
+            break;
+        }
+      }
+    });
+  }
+
+  // Handle creator filter
+  if (options.createdBy) {
+    conditions.push("created_by LIKE ?");
+    baseParams.push(`%${options.createdBy}%`);
+  }
+
+  // Handle date range filters
+  if (options.dateFrom) {
+    conditions.push("created_at >= ?");
+    baseParams.push(options.dateFrom);
+  }
+  if (options.dateTo) {
+    conditions.push("created_at <= ?");
+    baseParams.push(options.dateTo);
   }
 
   const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
