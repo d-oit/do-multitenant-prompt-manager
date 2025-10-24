@@ -138,11 +138,40 @@ export async function authenticateRequest(
   env: Env,
   options: AuthOptions = {}
 ): Promise<AuthContext | null> {
+  // E2E test mode bypass - allows unauthenticated access with full permissions
+  if (env.E2E_TEST_MODE === "true") {
+    console.log("🧪 E2E_TEST_MODE enabled - bypassing authentication");
+    const testUser: AuthenticatedUser = {
+      id: "e2e-test-user",
+      email: "e2e@test.local",
+      name: "E2E Test User"
+    };
+    const testRole: RoleAssignment = {
+      roleId: "e2e-test-role",
+      roleName: "E2E Test Admin",
+      permissions: ["*"],
+      tenantId: null
+    };
+    return buildAuthContext(testUser, [testRole], "jwt");
+  }
+
   const authHeader = request.headers.get("authorization");
   const apiKeyHeader = request.headers.get("x-api-key");
 
-  if (authHeader?.startsWith("Bearer ")) {
-    const token = authHeader.slice(7).trim();
+  // If no Authorization header, check cookies for access token (pm_access)
+  let cookieAccessToken: string | null = null;
+  const cookieHeader = request.headers.get("cookie");
+  if (!authHeader && cookieHeader) {
+    const cookies = parseCookies(cookieHeader);
+    if (cookies.pm_access) {
+      cookieAccessToken = cookies.pm_access;
+    }
+  }
+
+  if (authHeader?.startsWith("Bearer ") || cookieAccessToken) {
+    const token = authHeader?.startsWith("Bearer ")
+      ? authHeader.slice(7).trim()
+      : cookieAccessToken;
     if (!token) {
       throw jsonResponse({ error: "Unauthorized" }, 401);
     }
@@ -170,6 +199,19 @@ export async function authenticateRequest(
   }
 
   throw jsonResponse({ error: "Unauthorized" }, 401);
+}
+
+function parseCookies(cookieHeader: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  const parts = cookieHeader.split(";");
+  for (const part of parts) {
+    const idx = part.indexOf("=");
+    if (idx === -1) continue;
+    const key = part.slice(0, idx).trim();
+    const value = part.slice(idx + 1).trim();
+    out[key] = decodeURIComponent(value);
+  }
+  return out;
 }
 
 export async function generateSessionTokens(env: Env, userId: string): Promise<SessionTokens> {

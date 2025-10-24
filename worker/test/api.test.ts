@@ -16,6 +16,9 @@ const adminCredentials = {
   password: "super-secret"
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TestResponse = any;
+
 let authToken = "";
 
 async function apiFetch(path: string, init?: RequestInit) {
@@ -203,7 +206,7 @@ beforeEach(async () => {
   });
 
   expect(response.status).toBe(200);
-  const body = await response.json();
+  const body = (await response.json()) as TestResponse;
   authToken = body.data.accessToken;
 });
 
@@ -217,8 +220,12 @@ afterEach(async () => {
   `);
   let cursor: string | undefined;
   do {
-    const { keys, list_complete, cursor: next } = await env.PROMPT_CACHE.list({ cursor });
-    await Promise.all(keys.map((entry) => env.PROMPT_CACHE.delete(entry.name)));
+    const {
+      keys,
+      list_complete,
+      cursor: next
+    } = (await env.PROMPT_CACHE.list({ cursor })) as TestResponse;
+    await Promise.all(keys.map((entry: TestResponse) => env.PROMPT_CACHE.delete(entry.name)));
     cursor = list_complete ? undefined : next;
   } while (cursor);
   authToken = "";
@@ -241,7 +248,7 @@ describe("prompt API", () => {
     });
 
     expect(createResponse.status).toBe(201);
-    const created = await createResponse.json();
+    const created = (await createResponse.json()) as TestResponse;
     expect(created.data.title).toBe("Greeting");
     expect(created.data.tags).toEqual(["greeting"]);
     expect(created.data.tenantId).toBe("default");
@@ -254,7 +261,7 @@ describe("prompt API", () => {
       }
     );
     expect(listResponse.status).toBe(200);
-    const listBody = await listResponse.json();
+    const listBody = (await listResponse.json()) as TestResponse;
     expect(listBody.data).toHaveLength(1);
     expect(listBody.data[0].title).toBe("Greeting");
     expect(listBody.data[0].tenantId).toBe("default");
@@ -290,14 +297,14 @@ describe("prompt API", () => {
     const tagResponse = await apiFetch("/prompts?tenantId=default&tag=support", {
       headers: authorizedHeaders()
     });
-    const tagBody = await tagResponse.json();
+    const tagBody = (await tagResponse.json()) as TestResponse;
     expect(tagBody.data).toHaveLength(1);
     expect(tagBody.data[0].title).toBe("Support request");
 
     const searchResponse = await apiFetch("/prompts?tenantId=default&search=pitch", {
       headers: authorizedHeaders()
     });
-    const searchBody = await searchResponse.json();
+    const searchBody = (await searchResponse.json()) as TestResponse;
     expect(searchBody.data).toHaveLength(1);
     expect(searchBody.data[0].title).toBe("Product pitch");
 
@@ -307,7 +314,7 @@ describe("prompt API", () => {
         headers: authorizedHeaders()
       }
     );
-    const metadataBody = await metadataResponse.json();
+    const metadataBody = (await metadataResponse.json()) as TestResponse;
     expect(metadataBody.data).toHaveLength(1);
     expect(metadataBody.data[0].metadata.category).toBe("support");
   });
@@ -325,13 +332,13 @@ describe("prompt API", () => {
       })
     });
     expect(create.status).toBe(201);
-    const { data: createdPrompt } = await create.json();
+    const { data: createdPrompt } = (await create.json()) as TestResponse;
 
     const searchResponse = await apiFetch("/prompts?tenantId=default&search=assist", {
       headers: authorizedHeaders()
     });
     expect(searchResponse.status).toBe(200);
-    const searchBody = await searchResponse.json();
+    const searchBody = (await searchResponse.json()) as TestResponse;
     expect(searchBody.highlights).toBeDefined();
     const highlight = (searchBody.highlights || []).find(
       (entry: { promptId: string }) => entry.promptId === createdPrompt.id
@@ -343,7 +350,7 @@ describe("prompt API", () => {
       headers: authorizedHeaders()
     });
     expect(suggestionsResponse.status).toBe(200);
-    const suggestionsBody = await suggestionsResponse.json();
+    const suggestionsBody = (await suggestionsResponse.json()) as TestResponse;
     expect(Array.isArray(suggestionsBody.data)).toBe(true);
     expect(suggestionsBody.data.length).toBeGreaterThan(0);
     expect((suggestionsBody.data[0].highlight || "").toLowerCase()).toContain("<mark>");
@@ -380,7 +387,7 @@ describe("prompt API", () => {
     const limited = await apiFetch("/prompts?tenantId=default", { headers: authorizedHeaders() });
     expect(limited.status).toBe(429);
     expect(limited.headers.get("Retry-After")).toBe("60");
-    const body = await limited.json();
+    const body = (await limited.json()) as TestResponse;
     expect(body.error).toBe("Too Many Requests");
   });
 
@@ -398,7 +405,7 @@ describe("prompt API", () => {
       })
     });
     expect(create.status).toBe(201);
-    const created = await create.json();
+    const created = (await create.json()) as TestResponse;
     const promptId = created.data.id;
 
     const update = await apiFetch(`/prompts/${promptId}`, {
@@ -411,14 +418,14 @@ describe("prompt API", () => {
       })
     });
     expect(update.status).toBe(200);
-    const updated = await update.json();
+    const updated = (await update.json()) as TestResponse;
     expect(updated.data.version).toBe(2);
 
     const versions = await apiFetch(`/prompts/${promptId}/versions?tenantId=default`, {
       headers: authorizedHeaders()
     });
     expect(versions.status).toBe(200);
-    const body = await versions.json();
+    const body = (await versions.json()) as TestResponse;
     expect(body.data).toHaveLength(2);
     expect(body.data[0].version).toBe(2);
     expect(body.data[1].version).toBe(1);
@@ -437,7 +444,7 @@ describe("prompt API", () => {
         metadata: null
       })
     });
-    const created = await create.json();
+    const created = (await create.json()) as TestResponse;
     const promptId = created.data.id;
 
     for (let i = 0; i < 3; i += 1) {
@@ -453,7 +460,7 @@ describe("prompt API", () => {
       headers: authorizedHeaders()
     });
     expect(analytics.status).toBe(200);
-    const summary = await analytics.json();
+    const summary = (await analytics.json()) as TestResponse;
     const entry = summary.data.find((row: { promptId: string }) => row.promptId === promptId);
     expect(entry).toBeDefined();
     expect(entry?.usageCount).toBe(3);
@@ -472,7 +479,7 @@ describe("prompt API", () => {
       })
     });
     expect(create.status).toBe(201);
-    const created = await create.json();
+    const created = (await create.json()) as TestResponse;
     const promptId = created.data.id;
 
     await apiFetch(`/prompts/${promptId}/usage`, {
@@ -485,7 +492,7 @@ describe("prompt API", () => {
       headers: authorizedHeaders()
     });
     expect(overview.status).toBe(200);
-    const payload = await overview.json();
+    const payload = (await overview.json()) as TestResponse;
     expect(payload.data.stats.totalPrompts.value).toBeGreaterThan(0);
     expect(Array.isArray(payload.data.trend)).toBe(true);
     expect(payload.data.trend.length).toBe(7);
@@ -503,14 +510,14 @@ describe("prompt API", () => {
       })
     });
     expect(createTenant.status).toBe(201);
-    const { data: tenant } = await createTenant.json();
+    const { data: tenant } = (await createTenant.json()) as TestResponse;
     expect(tenant.slug).toBe("beta");
 
     const tenants = await apiFetch("/tenants", {
       headers: authorizedHeaders()
     });
     expect(tenants.status).toBe(200);
-    const list = await tenants.json();
+    const list = (await tenants.json()) as TestResponse;
     const ids = list.data.map((item: { slug: string }) => item.slug);
     expect(ids).toContain("beta");
     expect(ids).toContain("default");
@@ -529,7 +536,7 @@ describe("prompt API", () => {
       })
     });
     expect(create.status).toBe(201);
-    const created = await create.json();
+    const created = (await create.json()) as TestResponse;
     const promptId = created.data.id;
 
     const listResponse = await apiFetch(
@@ -574,7 +581,7 @@ describe("prompt API", () => {
       }
     );
     expect(updatedList.status).toBe(200);
-    const updatedBody = await updatedList.json();
+    const updatedBody = (await updatedList.json()) as TestResponse;
     expect(updatedBody.data[0].title).toBe("Cache sample updated");
 
     const refreshedCache = (await env.PROMPT_CACHE.get(cacheKey, {
@@ -593,7 +600,7 @@ describe("prompt API", () => {
       })
     });
     expect(createKey.status).toBe(201);
-    const created = await createKey.json();
+    const created = (await createKey.json()) as TestResponse;
     const apiKeyId = created.data.id as string;
     const originalKey = created.data.key as string;
 
@@ -602,7 +609,7 @@ describe("prompt API", () => {
       headers: authorizedHeaders()
     });
     expect(rotate.status).toBe(200);
-    const rotated = await rotate.json();
+    const rotated = (await rotate.json()) as TestResponse;
     const newKey = rotated.data.key as string;
     expect(newKey).toBeTruthy();
     expect(newKey).not.toBe(originalKey);
@@ -637,7 +644,7 @@ describe("prompt API", () => {
       })
     });
     expect(createKey.status).toBe(201);
-    const created = await createKey.json();
+    const created = (await createKey.json()) as TestResponse;
     const apiKey = created.data.key as string;
 
     const first = await apiFetch("/tenants", {

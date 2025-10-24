@@ -13,10 +13,11 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
-    "monaco-editor": "^0.53.0",
+    "monaco-editor": "^0.54.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "recharts": "^3.2.1"
+    "recharts": "^3.2.1",
+    "dompurify": "^3.2.4"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
@@ -30,5 +31,8 @@
     "typescript": "~5.9.3",
     "vite": "^7.1.10",
     "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "dompurify": "^3.2.4"
   }
 }

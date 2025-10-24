@@ -247,7 +247,9 @@ export function createDefaultApiState(): ApiState {
           body: `${prompt.body}\nPrevious revision.`,
           tags: prompt.tags,
           metadata: prompt.metadata,
-          createdAt: new Date(new Date(prompt.updatedAt).getTime() - 1000 * 60 * 60 * 24).toISOString(),
+          createdAt: new Date(
+            new Date(prompt.updatedAt).getTime() - 1000 * 60 * 60 * 24
+          ).toISOString(),
           createdBy: "revision-bot"
         }
       ].filter((version) => version.version > 0);
@@ -503,7 +505,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
       const payload = JSON.parse(request.postData() || "{}");
       const now = new Date().toISOString();
       const tenant: Tenant = {
-        id: _nextId("tenant"),
+        id: __nextId("tenant"),
         name: payload.name,
         slug: payload.slug,
         createdAt: now
@@ -565,7 +567,12 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
 
         if (search) {
           prompts = prompts.filter((prompt) => {
-            const haystack = [prompt.title, prompt.body, prompt.tags.join(" "), JSON.stringify(prompt.metadata ?? {})]
+            const haystack = [
+              prompt.title,
+              prompt.body,
+              prompt.tags.join(" "),
+              JSON.stringify(prompt.metadata ?? {})
+            ]
               .join(" ")
               .toLowerCase();
             return haystack.includes(search);
@@ -581,7 +588,9 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
             if (!prompt.metadata) return false;
             const value = prompt.metadata[metadataKey];
             if (metadataValue) {
-              return String(value ?? "").toLowerCase().includes(metadataValue);
+              return String(value ?? "")
+                .toLowerCase()
+                .includes(metadataValue);
             }
             return value !== undefined;
           });
@@ -631,7 +640,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         }
         const now = new Date().toISOString();
         const prompt: Prompt = {
-          id: _nextId("prompt"),
+          id: __nextId("prompt"),
           tenantId,
           title: payload.title,
           body: payload.body,
@@ -735,7 +744,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
       const now = new Date().toISOString();
       state.promptActivity[promptId] = state.promptActivity[promptId] ?? [];
       state.promptActivity[promptId].unshift({
-        id: _nextId("activity"),
+        id: __nextId("activity"),
         promptId,
         tenantId,
         actor: request.headers()["authorization"] ? "authenticated" : "system",
@@ -757,7 +766,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const comment: PromptComment = {
-          id: _nextId("comment"),
+          id: __nextId("comment"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           parentId: payload.parentId ?? null,
@@ -784,7 +793,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const share: PromptShare = {
-          id: _nextId("share"),
+          id: __nextId("share"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           targetType: payload.targetType,
@@ -826,7 +835,7 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
         const payload = JSON.parse(request.postData() || "{}");
         const now = new Date().toISOString();
         const approval: PromptApproval = {
-          id: _nextId("approval"),
+          id: __nextId("approval"),
           promptId,
           tenantId: request.headers()["x-tenant-id"] ?? "tenant_acme",
           requestedBy: "e2e-user",
@@ -865,7 +874,9 @@ export async function setupApiMocks(page: Page, overrides?: Partial<ApiState>): 
           target.updatedAt = new Date().toISOString();
         }
       });
-      const updated = Object.values(state.promptComments).flat().find((c) => c.id === commentId);
+      const updated = Object.values(state.promptComments)
+        .flat()
+        .find((c) => c.id === commentId);
       await fulfillJson(route, 200, { data: updated });
       return;
     }

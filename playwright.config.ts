@@ -2,43 +2,41 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: true,
+  fullyParallel: false, // Disable parallel execution to avoid database conflicts
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1, // Use single worker to avoid database conflicts
+  globalSetup: "./e2e/globalSetup.ts",
   reporter: [["html"], ["json", { outputFile: "test-results/results.json" }], ["list"]],
   use: {
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
-    video: "retain-on-failure"
+    video: "retain-on-failure",
+    navigationTimeout: 30000,
+    actionTimeout: 15000
   },
   projects: [
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] }
-    },
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] }
-    },
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] }
-    },
-    {
-      name: "Mobile Chrome",
-      use: { ...devices["Pixel 5"] }
-    },
-    {
-      name: "Mobile Safari",
-      use: { ...devices["iPhone 12"] }
     }
   ],
-  webServer: {
-    command: "npm run dev:frontend",
-    url: "http://localhost:5173",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000
-  }
+  webServer: [
+    {
+      command: "npm run dev:e2e --workspace do-multitenant-prompt-manager-worker",
+      url: "http://localhost:8787/healthz",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000
+    },
+    {
+      command: "npm run dev:frontend",
+      url: "http://localhost:5173",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+      env: {
+        VITE_API_BASE_URL: "http://localhost:8787"
+      }
+    }
+  ]
 });

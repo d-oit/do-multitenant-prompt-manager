@@ -7,9 +7,8 @@ const PromptsPage = lazy(() => import("./pages/PromptsPage"));
 const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const TenantsPage = lazy(() => import("./pages/TenantsPage"));
 import Button from "./components/ui/Button";
-import Input from "./components/ui/Input";
 import Badge from "./components/ui/Badge";
-import { DarkModeToggle } from "./components/ui/DarkModeToggle";
+import { ThemeSwitcher } from "./components/ui/ThemeSwitcher";
 import { ToastContainer, useToast } from "./components/ui/Toast";
 import {
   KeyboardShortcutsHelp,
@@ -37,12 +36,7 @@ const navItems: Array<{ id: ViewId; label: string; icon: string }> = [
   { id: "tenants", label: "Tenants", icon: "🏢" }
 ];
 
-function resolveStoredToken(): string {
-  if (typeof window === "undefined") {
-    return "";
-  }
-  return localStorage.getItem("pm-auth-token") ?? "";
-}
+// Cookie-based sessions are used; no client-side token resolver needed.
 
 export default function App(): JSX.Element {
   const toast = useToast();
@@ -52,8 +46,7 @@ export default function App(): JSX.Element {
   const [tenantsError, setTenantsError] = useState<string | null>(null);
   const [selectedTenantId, setSelectedTenantId] = useState<string>("");
   const [activeView, setActiveView] = useState<ViewId>("dashboard");
-  const [token, setToken] = useState<string>(() => resolveStoredToken());
-  const [tokenDirty, setTokenDirty] = useState(false);
+  // Authentication is now cookie-based (HttpOnly Secure cookie). Do not store tokens in localStorage.
   const [creatingTenant, setCreatingTenant] = useState(false);
   const [promptComposerSignal, setPromptComposerSignal] = useState(0);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -63,15 +56,7 @@ export default function App(): JSX.Element {
   const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
   const modKey = isMac ? "⌘" : "Ctrl";
 
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-    if (!tokenDirty) {
-      return;
-    }
-    localStorage.setItem("pm-auth-token", token);
-  }, [token, tokenDirty]);
+  // No local token persistence required for cookie-based sessions.
 
   useEffect(() => {
     let cancelled = false;
@@ -79,7 +64,7 @@ export default function App(): JSX.Element {
       setTenantsLoading(true);
       setTenantsError(null);
       try {
-        const response = await listTenants(token || undefined);
+        const response = await listTenants();
         if (cancelled) return;
         setTenants(response);
         if (!response.length) {
@@ -106,7 +91,7 @@ export default function App(): JSX.Element {
     return () => {
       cancelled = true;
     };
-  }, [token, selectedTenantId, showTenantError]);
+  }, [selectedTenantId, showTenantError]);
 
   useEffect(() => {
     function handleBeforeInstall(event: Event) {
@@ -143,7 +128,7 @@ export default function App(): JSX.Element {
     async (input: TenantCreateInput) => {
       setCreatingTenant(true);
       try {
-        const tenant = await createTenant(input, token || undefined);
+        const tenant = await createTenant(input);
         setTenants((prev) => [...prev, tenant]);
         setSelectedTenantId(tenant.id);
         toast.success(`Tenant “${tenant.name}” created`);
@@ -155,7 +140,7 @@ export default function App(): JSX.Element {
         setCreatingTenant(false);
       }
     },
-    [toast, token]
+    [toast]
   );
 
   const shortcuts = useMemo<KeyboardShortcut[]>(() => {
@@ -207,10 +192,7 @@ export default function App(): JSX.Element {
     }
   }, [showHelp]);
 
-  const handleTokenChange = (value: string) => {
-    setToken(value);
-    setTokenDirty(true);
-  };
+  // token input removed; authentication is handled with HttpOnly cookies.
 
   const renderMainContent = () => {
     if (tenantsLoading) {
@@ -235,16 +217,15 @@ export default function App(): JSX.Element {
 
     return (
       <Suspense fallback={<LoadingOverlay message="Loading page..." />}>
-        {activeView === "dashboard" && <DashboardPage tenantId={selectedTenantId} token={token} />}
+        {activeView === "dashboard" && <DashboardPage tenantId={selectedTenantId} />}
         {activeView === "prompts" && (
           <PromptsPage
             tenantId={selectedTenantId}
-            token={token}
             toast={toast}
             createSignal={promptComposerSignal}
           />
         )}
-        {activeView === "analytics" && <AnalyticsPage tenantId={selectedTenantId} token={token} />}
+        {activeView === "analytics" && <AnalyticsPage tenantId={selectedTenantId} />}
         {activeView === "tenants" && <TenantsPage tenants={tenants} />}
       </Suspense>
     );
@@ -262,33 +243,30 @@ export default function App(): JSX.Element {
   return (
     <div className="app-shell">
       <ToastContainer toasts={toast.toasts} onDismiss={toast.dismissToast} />
-      <header className="app-shell__header">
+      <header className="app-shell__header glass">
         <div className="app-header flex items-center justify-between gap-lg">
           <div className="flex items-center gap-md">
-            <h1 className="app-header__title">DO Multi-Tenant Prompt Manager</h1>
+            <h1 className="app-header__title text-gradient">d.o. Prompt Manager</h1>
             <Badge tone="info">Production</Badge>
           </div>
           <div className="flex items-center gap-md">
-            <div className="app-header__token-input">
-              <Input
-                value={token}
-                onChange={(event) => handleTokenChange(event.target.value)}
-                placeholder="Access token"
-                aria-label="API access token"
-              />
-            </div>
-            <NotificationMenu token={token} />
+            <NotificationMenu />
             {installAvailable ? (
-              <Button variant="secondary" size="sm" onClick={() => void handleInstallClick()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => void handleInstallClick()}
+                className="scale-on-hover"
+              >
                 Install app
               </Button>
             ) : null}
-            <DarkModeToggle />
+            <ThemeSwitcher />
           </div>
         </div>
       </header>
       <aside className="app-shell__sidebar">
-        <div className="stack-lg">
+        <div className="stack-lg stagger-fade-in">
           <TenantSelector
             tenants={tenants}
             selectedTenantId={selectedTenantId}
@@ -297,12 +275,16 @@ export default function App(): JSX.Element {
             busy={creatingTenant}
           />
           <nav className="stack-sm">
-            {navItems.map((item) => (
+            {navItems.map((item, index) => (
               <Button
                 key={item.id}
                 variant={activeView === item.id ? "primary" : "ghost"}
-                className={cn("app-nav__item", activeView === item.id && "app-nav__item--active")}
+                className={cn(
+                  "app-nav__item ripple scale-on-hover",
+                  activeView === item.id && "app-nav__item--active"
+                )}
                 onClick={() => setActiveView(item.id)}
+                style={{ animationDelay: `${(index + 1) * 0.05}s` }}
               >
                 <span className="app-nav__icon" aria-hidden="true">
                   {item.icon}
@@ -333,7 +315,7 @@ export default function App(): JSX.Element {
           </div>
         </div>
       </aside>
-      <main className="app-shell__main">{renderMainContent()}</main>
+      <main className="app-shell__main custom-scrollbar">{renderMainContent()}</main>
       <nav className="app-bottom-nav">
         {navItems.map((item) => (
           <Button

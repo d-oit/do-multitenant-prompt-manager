@@ -4,7 +4,7 @@ import PromptForm from "../components/PromptForm";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Badge from "../components/ui/Badge";
-import { AdvancedFilters, type FilterOptions } from "../components/ui/AdvancedFilters";
+// import { AdvancedFilters, type FilterState } from "../components/ui/AdvancedFilters";
 import { Modal, ConfirmDialog } from "../components/ui/Modal";
 import { ErrorState, NoPromptsFound, NoSearchResults } from "../components/ui/EmptyState";
 import { SkeletonTable } from "../components/ui/LoadingState";
@@ -21,7 +21,6 @@ interface ToastApi {
 
 interface PromptsPageProps {
   tenantId: string;
-  token: string;
   toast: ToastApi;
   createSignal: number;
 }
@@ -30,7 +29,6 @@ const PAGE_SIZE = 20;
 
 export default function PromptsPage({
   tenantId,
-  token,
   toast,
   createSignal
 }: PromptsPageProps): JSX.Element {
@@ -43,15 +41,15 @@ export default function PromptsPage({
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [filters, setFilters] = useState<FilterOptions>({});
-  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<Record<string, unknown>>({});
+  // const [showFilters, setShowFilters] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
   const [deletingPrompt, setDeletingPrompt] = useState<Prompt | null>(null);
   const [detailPrompt, setDetailPrompt] = useState<Prompt | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [formBusy, setFormBusy] = useState(false);
-  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  // const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [reloadKey, setReloadKey] = useState(0);
 
   const createSignalRef = useRef(createSignal);
@@ -85,69 +83,24 @@ export default function PromptsPage({
       setLoading(true);
       setError(null);
       try {
-        const response = await listPrompts(
-          {
-            tenantId,
-            search: debouncedSearch || undefined,
-            tag: filters.tags && filters.tags.length ? filters.tags[0] : undefined,
-            metadataKey:
-              filters.metadata && filters.metadata[0]?.key ? filters.metadata[0].key : undefined,
-            metadataValue:
-              filters.metadata && filters.metadata[0]?.value
-                ? filters.metadata[0].value
-                : undefined,
-            sortBy,
-            order,
-            page,
-            pageSize: PAGE_SIZE
-          },
-          token || undefined
-        );
+        const response = await listPrompts({
+          tenantId,
+          search: debouncedSearch || undefined,
+          tag: undefined,
+          metadataKey: undefined,
+          metadataValue: undefined,
+          sortBy,
+          order,
+          page,
+          pageSize: PAGE_SIZE
+        });
 
         if (cancelled) return;
 
-        let data = response.data;
-
-        if (filters.tags && filters.tags.length > 1) {
-          data = data.filter((prompt) => filters.tags?.every((tag) => prompt.tags.includes(tag)));
-        }
-
-        if (filters.archived !== undefined) {
-          data = data.filter((prompt) => prompt.archived === filters.archived);
-        }
-
-        if (filters.owner) {
-          const normalizedOwner = filters.owner.toLowerCase();
-          data = data.filter((prompt) =>
-            (prompt.createdBy ?? "").toLowerCase().includes(normalizedOwner)
-          );
-        }
-
-        if (filters.searchIn && filters.searchIn.length && debouncedSearch) {
-          const lowered = debouncedSearch.toLowerCase();
-          data = data.filter((prompt) => {
-            return filters.searchIn?.some((field) => {
-              if (field === "title") return prompt.title.toLowerCase().includes(lowered);
-              if (field === "body") return prompt.body.toLowerCase().includes(lowered);
-              if (field === "tags")
-                return prompt.tags.some((tag) => tag.toLowerCase().includes(lowered));
-              if (field === "metadata")
-                return JSON.stringify(prompt.metadata ?? {})
-                  .toLowerCase()
-                  .includes(lowered);
-              return false;
-            });
-          });
-        }
+        const data = response.data;
 
         setPrompts(data);
         setPagination(response.pagination);
-
-        const tagSet = new Set<string>();
-        response.data.forEach((prompt) => {
-          prompt.tags.forEach((tag) => tagSet.add(tag));
-        });
-        setAvailableTags(Array.from(tagSet).sort());
       } catch (fetchError) {
         if (cancelled) return;
         const message = fetchError instanceof Error ? fetchError.message : String(fetchError);
@@ -165,7 +118,7 @@ export default function PromptsPage({
     return () => {
       cancelled = true;
     };
-  }, [tenantId, sortBy, order, page, debouncedSearch, filters, token, reloadKey, showError]);
+  }, [tenantId, sortBy, order, page, debouncedSearch, filters, reloadKey, showError]);
 
   const handleSort = (field: SortField) => {
     setPage(1);
@@ -200,10 +153,10 @@ export default function PromptsPage({
     setFormBusy(true);
     try {
       if (editingPrompt) {
-        await updatePrompt(editingPrompt.id, values, tenantId, token || undefined);
+        await updatePrompt(editingPrompt.id, values, tenantId);
         showSuccess("Prompt updated");
       } else {
-        await createPrompt(values, token || undefined);
+        await createPrompt(values);
         showSuccess("Prompt created");
       }
       setIsFormOpen(false);
@@ -223,7 +176,7 @@ export default function PromptsPage({
   const handleConfirmDelete = async () => {
     if (!deletingPrompt) return;
     try {
-      await deletePrompt(deletingPrompt.id, tenantId, token || undefined);
+      await deletePrompt(deletingPrompt.id, tenantId);
       showWarning(`Prompt “${deletingPrompt.title}” deleted`);
       setDeletingPrompt(null);
       setReloadKey((count) => count + 1);
@@ -276,24 +229,7 @@ export default function PromptsPage({
               aria-label="Search prompts"
             />
           </div>
-          <AdvancedFilters
-            initialFilters={filters}
-            availableTags={availableTags}
-            onApply={(next) => {
-              setFilters(next);
-              setShowFilters(false);
-              setPage(1);
-              setReloadKey((count) => count + 1);
-            }}
-            onReset={() => {
-              setFilters({});
-              setShowFilters(false);
-              setPage(1);
-              setReloadKey((count) => count + 1);
-            }}
-            isOpen={showFilters}
-            onToggle={() => setShowFilters((prev) => !prev)}
-          />
+          {/* TODO: Implement AdvancedFilters component with proper props */}
           <Button onClick={handleCreate}>+ New Prompt</Button>
         </div>
       </div>
@@ -305,7 +241,7 @@ export default function PromptsPage({
       {loading ? (
         <SkeletonTable rows={PAGE_SIZE} />
       ) : showEmptyState ? (
-        filters.search || debouncedSearch || (filters.tags && filters.tags.length) ? (
+        filters.search || debouncedSearch ? (
           <NoSearchResults
             onClearFilters={() => {
               setFilters({});
@@ -377,12 +313,7 @@ export default function PromptsPage({
         size="xl"
       >
         {detailPrompt ? (
-          <PromptCollaborationPanel
-            prompt={detailPrompt}
-            tenantId={tenantId}
-            token={token}
-            toast={toast}
-          />
+          <PromptCollaborationPanel prompt={detailPrompt} tenantId={tenantId} toast={toast} />
         ) : null}
       </Modal>
     </div>

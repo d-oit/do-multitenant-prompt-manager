@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev --local --persist-to=.wrangler/state",
+    "dev:e2e": "cd .. && wrangler d1 migrations apply do_multitenant_prompt_manager --local --config wrangler.toml && wrangler dev --local --persist-to=.wrangler/state --port 8787 --config wrangler.toml --var E2E_TEST_MODE:true",
+    "build": "tsc --noEmit",
     "deploy": "wrangler deploy",
     "migrate": "wrangler d1 migrations apply do_multitenant_prompt_manager",
     "typecheck": "tsc --noEmit",

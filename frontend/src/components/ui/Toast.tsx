@@ -58,7 +58,7 @@ function ToastItem({ toast, onDismiss }: ToastProps) {
 
   return (
     <div
-      className={`toast ${variantStyles[toast.variant]} ${isExiting ? "toast-exit" : ""}`}
+      className={`toast glass ${variantStyles[toast.variant]} ${isExiting ? "toast-exit" : "slide-in-right"}`}
       role="alert"
       aria-live="polite"
     >
@@ -71,7 +71,7 @@ function ToastItem({ toast, onDismiss }: ToastProps) {
               toast.action?.onClick();
               handleDismiss();
             }}
-            className="toast__action"
+            className="toast__action hover-lift"
             type="button"
           >
             {toast.action.label}
@@ -80,7 +80,7 @@ function ToastItem({ toast, onDismiss }: ToastProps) {
       </div>
       <button
         onClick={handleDismiss}
-        className="toast__close"
+        className="toast__close scale-on-hover"
         aria-label="Dismiss notification"
         type="button"
       >

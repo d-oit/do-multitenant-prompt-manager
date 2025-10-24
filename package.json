@@ -9,11 +9,13 @@
   ],
   "scripts": {
     "setup": "node scripts/setup.mjs",
+    "dev": "concurrently -n \"frontend,worker\" -c \"cyan,yellow\" \"npm run dev:frontend\" \"npm run dev:worker\"",
     "dev:frontend": "npm run dev --workspace frontend",
     "dev:worker": "npm run dev --workspace do-multitenant-prompt-manager-worker",
-    "build:frontend": "npm run build --workspace frontend",
+    "build": "npm run lint:fix && npm run format:fix && npm run build:frontend",
     "lint": "npm run lint --workspace do-multitenant-prompt-manager-worker && npm run lint --workspace frontend",
     "lint:fix": "npm run lint:fix --workspace do-multitenant-prompt-manager-worker && npm run lint:fix --workspace frontend",
+    "typecheck": "npm run typecheck --workspace do-multitenant-prompt-manager-worker && tsc --project frontend/tsconfig.json --noEmit",
     "format": "prettier --check .",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
@@ -27,19 +29,27 @@
     "test:e2e:debug": "playwright test --debug",
     "deploy:worker": "npm run deploy --workspace do-multitenant-prompt-manager-worker",
     "deploy:pages": "node scripts/deploy-pages.mjs",
-    "prepare": "husky install"
+    "deploy:production": "node scripts/deploy-production.mjs",
+    "deploy:full-production": "node scripts/deploy-full-production.mjs",
+    "setup:production-secrets": "node scripts/setup-production-secrets.mjs",
+    "migrate:production": "node scripts/migrate-production.mjs",
+    "health-check:production": "node scripts/health-check-production.mjs",
+    "prepare": "husky install .husky"
+  },
+  "overrides": {
+    "dompurify": "^3.2.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0",
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",
+    "concurrently": "^9.2.1",
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.0",
-    "eslint-plugin-vitest": "^0.5.4",
     "globals": "^16.4.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.4",
@@ -47,6 +57,7 @@
     "typescript-eslint": "^8.46.1"
   },
   "dependencies": {
+    "dompurify": "^3.2.4",
     "sharp": "^0.34.4"
   }
 }

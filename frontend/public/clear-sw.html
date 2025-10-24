@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clear Service Worker & Cache</title>
+    <style>
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        margin-top: 0;
+      }
+      button {
+        background: #0066ff;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px 10px 10px 0;
+      }
+      button:hover {
+        background: #0052cc;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .status {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 4px;
+        display: none;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        display: block;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        display: block;
+      }
+      .info {
+        background: #e7f3ff;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+      }
+      code {
+        background: #f4f4f4;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🧹 Clear Service Worker & Cache</h1>
+
+      <div class="info">
+        <strong>Use this page if you're experiencing:</strong>
+        <ul>
+          <li>404 errors for <code>@vite-plugin-pwa</code> or <code>pwa-entry-point</code></li>
+          <li>Cached old versions of the app</li>
+          <li>Service worker issues</li>
+        </ul>
+      </div>
+
+      <button id="clearAll">Clear Everything</button>
+      <button id="unregisterSW">Unregister Service Worker</button>
+      <button id="clearCache">Clear Cache Storage</button>
+      <button id="reload">Hard Reload Page</button>
+
+      <div id="status" class="status"></div>
+
+      <div style="margin-top: 30px; color: #666; font-size: 14px">
+        <p><strong>After clearing:</strong></p>
+        <ol>
+          <li>Click "Hard Reload Page" or press <code>Ctrl+Shift+R</code></li>
+          <li>Close all browser tabs with this app</li>
+          <li>Reopen the app</li>
+        </ol>
+      </div>
+    </div>
+
+    <script>
+      const statusEl = document.getElementById("status");
+
+      function showStatus(message, type = "success") {
+        statusEl.textContent = message;
+        statusEl.className = `status ${type}`;
+      }
+
+      async function unregisterServiceWorker() {
+        if (!("serviceWorker" in navigator)) {
+          showStatus("Service Worker not supported", "error");
+          return false;
+        }
+
+        try {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const registration of registrations) {
+            await registration.unregister();
+          }
+          return true;
+        } catch (error) {
+          console.error("Failed to unregister service worker:", error);
+          return false;
+        }
+      }
+
+      async function clearAllCaches() {
+        if (!("caches" in window)) {
+          showStatus("Cache API not supported", "error");
+          return false;
+        }
+
+        try {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map((name) => caches.delete(name)));
+          return true;
+        } catch (error) {
+          console.error("Failed to clear caches:", error);
+          return false;
+        }
+      }
+
+      document.getElementById("clearAll").addEventListener("click", async () => {
+        showStatus("Clearing...", "info");
+        const swCleared = await unregisterServiceWorker();
+        const cacheCleared = await clearAllCaches();
+
+        if (swCleared && cacheCleared) {
+          showStatus(
+            "✅ All cleared! Service Worker unregistered and all caches deleted.",
+            "success"
+          );
+        } else if (swCleared) {
+          showStatus("✅ Service Worker unregistered. ⚠️ Cache clearing failed.", "success");
+        } else if (cacheCleared) {
+          showStatus("✅ Caches cleared. ⚠️ Service Worker unregister failed.", "success");
+        } else {
+          showStatus("❌ Failed to clear. Check console for details.", "error");
+        }
+      });
+
+      document.getElementById("unregisterSW").addEventListener("click", async () => {
+        const success = await unregisterServiceWorker();
+        if (success) {
+          showStatus("✅ Service Worker unregistered successfully", "success");
+        } else {
+          showStatus("❌ Failed to unregister Service Worker", "error");
+        }
+      });
+
+      document.getElementById("clearCache").addEventListener("click", async () => {
+        const success = await clearAllCaches();
+        if (success) {
+          showStatus("✅ All caches cleared successfully", "success");
+        } else {
+          showStatus("❌ Failed to clear caches", "error");
+        }
+      });
+
+      document.getElementById("reload").addEventListener("click", () => {
+        location.reload(true);
+      });
+
+      // Auto-check on load
+      window.addEventListener("load", async () => {
+        if ("serviceWorker" in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          if (registrations.length > 0) {
+            console.log("Active service workers found:", registrations.length);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

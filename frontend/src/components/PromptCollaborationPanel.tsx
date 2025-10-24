@@ -33,7 +33,6 @@ import Badge from "./ui/Badge";
 interface PromptCollaborationPanelProps {
   prompt: Prompt;
   tenantId: string;
-  token: string;
   toast: {
     success: (message: string) => string;
     error: (message: string) => string;
@@ -60,7 +59,6 @@ const TABS: { key: TabKey; label: string }[] = [
 export default function PromptCollaborationPanel({
   prompt,
   tenantId,
-  token,
   toast
 }: PromptCollaborationPanelProps): JSX.Element {
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
@@ -108,7 +106,7 @@ export default function PromptCollaborationPanel({
     try {
       setVersionsLoading(true);
       setVersionsError(null);
-      const next = await fetchPromptVersions(prompt.id, tenantId, 20, token || undefined);
+      const next = await fetchPromptVersions(prompt.id, tenantId, 20);
       setVersions(next);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -117,7 +115,7 @@ export default function PromptCollaborationPanel({
     } finally {
       setVersionsLoading(false);
     }
-  }, [prompt.id, tenantId, token, showError]);
+  }, [prompt.id, tenantId, showError]);
 
   useEffect(() => {
     void refreshVersions();
@@ -127,7 +125,7 @@ export default function PromptCollaborationPanel({
     async (notify = false) => {
       try {
         setCommentsLoading(true);
-        const next = await fetchPromptComments(prompt.id, tenantId, token || undefined);
+        const next = await fetchPromptComments(prompt.id, tenantId);
         setComments(next);
         if (notify) showSuccess("Comments updated");
       } catch (error) {
@@ -137,14 +135,14 @@ export default function PromptCollaborationPanel({
         setCommentsLoading(false);
       }
     },
-    [prompt.id, tenantId, token, showError, showSuccess]
+    [prompt.id, tenantId, showError, showSuccess]
   );
 
   const refreshShares = useCallback(
     async (notify = false) => {
       try {
         setSharesLoading(true);
-        const next = await fetchPromptShares(prompt.id, tenantId, token || undefined);
+        const next = await fetchPromptShares(prompt.id, tenantId);
         setShares(next);
         if (notify) showSuccess("Shares updated");
       } catch (error) {
@@ -154,14 +152,14 @@ export default function PromptCollaborationPanel({
         setSharesLoading(false);
       }
     },
-    [prompt.id, tenantId, token, showError, showSuccess]
+    [prompt.id, tenantId, showError, showSuccess]
   );
 
   const refreshApprovals = useCallback(
     async (notify = false) => {
       try {
         setApprovalsLoading(true);
-        const next = await fetchPromptApprovals(prompt.id, tenantId, token || undefined);
+        const next = await fetchPromptApprovals(prompt.id, tenantId);
         setApprovals(next);
         if (notify) showSuccess("Approvals updated");
       } catch (error) {
@@ -171,14 +169,14 @@ export default function PromptCollaborationPanel({
         setApprovalsLoading(false);
       }
     },
-    [prompt.id, tenantId, token, showError, showSuccess]
+    [prompt.id, tenantId, showError, showSuccess]
   );
 
   const refreshActivity = useCallback(
     async (notify = false) => {
       try {
         setActivityLoading(true);
-        const next = await fetchPromptActivity(prompt.id, tenantId, token || undefined);
+        const next = await fetchPromptActivity(prompt.id, tenantId);
         setActivity(next);
         if (notify) showSuccess("Activity updated");
       } catch (error) {
@@ -188,7 +186,7 @@ export default function PromptCollaborationPanel({
         setActivityLoading(false);
       }
     },
-    [prompt.id, tenantId, token, showError, showSuccess]
+    [prompt.id, tenantId, showError, showSuccess]
   );
 
   useEffect(() => {
@@ -221,7 +219,7 @@ export default function PromptCollaborationPanel({
 
   async function handleRecordUsage() {
     try {
-      await recordPromptUsage(prompt.id, tenantId, {}, token || undefined);
+      await recordPromptUsage(prompt.id, tenantId, {});
       showSuccess("Usage recorded");
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -235,15 +233,10 @@ export default function PromptCollaborationPanel({
       return;
     }
     try {
-      await createPromptComment(
-        prompt.id,
-        tenantId,
-        {
-          body: commentDraft.trim(),
-          parentId: commentParentId ?? undefined
-        },
-        token || undefined
-      );
+      await createPromptComment(prompt.id, tenantId, {
+        body: commentDraft.trim(),
+        parentId: commentParentId ?? undefined
+      });
       setCommentDraft("");
       setCommentParentId(null);
       await refreshComments(true);
@@ -255,12 +248,7 @@ export default function PromptCollaborationPanel({
 
   async function handleToggleResolved(comment: PromptComment) {
     try {
-      await updatePromptComment(
-        comment.id,
-        tenantId,
-        { resolved: !comment.resolved },
-        token || undefined
-      );
+      await updatePromptComment(comment.id, tenantId, { resolved: !comment.resolved });
       await refreshComments();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -270,7 +258,7 @@ export default function PromptCollaborationPanel({
 
   async function handleDeleteComment(comment: PromptComment) {
     try {
-      await deletePromptComment(comment.id, tenantId, token || undefined);
+      await deletePromptComment(comment.id, tenantId);
       await refreshComments(true);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -284,17 +272,12 @@ export default function PromptCollaborationPanel({
       return;
     }
     try {
-      await createPromptShare(
-        prompt.id,
-        tenantId,
-        {
-          targetType: shareTargetType as PromptShare["targetType"],
-          targetIdentifier: shareIdentifier.trim(),
-          role: shareRole as PromptShare["role"],
-          expiresAt: shareExpiry ? new Date(shareExpiry).toISOString() : null
-        },
-        token || undefined
-      );
+      await createPromptShare(prompt.id, tenantId, {
+        targetType: shareTargetType as PromptShare["targetType"],
+        targetIdentifier: shareIdentifier.trim(),
+        role: shareRole as PromptShare["role"],
+        expiresAt: shareExpiry ? new Date(shareExpiry).toISOString() : null
+      });
       setShareIdentifier("");
       setShareExpiry("");
       await refreshShares(true);
@@ -306,7 +289,7 @@ export default function PromptCollaborationPanel({
 
   async function handleRemoveShare(share: PromptShare) {
     try {
-      await removePromptShare(prompt.id, share.id, tenantId, token || undefined);
+      await removePromptShare(prompt.id, share.id, tenantId);
       await refreshShares();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -320,12 +303,10 @@ export default function PromptCollaborationPanel({
       return;
     }
     try {
-      await requestPromptApproval(
-        prompt.id,
-        tenantId,
-        { approver: approvalTarget.trim(), message: approvalMessage.trim() || undefined },
-        token || undefined
-      );
+      await requestPromptApproval(prompt.id, tenantId, {
+        approver: approvalTarget.trim(),
+        message: approvalMessage.trim() || undefined
+      });
       setApprovalTarget("");
       setApprovalMessage("");
       await refreshApprovals(true);
@@ -341,15 +322,7 @@ export default function PromptCollaborationPanel({
     message?: string
   ) {
     try {
-      await updatePromptApproval(
-        approval.id,
-        tenantId,
-        {
-          status,
-          message
-        },
-        token || undefined
-      );
+      await updatePromptApproval(approval.id, tenantId, { status, message });
       await refreshApprovals();
       await refreshActivity();
     } catch (error) {

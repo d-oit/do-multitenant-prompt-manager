@@ -1,6 +1,10 @@
 import type { editor } from "monaco-editor";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Editor from "@monaco-editor/react";
+import Editor, { type OnMount } from "@monaco-editor/react";
+import { monacoDoDarkTheme } from "../themes/monaco-do-dark";
+import { monacoDoLightTheme } from "../themes/monaco-do-light";
+import TokenCounter from "./TokenCounter";
+import "../styles/token-counter.css";
 
 interface RichTextEditorProps {
   value: string;
@@ -20,6 +24,8 @@ interface RichTextEditorProps {
   ariaLabel?: string;
   showLineNumbers?: boolean;
   showMinimap?: boolean;
+  showTokenCounter?: boolean;
+  maxTokens?: number;
 }
 
 const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
@@ -57,9 +63,18 @@ export function RichTextEditor({
   readOnly = false,
   ariaLabel,
   showLineNumbers = false,
-  showMinimap = false
+  showMinimap = false,
+  showTokenCounter = true,
+  maxTokens
 }: RichTextEditorProps): JSX.Element {
-  const [theme, setTheme] = useState<"vs-light" | "vs-dark">("vs-light");
+  const [theme, setTheme] = useState<"do-light" | "do-dark">("do-light");
+
+  // Register custom themes when Monaco loads
+  const handleMonacoMount = useCallback<OnMount>((_, monaco) => {
+    // Register custom themes
+    monaco.editor.defineTheme("do-dark", monacoDoDarkTheme);
+    monaco.editor.defineTheme("do-light", monacoDoLightTheme);
+  }, []);
 
   // Detect system theme and theme changes
   useEffect(() => {
@@ -68,7 +83,7 @@ export function RichTextEditor({
         document.documentElement.classList.contains("dark") ||
         document.documentElement.dataset.theme === "dark" ||
         (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
-      setTheme(isDark ? "vs-dark" : "vs-light");
+      setTheme(isDark ? "do-dark" : "do-light");
     };
 
     updateTheme();
@@ -118,12 +133,18 @@ export function RichTextEditor({
         height={height}
         options={options}
         theme={theme}
+        onMount={handleMonacoMount}
         loading={
           <div style={{ padding: "12px", color: "var(--color-text-muted)" }}>Loading editor...</div>
         }
       />
       {placeholder && !value ? (
         <div className="rich-text-editor__placeholder">{placeholder}</div>
+      ) : null}
+      {showTokenCounter && value ? (
+        <div className="rich-text-editor__footer">
+          <TokenCounter text={value} maxTokens={maxTokens} />
+        </div>
       ) : null}
     </div>
   );
